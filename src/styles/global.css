@@ -19,38 +19,52 @@
   --font-size-phi-xl: 4.236rem;
   --font-size-phi-hero: 6.854rem;
 
-  /* ── Strawberry & Summer Sky Palette ── */
-  --color-pop-red: hsl(348, 83%, 47%);
-  --color-pop-yellow: hsl(3, 100%, 72%);
-  --color-pop-blue: hsl(205, 85%, 55%);
-  --color-pop-pink: hsl(340, 82%, 60%);
-  --color-pop-cyan: hsl(195, 85%, 65%);
-  --color-pop-black: hsl(215, 50%, 10%);
-  --color-pop-white: hsl(40, 30%, 96%);
+  /* ── Disco Floor Palette ── */
+  --color-pop-red: #CC5500;
+  --color-pop-yellow: #FFD700;
+  --color-pop-blue: #483D8B;
+  --color-pop-pink: #FF007F;
+  --color-pop-cyan: #40E0D0;
+  --color-pop-black: #1a0a2e;
+  --color-pop-white: #FAF6ED;
+
+  /* ── Extended 70s Palette ── */
+  --color-harvest-gold: #D4A017;
+  --color-burnt-orange: #CC5500;
+  --color-rust: #B7410E;
+  --color-mustard: #E1AD01;
+  --color-chocolate: #3D1C02;
+  --color-warm-cream: #FAF6ED;
+  --color-disco-gold: #FFD700;
+  --color-hot-pink: #FF007F;
+  --color-deep-purple: #483D8B;
+  --color-galactic-purple: #5D3FD3;
+  --color-metallic-silver: #BCC6CC;
+  --color-turquoise: #40E0D0;
 
   /* ── Functional Colors ── */
-  --color-ink: hsl(215, 50%, 10%);
-  --color-paper: hsl(40, 30%, 96%);
-  --color-muted: hsl(210, 15%, 45%);
-  --color-accent: hsl(340, 82%, 60%);
-  --color-border: hsl(215, 50%, 10%);
+  --color-ink: #1a0a2e;
+  --color-paper: #FAF6ED;
+  --color-muted: #9b8ec4;
+  --color-accent: #FFD700;
+  --color-border: #FFD700;
 }
 
-/* ── Shadow Elevation System (berry warm / sky cool) ── */
+/* ── Disco Shadows & Glow ── */
 :root {
-  --shadow-warm: 340deg 82% 50%;
-  --shadow-cool: 205deg 85% 45%;
+  --shadow-warm: 35deg 100% 50%;
+  --shadow-cool: 270deg 60% 40%;
 
   --shadow-elevation-low:
-    0.3px 0.5px 0.7px hsl(var(--shadow-cool) / 0.2),
-    0.4px 0.8px 1px -1.2px hsl(var(--shadow-cool) / 0.2),
-    1px 2px 2.5px -2.5px hsl(var(--shadow-cool) / 0.2);
+    0.3px 0.5px 0.7px hsl(var(--shadow-cool) / 0.25),
+    0.4px 0.8px 1px -1.2px hsl(var(--shadow-cool) / 0.25),
+    1px 2px 2.5px -2.5px hsl(var(--shadow-cool) / 0.25);
 
   --shadow-elevation-medium:
-    0.3px 0.5px 0.7px hsl(var(--shadow-cool) / 0.25),
-    0.8px 1.6px 2px -0.8px hsl(var(--shadow-cool) / 0.25),
-    2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-cool) / 0.25),
-    5px 10px 12.6px -2.5px hsl(var(--shadow-cool) / 0.25);
+    0.3px 0.5px 0.7px hsl(var(--shadow-cool) / 0.3),
+    0.8px 1.6px 2px -0.8px hsl(var(--shadow-cool) / 0.3),
+    2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-cool) / 0.3),
+    5px 10px 12.6px -2.5px hsl(var(--shadow-cool) / 0.3);
 
   --shadow-elevation-high:
     0.3px 0.5px 0.7px hsl(var(--shadow-warm) / 0.2),
@@ -60,8 +74,32 @@
     7.1px 14.3px 18px -1.4px hsl(var(--shadow-warm) / 0.2),
     11.2px 22.3px 28.1px -1.8px hsl(var(--shadow-warm) / 0.2);
 
-  /* Dual-color glow: berry + sky */
   --glow-dual:
-    -3px -3px 13px hsl(340, 82%, 60% / 0.4),
-     3px  3px 13px hsl(195, 85%, 65% / 0.4);
+    -3px -3px 13px hsl(45, 100%, 50% / 0.35),
+     3px  3px 13px hsl(300, 100%, 50% / 0.3);
+}
+
+/* ── Sparkle animation ── */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes disco-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float-drift {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
