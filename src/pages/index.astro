@@ -128,14 +128,17 @@ import '../styles/global.css'
         </p>
       </header>
 
-      <!-- ═══ Wavy section divider ═══ -->
-      <div class="w-full h-[21px] overflow-hidden">
-        <svg viewBox="0 0 1200 30" class="w-full h-full" preserveAspectRatio="none">
-          <path d="M0,15 C200,0 400,30 600,15 C800,0 1000,30 1200,15"
-                stroke="#FFD700" stroke-width="2" fill="none" opacity="0.5" />
-          <path d="M0,18 C200,3 400,33 600,18 C800,3 1000,33 1200,18"
-                stroke="#FF007F" stroke-width="1.5" fill="none" opacity="0.35" />
-        </svg>
+      <!-- ═══ Disco stripe band ═══ -->
+      <div class="disco-stripes w-full rounded-sm overflow-hidden" style="height: 21px;">
+        <div class="h-full flex">
+          <div class="flex-1" style="background: #FFD700;"></div>
+          <div class="flex-1" style="background: #FF007F;"></div>
+          <div class="flex-1" style="background: #483D8B;"></div>
+          <div class="flex-1" style="background: #40E0D0;"></div>
+          <div class="flex-1" style="background: #BCC6CC;"></div>
+          <div class="flex-1" style="background: #CC5500;"></div>
+          <div class="flex-1" style="background: #FFD700;"></div>
+        </div>
       </div>
 
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
@@ -208,12 +211,16 @@ import '../styles/global.css'
         </section>
       </div>
 
-      <!-- ═══ Wavy divider (bottom) ═══ -->
-      <div class="w-full h-[13px] overflow-hidden">
-        <svg viewBox="0 0 1200 20" class="w-full h-full" preserveAspectRatio="none">
-          <path d="M0,10 C150,0 300,20 450,10 C600,0 750,20 900,10 C1050,0 1200,20 1200,10"
-                stroke="#40E0D0" stroke-width="1.5" fill="none" opacity="0.4" />
-        </svg>
+      <!-- ═══ Disco stripe band (thin, reversed) ═══ -->
+      <div class="disco-stripes w-full rounded-sm overflow-hidden" style="height: 8px;">
+        <div class="h-full flex">
+          <div class="flex-1" style="background: #CC5500;"></div>
+          <div class="flex-1" style="background: #BCC6CC;"></div>
+          <div class="flex-1" style="background: #40E0D0;"></div>
+          <div class="flex-1" style="background: #483D8B;"></div>
+          <div class="flex-1" style="background: #FF007F;"></div>
+          <div class="flex-1" style="background: #FFD700;"></div>
+        </div>
       </div>
 
       <!-- ═══ Footer ═══ -->
