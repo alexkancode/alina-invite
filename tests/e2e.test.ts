@@ -293,11 +293,11 @@ test.describe('Disco design system', () => {
     expect(count).toBe(3);
   });
 
-  test('wavy section dividers use SVG paths', async ({ page }) => {
+  test('disco stripe bands are present as dividers', async ({ page }) => {
     await page.goto(BASE);
-    const wavyPaths = page.locator('main svg path');
-    const count = await wavyPaths.count();
-    expect(count).toBeGreaterThanOrEqual(2);
+    const stripes = page.locator('.disco-stripes');
+    const count = await stripes.count();
+    expect(count).toBe(2);
   });
 });
 
