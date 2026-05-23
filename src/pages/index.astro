@@ -8,118 +8,209 @@ import '../styles/global.css'
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <title>You're Invited</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-paper text-ink min-h-screen flex items-center justify-center p-phi-lg">
-    <main class="max-w-[791px] w-full space-y-phi-2xl">
 
-      <!-- Header -->
-      <header class="space-y-phi-md">
-        <h1 class="text-phi-2xl font-light tracking-tight leading-tight">
-          You're Invited
+  <!-- Dual-color lighting on body -->
+  <body class="bg-pop-black text-pop-white min-h-screen overflow-x-hidden"
+        style="font-family: 'Inter', sans-serif;
+               background:
+                 radial-gradient(ellipse at 15% 20%, hsl(330, 100%, 60% / 0.12), transparent 50%),
+                 radial-gradient(ellipse at 85% 80%, hsl(180, 100%, 50% / 0.10), transparent 50%),
+                 hsl(0, 0%, 5%);">
+
+    <!-- Halftone background texture (subtle) -->
+    <div class="fixed inset-0 pointer-events-none opacity-[0.04] z-0"
+         style="background: radial-gradient(closest-side, hsl(330, 100%, 65%), transparent) 0 / 8px 8px space;">
+    </div>
+
+    <main class="relative z-10 max-w-[791px] mx-auto px-phi-lg py-phi-3xl space-y-phi-2xl">
+
+      <!-- ═══ HERO: Date as Display Type ═══ -->
+      <header class="space-y-phi-lg">
+        <!-- Purpose statement — confident, not a heading -->
+        <p class="text-phi-md font-medium tracking-wide text-pop-cyan uppercase"
+           style="font-family: 'Inter', sans-serif;">
+          You're invited to celebrate
+        </p>
+
+        <!-- Date — largest, most dramatic, hero display -->
+        <h1 class="text-pop-yellow leading-none tracking-tight"
+            style="font-family: 'Dela Gothic One', sans-serif;
+                   font-size: clamp(3rem, 10vw, var(--font-size-phi-hero));
+                   text-shadow:
+                     3px 3px 0 hsl(0, 100%, 50%),
+                     -1px -1px 0 hsl(180, 100%, 45%);">
+          July 11th, 2026
         </h1>
-        <p class="text-phi-lg text-muted font-light">
-          A celebration of creativity, friendship, and another trip around the sun
+
+        <!-- Time — bold but secondary, different treatment -->
+        <p class="text-phi-xl font-semibold text-pop-pink"
+           style="font-family: 'Dela Gothic One', sans-serif;
+                  text-shadow: 2px 2px 0 hsl(220, 100%, 55% / 0.5);">
+          6:00 PM
+        </p>
+
+        <!-- Location — medium emphasis -->
+        <p class="text-phi-md text-pop-white/80">
+          The Design Studio, 742 Evergreen Terrace
         </p>
       </header>
 
-      <!-- Event Details — no labels, just information -->
-      <section class="space-y-phi-sm text-phi-lg">
-        <p>July 11th, 2026</p>
-        <p>6:00 PM</p>
-        <p>The Design Studio, 742 Evergreen Terrace</p>
-      </section>
+      <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
+      <div class="grid gap-phi-xl" style="grid-template-columns: 1fr 0.618fr;">
 
-      <!-- Map Embed — golden ratio proportions -->
-      <section class="w-full" style="aspect-ratio: 1.618 / 1;">
-        <iframe
-          class="w-full h-full rounded-lg border border-border"
-          loading="lazy"
-          allowfullscreen
-          referrerpolicy="no-referrer-when-downgrade"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019112498507!2d-122.41941548468204!3d37.77492977975892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064b1e8d1b9%3A0x4a83ab0e2e0fcc!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1"
-        ></iframe>
-      </section>
+        <!-- 62% — Map with pop art frame -->
+        <section class="relative">
+          <!-- Bold pop art border -->
+          <div class="border-[3px] border-pop-yellow rounded-lg overflow-hidden"
+               style="aspect-ratio: 1.618 / 1;
+                      box-shadow: var(--shadow-elevation-medium);">
+            <iframe
+              class="w-full h-full"
+              loading="lazy"
+              allowfullscreen
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019112498507!2d-122.41941548468204!3d37.77492977975892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064b1e8d1b9%3A0x4a83ab0e2e0fcc!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1"
+            ></iframe>
+          </div>
+        </section>
 
-      <!-- Action Buttons -->
-      <section class="flex flex-wrap gap-phi-md">
-        <button
-          id="rsvp-btn"
-          class="px-phi-xl py-phi-md bg-ink text-paper rounded-lg text-phi-base font-medium hover:bg-accent transition-colors cursor-pointer"
-        >
-          RSVP
-        </button>
-        <a
-          id="cal-btn"
-          href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Birthday+Celebration&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+a+celebration+of+creativity%2C+friendship%2C+and+another+trip+around+the+sun.&location=The+Design+Studio%2C+742+Evergreen+Terrace&ctz=America/New_York"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Add this event to your Google Calendar"
-          class="inline-flex items-center gap-phi-sm px-phi-xl py-phi-md border border-ink rounded-lg text-phi-base font-medium hover:bg-ink hover:text-paper transition-colors cursor-pointer no-underline text-ink"
-        >
-          <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          Add to Google Calendar
-        </a>
-      </section>
+        <!-- 38% — Actions panel -->
+        <section class="flex flex-col gap-phi-lg justify-center">
+          <!-- RSVP Button — primary, pop art drama -->
+          <button
+            id="rsvp-btn"
+            class="w-full px-phi-xl py-phi-md bg-pop-red text-pop-white border-[3px] border-pop-black
+                   rounded-lg text-phi-base font-bold uppercase tracking-wider cursor-pointer
+                   transition-all duration-150"
+            style="font-family: 'Dela Gothic One', sans-serif;
+                   box-shadow: 4px 4px 0 hsl(50, 100%, 55%);
+                   min-height: 55px;"
+            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 hsl(50, 100%, 55%)'"
+            onmouseleave="this.style.boxShadow='4px 4px 0 hsl(50, 100%, 55%)'"
+          >
+            RSVP
+          </button>
 
-      <!-- Stack Demo Info -->
-      <footer class="pt-phi-xl border-t border-border text-phi-sm text-muted space-y-phi-xs">
-        <p>Stack demo: Astro + Tailwind 4 + Cloudflare Pages</p>
-        <p>Golden ratio spacing &amp; proportions throughout</p>
+          <!-- Calendar Link — secondary but still pop art -->
+          <a
+            id="cal-btn"
+            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Birthday+Celebration&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+a+celebration+of+creativity%2C+friendship%2C+and+another+trip+around+the+sun.&location=The+Design+Studio%2C+742+Evergreen+Terrace&ctz=America/New_York"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Add this event to your Google Calendar"
+            class="inline-flex items-center justify-center gap-phi-sm w-full px-phi-xl py-phi-md
+                   bg-pop-black text-pop-cyan border-[3px] border-pop-cyan
+                   rounded-lg text-phi-base font-bold uppercase tracking-wider no-underline
+                   transition-all duration-150 cursor-pointer"
+            style="font-family: 'Inter', sans-serif;
+                   box-shadow: 4px 4px 0 hsl(220, 100%, 55%);
+                   min-height: 55px;"
+            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 hsl(220, 100%, 55%)'"
+            onmouseleave="this.style.boxShadow='4px 4px 0 hsl(220, 100%, 55%)'"
+          >
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Save the Date
+          </a>
+        </section>
+      </div>
+
+      <!-- ═══ Halftone Divider Strip ═══ -->
+      <div class="h-[34px] rounded-sm overflow-hidden"
+           style="background:
+             radial-gradient(closest-side, hsl(0, 100%, 50%), hsl(60, 20%, 97%)) 0 / 21px 21px space,
+             linear-gradient(90deg, hsl(0, 0%, 53%), hsl(60, 20%, 97%));
+           background-blend-mode: multiply;
+           filter: contrast(16);">
+      </div>
+
+      <!-- ═══ Footer ═══ -->
+      <footer class="text-phi-sm text-pop-white/40 space-y-phi-xs">
+        <p>Astro + Tailwind 4 + Cloudflare Pages</p>
         <p id="runtime-info"></p>
       </footer>
     </main>
 
-    <!-- RSVP Modal -->
-    <div id="rsvp-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-phi-lg hidden z-50">
-      <div class="bg-paper rounded-xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg shadow-2xl" style="aspect-ratio: 1 / 1.618;">
-        <h2 class="text-phi-xl font-light">RSVP</h2>
-        <form id="rsvp-form" class="space-y-phi-md flex flex-col h-full">
+    <!-- ═══ RSVP Modal ═══ -->
+    <div id="rsvp-modal" class="fixed inset-0 bg-pop-black/70 flex items-center justify-center p-phi-lg hidden z-50 backdrop-blur-sm">
+      <div class="bg-pop-black border-[3px] border-pop-yellow rounded-xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg"
+           style="box-shadow: var(--shadow-elevation-high), var(--glow-dual);">
+        <h2 class="text-phi-xl text-pop-yellow"
+            style="font-family: 'Dela Gothic One', sans-serif;">
+          RSVP
+        </h2>
+        <form id="rsvp-form" class="space-y-phi-md flex flex-col">
           <input
             name="name"
             type="text"
             placeholder="Your name"
             required
-            class="w-full px-phi-md py-phi-sm border border-border rounded-lg bg-transparent text-phi-base focus:outline-none focus:border-ink"
+            class="w-full px-phi-md py-phi-sm bg-transparent border-[2px] border-pop-white/30
+                   rounded-lg text-phi-base text-pop-white placeholder-pop-white/40
+                   focus:outline-none focus:border-pop-cyan transition-colors"
           />
           <textarea
             name="message"
             placeholder="A brief message (optional)"
             rows="3"
-            class="w-full px-phi-md py-phi-sm border border-border rounded-lg bg-transparent text-phi-base resize-none focus:outline-none focus:border-ink"
+            class="w-full px-phi-md py-phi-sm bg-transparent border-[2px] border-pop-white/30
+                   rounded-lg text-phi-base text-pop-white placeholder-pop-white/40
+                   resize-none focus:outline-none focus:border-pop-cyan transition-colors"
           ></textarea>
-          <fieldset class="flex gap-phi-lg">
+          <fieldset class="flex gap-phi-xl text-pop-white">
             <label class="flex items-center gap-phi-sm cursor-pointer">
-              <input type="radio" name="attending" value="yes" required class="accent-ink" />
-              <span>I'll be there</span>
+              <input type="radio" name="attending" value="yes" required class="accent-pop-cyan w-[18px] h-[18px]" />
+              <span class="font-medium">I'll be there</span>
             </label>
             <label class="flex items-center gap-phi-sm cursor-pointer">
-              <input type="radio" name="attending" value="no" class="accent-ink" />
-              <span>Can't make it</span>
+              <input type="radio" name="attending" value="no" class="accent-pop-pink w-[18px] h-[18px]" />
+              <span class="font-medium">Can't make it</span>
             </label>
           </fieldset>
-          <div class="flex gap-phi-md mt-auto">
-            <button type="submit" class="px-phi-xl py-phi-sm bg-ink text-paper rounded-lg font-medium hover:bg-accent transition-colors cursor-pointer">
+          <div class="flex gap-phi-md pt-phi-sm">
+            <button type="submit"
+                    class="px-phi-xl py-phi-sm bg-pop-red text-pop-white border-[2px] border-pop-black
+                           rounded-lg font-bold uppercase tracking-wider cursor-pointer transition-all"
+                    style="box-shadow: 3px 3px 0 hsl(50, 100%, 55%);">
               Send
             </button>
-            <button type="button" id="modal-close" class="px-phi-xl py-phi-sm border border-border rounded-lg font-medium hover:bg-border transition-colors cursor-pointer">
+            <button type="button" id="modal-close"
+                    class="px-phi-xl py-phi-sm bg-transparent text-pop-white/70 border-[2px] border-pop-white/30
+                           rounded-lg font-medium cursor-pointer hover:border-pop-white/60 transition-colors">
               Cancel
             </button>
           </div>
         </form>
-        <div id="rsvp-success" class="hidden text-center space-y-phi-md">
-          <p class="text-phi-lg">Thank you!</p>
-          <p class="text-muted">Your response has been recorded.</p>
-          <button id="success-close" class="px-phi-xl py-phi-sm border border-border rounded-lg font-medium hover:bg-border transition-colors cursor-pointer">
+        <div id="rsvp-success" class="hidden text-center space-y-phi-lg py-phi-xl">
+          <p class="text-phi-lg text-pop-yellow" style="font-family: 'Dela Gothic One', sans-serif;">
+            Thank you!
+          </p>
+          <p class="text-pop-white/70">Your response has been recorded.</p>
+          <button id="success-close"
+                  class="px-phi-xl py-phi-sm text-pop-cyan border-[2px] border-pop-cyan
+                         rounded-lg font-medium cursor-pointer hover:bg-pop-cyan/10 transition-colors">
             Close
           </button>
         </div>
       </div>
     </div>
+
+    <!-- ═══ Responsive: stack on mobile ═══ -->
+    <style>
+      @media (max-width: 640px) {
+        [style*="grid-template-columns: 1fr 0.618fr"] {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
 
     <script>
       // RSVP Modal

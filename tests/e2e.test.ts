@@ -22,10 +22,10 @@ test.describe('Page content', () => {
     expect(body).not.toContain('Location:');
   });
 
-  test('displays heading and subheading', async ({ page }) => {
+  test('displays date as hero heading and purpose statement', async ({ page }) => {
     await page.goto(BASE);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText("You're Invited");
-    await expect(page.getByText('celebration of creativity')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('July 11th, 2026');
+    await expect(page.getByText('invited to celebrate')).toBeVisible();
   });
 });
 
@@ -209,11 +209,78 @@ test.describe('Golden ratio design tokens', () => {
 
   test('golden ratio spacing tokens are applied', async ({ page }) => {
     await page.goto(BASE);
-    // Verify phi spacing is loaded as CSS custom properties
     const phiLg = await page.evaluate(() =>
       getComputedStyle(document.documentElement).getPropertyValue('--spacing-phi-lg').trim()
     );
     expect(phiLg).toBe('21px');
+  });
+
+  test('62/38 golden ratio grid layout exists', async ({ page }) => {
+    await page.goto(BASE);
+    const grid = page.locator('[style*="1fr 0.618fr"]');
+    await expect(grid).toBeVisible();
+  });
+});
+
+test.describe('Pop art design system', () => {
+  test('pop art color palette is defined', async ({ page }) => {
+    await page.goto(BASE);
+    const colors = await page.evaluate(() => {
+      const style = getComputedStyle(document.documentElement);
+      return {
+        red: style.getPropertyValue('--color-pop-red').trim(),
+        yellow: style.getPropertyValue('--color-pop-yellow').trim(),
+        blue: style.getPropertyValue('--color-pop-blue').trim(),
+        pink: style.getPropertyValue('--color-pop-pink').trim(),
+        cyan: style.getPropertyValue('--color-pop-cyan').trim(),
+      };
+    });
+    // All pop colors should be defined and non-empty
+    expect(colors.red).toBeTruthy();
+    expect(colors.yellow).toBeTruthy();
+    expect(colors.blue).toBeTruthy();
+    expect(colors.pink).toBeTruthy();
+    expect(colors.cyan).toBeTruthy();
+  });
+
+  test('shadow elevation system is defined', async ({ page }) => {
+    await page.goto(BASE);
+    const shadowLow = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue('--shadow-elevation-low').trim()
+    );
+    expect(shadowLow).toBeTruthy();
+  });
+
+  test('RSVP button has bold pop art border', async ({ page }) => {
+    await page.goto(BASE);
+    const borderWidth = await page.locator('#rsvp-btn').evaluate(el =>
+      getComputedStyle(el).borderWidth
+    );
+    // 3px border for pop art boldness
+    expect(borderWidth).toBe('3px');
+  });
+
+  test('halftone texture overlay is present', async ({ page }) => {
+    await page.goto(BASE);
+    // The fixed halftone div uses radial-gradient and low opacity
+    const halftone = page.locator('.fixed.pointer-events-none');
+    await expect(halftone).toBeAttached();
+  });
+
+  test('dual-color lighting gradients on body', async ({ page }) => {
+    await page.goto(BASE);
+    const bgStyle = await page.locator('body').getAttribute('style');
+    expect(bgStyle).toContain('radial-gradient');
+    // Should have contrasting pink and cyan light sources
+    expect(bgStyle).toContain('330');  // pink hue
+    expect(bgStyle).toContain('180');  // cyan hue
+  });
+
+  test('halftone divider strip is present', async ({ page }) => {
+    await page.goto(BASE);
+    // The halftone strip uses contrast filter
+    const strip = page.locator('[style*="filter: contrast(16)"]');
+    await expect(strip).toBeVisible();
   });
 });
 
@@ -223,6 +290,6 @@ test.describe('Buttons are present', () => {
     await expect(page.locator('#rsvp-btn')).toBeVisible();
     await expect(page.locator('#cal-btn')).toBeVisible();
     await expect(page.locator('#rsvp-btn')).toHaveText('RSVP');
-    await expect(page.locator('#cal-btn')).toContainText('Add to Google Calendar');
+    await expect(page.locator('#cal-btn')).toContainText('Save the Date');
   });
 });
