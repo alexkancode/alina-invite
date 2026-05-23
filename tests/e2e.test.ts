@@ -1,0 +1,199 @@
+import { test, expect } from '@playwright/test';
+
+const BASE = 'http://localhost:4321';
+
+test.describe('Page content', () => {
+  test('loads with correct title', async ({ page }) => {
+    await page.goto(BASE);
+    await expect(page).toHaveTitle("You're Invited");
+  });
+
+  test('displays event details without labels', async ({ page }) => {
+    await page.goto(BASE);
+    // Details should be present as plain text, not prefixed with labels
+    await expect(page.getByText('July 11th, 2026')).toBeVisible();
+    await expect(page.getByText('6:00 PM')).toBeVisible();
+    await expect(page.getByText('The Design Studio, 742 Evergreen Terrace')).toBeVisible();
+
+    // No labels like "Date:", "Time:", "Location:" should exist
+    const body = await page.textContent('body');
+    expect(body).not.toContain('Date:');
+    expect(body).not.toContain('Time:');
+    expect(body).not.toContain('Location:');
+  });
+
+  test('displays heading and subheading', async ({ page }) => {
+    await page.goto(BASE);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText("You're Invited");
+    await expect(page.getByText('celebration of creativity')).toBeVisible();
+  });
+});
+
+test.describe('Google Maps embed', () => {
+  test('map iframe is present with correct attributes', async ({ page }) => {
+    await page.goto(BASE);
+    const iframe = page.locator('iframe');
+    await expect(iframe).toBeVisible();
+    const src = await iframe.getAttribute('src');
+    expect(src).toContain('google.com/maps/embed');
+    expect(await iframe.getAttribute('loading')).toBe('lazy');
+    expect(await iframe.getAttribute('allowfullscreen')).not.toBeNull();
+  });
+
+  test('map container uses golden ratio aspect ratio', async ({ page }) => {
+    await page.goto(BASE);
+    const mapSection = page.locator('iframe').locator('..');
+    const style = await mapSection.getAttribute('style');
+    expect(style).toContain('1.618');
+  });
+});
+
+test.describe('RSVP modal — happy paths', () => {
+  test('RSVP button opens modal', async ({ page }) => {
+    await page.goto(BASE);
+    const modal = page.locator('#rsvp-modal');
+    await expect(modal).toBeHidden();
+    await page.click('#rsvp-btn');
+    await expect(modal).toBeVisible();
+  });
+
+  test('cancel button closes modal', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+    await expect(page.locator('#rsvp-modal')).toBeVisible();
+    // force: true bypasses Astro dev toolbar overlay (dev-only artifact)
+    await page.click('#modal-close', { force: true });
+    await expect(page.locator('#rsvp-modal')).toBeHidden();
+  });
+
+  test('clicking backdrop closes modal', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+    await expect(page.locator('#rsvp-modal')).toBeVisible();
+    // Click the overlay (not the form panel)
+    await page.locator('#rsvp-modal').click({ position: { x: 10, y: 10 } });
+    await expect(page.locator('#rsvp-modal')).toBeHidden();
+  });
+
+  test('submitting valid RSVP shows success message', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+
+    await page.fill('input[name="name"]', 'E2E Tester');
+    await page.fill('textarea[name="message"]', 'Looking forward to it!');
+    await page.click('input[name="attending"][value="yes"]');
+    await page.click('#rsvp-form button[type="submit"]');
+
+    await expect(page.getByText('Thank you!')).toBeVisible();
+    await expect(page.getByText('Your response has been recorded.')).toBeVisible();
+  });
+
+  test('success close button resets modal for next use', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+
+    await page.fill('input[name="name"]', 'Reset Tester');
+    await page.click('input[name="attending"][value="no"]');
+    await page.click('#rsvp-form button[type="submit"]');
+
+    await expect(page.getByText('Thank you!')).toBeVisible();
+    await page.click('#success-close');
+    await expect(page.locator('#rsvp-modal')).toBeHidden();
+
+    // Reopen — form should be visible and empty
+    await page.click('#rsvp-btn');
+    await expect(page.locator('#rsvp-form')).toBeVisible();
+    expect(await page.inputValue('input[name="name"]')).toBe('');
+  });
+
+  test('RSVP with "no" attendance works', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+
+    await page.fill('input[name="name"]', 'Decline Tester');
+    await page.click('input[name="attending"][value="no"]');
+    await page.click('#rsvp-form button[type="submit"]');
+
+    await expect(page.getByText('Thank you!')).toBeVisible();
+  });
+});
+
+test.describe('RSVP modal — unhappy paths', () => {
+  test('form prevents submission without name (HTML validation)', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+
+    // Don't fill name, just select attendance and try to submit
+    await page.click('input[name="attending"][value="yes"]');
+    await page.click('#rsvp-form button[type="submit"]');
+
+    // Modal should still be open with form visible (not success)
+    await expect(page.locator('#rsvp-form')).toBeVisible();
+    await expect(page.getByText('Thank you!')).toBeHidden();
+  });
+
+  test('form prevents submission without attendance selection (HTML validation)', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+
+    await page.fill('input[name="name"]', 'No Attendance Tester');
+    await page.click('#rsvp-form button[type="submit"]');
+
+    // Modal should still be open with form visible
+    await expect(page.locator('#rsvp-form')).toBeVisible();
+    await expect(page.getByText('Thank you!')).toBeHidden();
+  });
+
+  test('message field is optional — form submits without it', async ({ page }) => {
+    await page.goto(BASE);
+    await page.click('#rsvp-btn');
+
+    await page.fill('input[name="name"]', 'No Message Tester');
+    // Leave message empty
+    await page.click('input[name="attending"][value="yes"]');
+    await page.click('#rsvp-form button[type="submit"]');
+
+    await expect(page.getByText('Thank you!')).toBeVisible();
+  });
+});
+
+test.describe('Calendar button', () => {
+  test('calendar button triggers .ics download', async ({ page }) => {
+    await page.goto(BASE);
+
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.click('#cal-btn'),
+    ]);
+
+    expect(download.suggestedFilename()).toBe('birthday-celebration.ics');
+  });
+});
+
+test.describe('Golden ratio design tokens', () => {
+  test('content container uses golden ratio max-width (791px)', async ({ page }) => {
+    await page.goto(BASE);
+    const main = page.locator('main');
+    const maxWidth = await main.evaluate(el => getComputedStyle(el).maxWidth);
+    expect(maxWidth).toBe('791px');
+  });
+
+  test('golden ratio spacing tokens are applied', async ({ page }) => {
+    await page.goto(BASE);
+    // Verify phi spacing is loaded as CSS custom properties
+    const phiLg = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue('--spacing-phi-lg').trim()
+    );
+    expect(phiLg).toBe('21px');
+  });
+});
+
+test.describe('Buttons are present', () => {
+  test('RSVP and Add to Calendar buttons are visible', async ({ page }) => {
+    await page.goto(BASE);
+    await expect(page.locator('#rsvp-btn')).toBeVisible();
+    await expect(page.locator('#cal-btn')).toBeVisible();
+    await expect(page.locator('#rsvp-btn')).toHaveText('RSVP');
+    await expect(page.locator('#cal-btn')).toHaveText('Add to Calendar');
+  });
+});

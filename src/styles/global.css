@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  /* Golden ratio spacing (Fibonacci) */
+  --spacing-phi-xs: 5px;
+  --spacing-phi-sm: 8px;
+  --spacing-phi-md: 13px;
+  --spacing-phi-lg: 21px;
+  --spacing-phi-xl: 34px;
+  --spacing-phi-2xl: 55px;
+  --spacing-phi-3xl: 89px;
+
+  /* Golden ratio typography */
+  --font-size-phi-sm: 0.812rem;
+  --font-size-phi-base: 1rem;
+  --font-size-phi-lg: 1.618rem;
+  --font-size-phi-xl: 2.618rem;
+  --font-size-phi-2xl: 4.236rem;
+
+  /* Colors — minimal, elegant */
+  --color-ink: #1a1a1a;
+  --color-paper: #faf9f6;
+  --color-muted: #6b6b6b;
+  --color-accent: #2d2d2d;
+  --color-border: #e0ddd8;
+}
