@@ -157,16 +157,45 @@ test.describe('RSVP modal — unhappy paths', () => {
   });
 });
 
-test.describe('Calendar button', () => {
-  test('calendar button triggers .ics download', async ({ page }) => {
+test.describe('Calendar link', () => {
+  test('calendar link points to Google Calendar with correct parameters', async ({ page }) => {
     await page.goto(BASE);
+    const calLink = page.locator('#cal-btn');
+    const href = await calLink.getAttribute('href');
 
-    const [download] = await Promise.all([
-      page.waitForEvent('download'),
-      page.click('#cal-btn'),
-    ]);
+    expect(href).toContain('calendar.google.com/calendar/render');
+    expect(href).toContain('action=TEMPLATE');
+    expect(href).toContain('Birthday+Celebration');
+    expect(href).toContain('dates=');
+    expect(href).toContain('location=');
+    expect(href).toContain('ctz=America/New_York');
+  });
 
-    expect(download.suggestedFilename()).toBe('birthday-celebration.ics');
+  test('calendar link opens in new tab', async ({ page }) => {
+    await page.goto(BASE);
+    const calLink = page.locator('#cal-btn');
+    expect(await calLink.getAttribute('target')).toBe('_blank');
+    expect(await calLink.getAttribute('rel')).toContain('noopener');
+  });
+
+  test('calendar link has accessible label', async ({ page }) => {
+    await page.goto(BASE);
+    const calLink = page.locator('#cal-btn');
+    const ariaLabel = await calLink.getAttribute('aria-label');
+    expect(ariaLabel).toBeTruthy();
+    expect(ariaLabel).toContain('Google Calendar');
+  });
+
+  test('calendar link is an anchor tag, not a button (zero JS)', async ({ page }) => {
+    await page.goto(BASE);
+    const tagName = await page.locator('#cal-btn').evaluate(el => el.tagName.toLowerCase());
+    expect(tagName).toBe('a');
+  });
+
+  test('calendar link includes calendar icon', async ({ page }) => {
+    await page.goto(BASE);
+    const svg = page.locator('#cal-btn svg');
+    await expect(svg).toBeVisible();
   });
 });
 
@@ -194,6 +223,6 @@ test.describe('Buttons are present', () => {
     await expect(page.locator('#rsvp-btn')).toBeVisible();
     await expect(page.locator('#cal-btn')).toBeVisible();
     await expect(page.locator('#rsvp-btn')).toHaveText('RSVP');
-    await expect(page.locator('#cal-btn')).toHaveText('Add to Calendar');
+    await expect(page.locator('#cal-btn')).toContainText('Add to Google Calendar');
   });
 });
