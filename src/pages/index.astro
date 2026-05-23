@@ -1,0 +1,189 @@
+---
+import '../styles/global.css'
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <title>You're Invited</title>
+  </head>
+  <body class="bg-paper text-ink min-h-screen flex items-center justify-center p-phi-lg">
+    <main class="max-w-[791px] w-full space-y-phi-2xl">
+
+      <!-- Header -->
+      <header class="space-y-phi-md">
+        <h1 class="text-phi-2xl font-light tracking-tight leading-tight">
+          You're Invited
+        </h1>
+        <p class="text-phi-lg text-muted font-light">
+          A celebration of creativity, friendship, and another trip around the sun
+        </p>
+      </header>
+
+      <!-- Event Details — no labels, just information -->
+      <section class="space-y-phi-sm text-phi-lg">
+        <p>July 11th, 2026</p>
+        <p>6:00 PM</p>
+        <p>The Design Studio, 742 Evergreen Terrace</p>
+      </section>
+
+      <!-- Map Embed — golden ratio proportions -->
+      <section class="w-full" style="aspect-ratio: 1.618 / 1;">
+        <iframe
+          class="w-full h-full rounded-lg border border-border"
+          loading="lazy"
+          allowfullscreen
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019112498507!2d-122.41941548468204!3d37.77492977975892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064b1e8d1b9%3A0x4a83ab0e2e0fcc!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1"
+        ></iframe>
+      </section>
+
+      <!-- Action Buttons -->
+      <section class="flex flex-wrap gap-phi-md">
+        <button
+          id="rsvp-btn"
+          class="px-phi-xl py-phi-md bg-ink text-paper rounded-lg text-phi-base font-medium hover:bg-accent transition-colors cursor-pointer"
+        >
+          RSVP
+        </button>
+        <button
+          id="cal-btn"
+          class="px-phi-xl py-phi-md border border-ink rounded-lg text-phi-base font-medium hover:bg-ink hover:text-paper transition-colors cursor-pointer"
+        >
+          Add to Calendar
+        </button>
+      </section>
+
+      <!-- Stack Demo Info -->
+      <footer class="pt-phi-xl border-t border-border text-phi-sm text-muted space-y-phi-xs">
+        <p>Stack demo: Astro + Tailwind 4 + Cloudflare Pages</p>
+        <p>Golden ratio spacing &amp; proportions throughout</p>
+        <p id="runtime-info"></p>
+      </footer>
+    </main>
+
+    <!-- RSVP Modal -->
+    <div id="rsvp-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-phi-lg hidden z-50">
+      <div class="bg-paper rounded-xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg shadow-2xl" style="aspect-ratio: 1 / 1.618;">
+        <h2 class="text-phi-xl font-light">RSVP</h2>
+        <form id="rsvp-form" class="space-y-phi-md flex flex-col h-full">
+          <input
+            name="name"
+            type="text"
+            placeholder="Your name"
+            required
+            class="w-full px-phi-md py-phi-sm border border-border rounded-lg bg-transparent text-phi-base focus:outline-none focus:border-ink"
+          />
+          <textarea
+            name="message"
+            placeholder="A brief message (optional)"
+            rows="3"
+            class="w-full px-phi-md py-phi-sm border border-border rounded-lg bg-transparent text-phi-base resize-none focus:outline-none focus:border-ink"
+          ></textarea>
+          <fieldset class="flex gap-phi-lg">
+            <label class="flex items-center gap-phi-sm cursor-pointer">
+              <input type="radio" name="attending" value="yes" required class="accent-ink" />
+              <span>I'll be there</span>
+            </label>
+            <label class="flex items-center gap-phi-sm cursor-pointer">
+              <input type="radio" name="attending" value="no" class="accent-ink" />
+              <span>Can't make it</span>
+            </label>
+          </fieldset>
+          <div class="flex gap-phi-md mt-auto">
+            <button type="submit" class="px-phi-xl py-phi-sm bg-ink text-paper rounded-lg font-medium hover:bg-accent transition-colors cursor-pointer">
+              Send
+            </button>
+            <button type="button" id="modal-close" class="px-phi-xl py-phi-sm border border-border rounded-lg font-medium hover:bg-border transition-colors cursor-pointer">
+              Cancel
+            </button>
+          </div>
+        </form>
+        <div id="rsvp-success" class="hidden text-center space-y-phi-md">
+          <p class="text-phi-lg">Thank you!</p>
+          <p class="text-muted">Your response has been recorded.</p>
+          <button id="success-close" class="px-phi-xl py-phi-sm border border-border rounded-lg font-medium hover:bg-border transition-colors cursor-pointer">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // RSVP Modal
+      const modal = document.getElementById('rsvp-modal')!;
+      const form = document.getElementById('rsvp-form') as HTMLFormElement;
+      const success = document.getElementById('rsvp-success')!;
+
+      document.getElementById('rsvp-btn')!.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+      });
+
+      document.getElementById('modal-close')!.addEventListener('click', () => {
+        modal.classList.add('hidden');
+      });
+
+      document.getElementById('success-close')!.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        form.classList.remove('hidden');
+        success.classList.add('hidden');
+        form.reset();
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form));
+
+        try {
+          const res = await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          const result = await res.json();
+          console.log('RSVP response:', result);
+          form.classList.add('hidden');
+          success.classList.remove('hidden');
+        } catch (err) {
+          console.error('RSVP error:', err);
+          alert('Something went wrong. Please try again.');
+        }
+      });
+
+      // Calendar — generates .ics file client-side
+      document.getElementById('cal-btn')!.addEventListener('click', () => {
+        const ics = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'BEGIN:VEVENT',
+          'DTSTART:20260711T180000',
+          'DTEND:20260711T230000',
+          'SUMMARY:Birthday Celebration',
+          'LOCATION:The Design Studio, 742 Evergreen Terrace',
+          'DESCRIPTION:A celebration of creativity and friendship',
+          'END:VEVENT',
+          'END:VCALENDAR',
+        ].join('\r\n');
+
+        const blob = new Blob([ics], { type: 'text/calendar' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'birthday-celebration.ics';
+        a.click();
+        URL.revokeObjectURL(url);
+        console.log('Calendar .ics downloaded');
+      });
+
+      // Runtime info
+      document.getElementById('runtime-info')!.textContent =
+        `Rendered ${typeof globalThis.caches !== 'undefined' ? 'on Cloudflare Workers (edge)' : 'locally (dev server)'}`;
+    </script>
+  </body>
+</html>
