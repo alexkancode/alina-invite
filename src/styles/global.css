@@ -79,32 +79,26 @@
      3px  3px 13px hsl(300, 100%, 50% / 0.3);
 }
 
-/* ── Sliding bar animation ──
-   Phase 1 (0-30%):   Right edge extends 0% → 35%. Left stays at 0%.
-   Phase 2 (30-70%):  Left chases from 0% → 35%. Right extends 35% → 50%.
-   Phase 3 (70-100%): Both converge at 50%. Bar disappears.
-   Uses clip-path: inset(top right bottom left) on a 50vw-wide element.
-   Right inset = how much to clip from right. Left inset = how much to clip from left.
-   Inset values are relative to the element (50vw), so 30% of element = 15vw = 30% of 50vw.
-*/
+/* ── Sliding bar animation ── */
 @keyframes sliding-bar {
-  0%   { clip-path: inset(0 100% 0 0);   }   /* invisible */
-  15%  { clip-path: inset(0 60%  0 0);   }   /* right opening, left anchored */
-  30%  { clip-path: inset(0 30%  0 5%);  }   /* right at 35vw, left just starting */
-  50%  { clip-path: inset(0 15%  0 35%); }   /* left chasing, right still ahead */
-  70%  { clip-path: inset(0 5%   0 60%); }   /* converging */
-  85%  { clip-path: inset(0 2%   0 85%); }   /* nearly caught */
-  100% { clip-path: inset(0 0    0 100%); }  /* invisible */
+  0%   { clip-path: inset(0 100% 0 0);  }
+  8%   { clip-path: inset(0 30%  0 0);  }
+  20%  { clip-path: inset(0 15%  0 0);  }
+  40%  { clip-path: inset(0 8%   0 0);  }
+  50%  { clip-path: inset(0 5%   0 5%); }
+  65%  { clip-path: inset(0 3%   0 35%); }
+  80%  { clip-path: inset(0 1%   0 70%); }
+  100% { clip-path: inset(0 0    0 100%); }
 }
 
-/* Mirrored: right-to-center (swap left/right insets) */
 @keyframes sliding-bar-rtl {
   0%   { clip-path: inset(0 0 0 100%);  }
-  15%  { clip-path: inset(0 0 0 60%);   }
-  30%  { clip-path: inset(0 5% 0 30%);  }
-  50%  { clip-path: inset(0 35% 0 15%); }
-  70%  { clip-path: inset(0 60% 0 5%);  }
-  85%  { clip-path: inset(0 85% 0 2%);  }
+  8%   { clip-path: inset(0 0 0 30%);   }
+  20%  { clip-path: inset(0 0 0 15%);   }
+  40%  { clip-path: inset(0 0 0 8%);    }
+  50%  { clip-path: inset(0 5% 0 5%);   }
+  65%  { clip-path: inset(0 35% 0 3%);  }
+  80%  { clip-path: inset(0 70% 0 1%);  }
   100% { clip-path: inset(0 100% 0 0);  }
 }
 
