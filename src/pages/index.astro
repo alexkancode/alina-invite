@@ -20,6 +20,89 @@ import '../styles/global.css'
                  radial-gradient(ellipse at 70% 80%, hsl(35, 100%, 40% / 0.3), transparent 50%),
                  linear-gradient(180deg, #1a0a2e 0%, #2d1254 40%, #1a0a2e 100%);">
 
+    <!-- ═══ Sliding bar animation ═══ -->
+    <div id="sliding-bar" class="fixed top-0 left-0 w-[50vw] pointer-events-none"
+         style="height: 25px;
+                z-index: 100;
+                background: hsl(220, 35%, 30%);
+                clip-path: inset(0 100% 0 0);
+                animation: sliding-bar 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed left-0 w-[50vw] pointer-events-none"
+         style="top: 25px;
+                height: 25px;
+                z-index: 100;
+                background: #FFD700;
+                clip-path: inset(0 100% 0 0);
+                animation: sliding-bar 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed left-0 w-[50vw] pointer-events-none"
+         style="top: 50px;
+                height: 25px;
+                z-index: 100;
+                background: #FF007F;
+                clip-path: inset(0 100% 0 0);
+                animation: sliding-bar 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed left-0 w-[50vw] pointer-events-none"
+         style="top: 75px;
+                height: 25px;
+                z-index: 100;
+                background: #5cc8e6;
+                clip-path: inset(0 100% 0 0);
+                animation: sliding-bar 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed left-0 w-[50vw] pointer-events-none"
+         style="top: 100px;
+                height: 25px;
+                z-index: 100;
+                background: #E2725B;
+                clip-path: inset(0 100% 0 0);
+                animation: sliding-bar 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+
+    <!-- ═══ Sliding bars from right ═══ -->
+    <div class="fixed right-0 w-[50vw] pointer-events-none"
+         style="top: 0; height: 25px; z-index: 100;
+                background: hsl(220, 35%, 30%);
+                clip-path: inset(0 0 0 100%);
+                animation: sliding-bar-rtl 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed right-0 w-[50vw] pointer-events-none"
+         style="top: 25px; height: 25px; z-index: 100;
+                background: #FFD700;
+                clip-path: inset(0 0 0 100%);
+                animation: sliding-bar-rtl 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed right-0 w-[50vw] pointer-events-none"
+         style="top: 50px; height: 25px; z-index: 100;
+                background: #FF007F;
+                clip-path: inset(0 0 0 100%);
+                animation: sliding-bar-rtl 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed right-0 w-[50vw] pointer-events-none"
+         style="top: 75px; height: 25px; z-index: 100;
+                background: #5cc8e6;
+                clip-path: inset(0 0 0 100%);
+                animation: sliding-bar-rtl 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+    <div class="fixed right-0 w-[50vw] pointer-events-none"
+         style="top: 100px; height: 25px; z-index: 100;
+                background: #E2725B;
+                clip-path: inset(0 0 0 100%);
+                animation: sliding-bar-rtl 2s linear infinite;
+                animation-delay: 1s;">
+    </div>
+
     <!-- ═══ Sunburst background (radial composition) ═══ -->
     <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.06]">
       <svg viewBox="0 0 800 800" class="w-[150vmax] h-[150vmax]" style="animation: disco-rotate 120s linear infinite;">
