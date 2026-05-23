@@ -271,9 +271,9 @@ test.describe('Pop art design system', () => {
     await page.goto(BASE);
     const bgStyle = await page.locator('body').getAttribute('style');
     expect(bgStyle).toContain('radial-gradient');
-    // Should have contrasting pink and cyan light sources
-    expect(bgStyle).toContain('330');  // pink hue
-    expect(bgStyle).toContain('180');  // cyan hue
+    // Should have contrasting berry and sky light sources
+    expect(bgStyle).toContain('340');  // berry hue
+    expect(bgStyle).toContain('205');  // sky hue
   });
 
   test('halftone divider strip is present', async ({ page }) => {

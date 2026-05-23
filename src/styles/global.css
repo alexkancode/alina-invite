@@ -19,27 +19,27 @@
   --font-size-phi-xl: 4.236rem;
   --font-size-phi-hero: 6.854rem;
 
-  /* ── Pop Art Palette ── */
-  --color-pop-red: hsl(0, 100%, 50%);
-  --color-pop-yellow: hsl(50, 100%, 55%);
-  --color-pop-blue: hsl(220, 100%, 55%);
-  --color-pop-pink: hsl(330, 100%, 65%);
-  --color-pop-cyan: hsl(180, 100%, 45%);
-  --color-pop-black: hsl(0, 0%, 5%);
-  --color-pop-white: hsl(60, 20%, 97%);
+  /* ── Strawberry & Summer Sky Palette ── */
+  --color-pop-red: hsl(348, 83%, 47%);
+  --color-pop-yellow: hsl(3, 100%, 72%);
+  --color-pop-blue: hsl(205, 85%, 55%);
+  --color-pop-pink: hsl(340, 82%, 60%);
+  --color-pop-cyan: hsl(195, 85%, 65%);
+  --color-pop-black: hsl(215, 50%, 10%);
+  --color-pop-white: hsl(40, 30%, 96%);
 
   /* ── Functional Colors ── */
-  --color-ink: hsl(0, 0%, 5%);
-  --color-paper: hsl(60, 20%, 97%);
-  --color-muted: hsl(0, 0%, 40%);
-  --color-accent: hsl(330, 100%, 65%);
-  --color-border: hsl(0, 0%, 5%);
+  --color-ink: hsl(215, 50%, 10%);
+  --color-paper: hsl(40, 30%, 96%);
+  --color-muted: hsl(210, 15%, 45%);
+  --color-accent: hsl(340, 82%, 60%);
+  --color-border: hsl(215, 50%, 10%);
 }
 
-/* ── Shadow Elevation System (contrasting hues) ── */
+/* ── Shadow Elevation System (berry warm / sky cool) ── */
 :root {
-  --shadow-warm: 330deg 100% 50%;
-  --shadow-cool: 220deg 100% 50%;
+  --shadow-warm: 340deg 82% 50%;
+  --shadow-cool: 205deg 85% 45%;
 
   --shadow-elevation-low:
     0.3px 0.5px 0.7px hsl(var(--shadow-cool) / 0.2),
@@ -60,8 +60,8 @@
     7.1px 14.3px 18px -1.4px hsl(var(--shadow-warm) / 0.2),
     11.2px 22.3px 28.1px -1.8px hsl(var(--shadow-warm) / 0.2);
 
-  /* Dual-color neon glow */
+  /* Dual-color glow: berry + sky */
   --glow-dual:
-    -3px -3px 13px hsl(330, 100%, 60% / 0.4),
-     3px  3px 13px hsl(180, 100%, 50% / 0.4);
+    -3px -3px 13px hsl(340, 82%, 60% / 0.4),
+     3px  3px 13px hsl(195, 85%, 65% / 0.4);
 }
