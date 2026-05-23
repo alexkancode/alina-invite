@@ -84,7 +84,7 @@ test.describe('RSVP modal — happy paths', () => {
     await page.click('input[name="attending"][value="yes"]');
     await page.click('#rsvp-form button[type="submit"]');
 
-    await expect(page.getByText('Thank you!')).toBeVisible();
+    await expect(page.getByText('Far out!')).toBeVisible();
     await expect(page.getByText('Your response has been recorded.')).toBeVisible();
   });
 
@@ -96,7 +96,7 @@ test.describe('RSVP modal — happy paths', () => {
     await page.click('input[name="attending"][value="no"]');
     await page.click('#rsvp-form button[type="submit"]');
 
-    await expect(page.getByText('Thank you!')).toBeVisible();
+    await expect(page.getByText('Far out!')).toBeVisible();
     await page.click('#success-close');
     await expect(page.locator('#rsvp-modal')).toBeHidden();
 
@@ -114,7 +114,7 @@ test.describe('RSVP modal — happy paths', () => {
     await page.click('input[name="attending"][value="no"]');
     await page.click('#rsvp-form button[type="submit"]');
 
-    await expect(page.getByText('Thank you!')).toBeVisible();
+    await expect(page.getByText('Far out!')).toBeVisible();
   });
 });
 
@@ -129,7 +129,7 @@ test.describe('RSVP modal — unhappy paths', () => {
 
     // Modal should still be open with form visible (not success)
     await expect(page.locator('#rsvp-form')).toBeVisible();
-    await expect(page.getByText('Thank you!')).toBeHidden();
+    await expect(page.getByText('Far out!')).toBeHidden();
   });
 
   test('form prevents submission without attendance selection (HTML validation)', async ({ page }) => {
@@ -141,7 +141,7 @@ test.describe('RSVP modal — unhappy paths', () => {
 
     // Modal should still be open with form visible
     await expect(page.locator('#rsvp-form')).toBeVisible();
-    await expect(page.getByText('Thank you!')).toBeHidden();
+    await expect(page.getByText('Far out!')).toBeHidden();
   });
 
   test('message field is optional — form submits without it', async ({ page }) => {
@@ -153,7 +153,7 @@ test.describe('RSVP modal — unhappy paths', () => {
     await page.click('input[name="attending"][value="yes"]');
     await page.click('#rsvp-form button[type="submit"]');
 
-    await expect(page.getByText('Thank you!')).toBeVisible();
+    await expect(page.getByText('Far out!')).toBeVisible();
   });
 });
 
@@ -222,25 +222,24 @@ test.describe('Golden ratio design tokens', () => {
   });
 });
 
-test.describe('Pop art design system', () => {
-  test('pop art color palette is defined', async ({ page }) => {
+test.describe('Disco design system', () => {
+  test('disco color palette is defined', async ({ page }) => {
     await page.goto(BASE);
     const colors = await page.evaluate(() => {
       const style = getComputedStyle(document.documentElement);
       return {
-        red: style.getPropertyValue('--color-pop-red').trim(),
-        yellow: style.getPropertyValue('--color-pop-yellow').trim(),
-        blue: style.getPropertyValue('--color-pop-blue').trim(),
-        pink: style.getPropertyValue('--color-pop-pink').trim(),
-        cyan: style.getPropertyValue('--color-pop-cyan').trim(),
+        gold: style.getPropertyValue('--color-disco-gold').trim(),
+        hotPink: style.getPropertyValue('--color-hot-pink').trim(),
+        deepPurple: style.getPropertyValue('--color-deep-purple').trim(),
+        turquoise: style.getPropertyValue('--color-turquoise').trim(),
+        metallic: style.getPropertyValue('--color-metallic-silver').trim(),
       };
     });
-    // All pop colors should be defined and non-empty
-    expect(colors.red).toBeTruthy();
-    expect(colors.yellow).toBeTruthy();
-    expect(colors.blue).toBeTruthy();
-    expect(colors.pink).toBeTruthy();
-    expect(colors.cyan).toBeTruthy();
+    expect(colors.gold).toBeTruthy();
+    expect(colors.hotPink).toBeTruthy();
+    expect(colors.deepPurple).toBeTruthy();
+    expect(colors.turquoise).toBeTruthy();
+    expect(colors.metallic).toBeTruthy();
   });
 
   test('shadow elevation system is defined', async ({ page }) => {
@@ -251,36 +250,54 @@ test.describe('Pop art design system', () => {
     expect(shadowLow).toBeTruthy();
   });
 
-  test('RSVP button has bold pop art border', async ({ page }) => {
+  test('RSVP button has bold border', async ({ page }) => {
     await page.goto(BASE);
     const borderWidth = await page.locator('#rsvp-btn').evaluate(el =>
       getComputedStyle(el).borderWidth
     );
-    // 3px border for pop art boldness
     expect(borderWidth).toBe('3px');
   });
 
-  test('halftone texture overlay is present', async ({ page }) => {
+  test('decorative background layers are present', async ({ page }) => {
     await page.goto(BASE);
-    // The fixed halftone div uses radial-gradient and low opacity
-    const halftone = page.locator('.fixed.pointer-events-none');
-    await expect(halftone).toBeAttached();
+    const decorative = page.locator('.fixed.pointer-events-none');
+    const count = await decorative.count();
+    expect(count).toBeGreaterThanOrEqual(1);
   });
 
   test('dual-color lighting gradients on body', async ({ page }) => {
     await page.goto(BASE);
     const bgStyle = await page.locator('body').getAttribute('style');
     expect(bgStyle).toContain('radial-gradient');
-    // Should have contrasting berry and sky light sources
-    expect(bgStyle).toContain('340');  // berry hue
-    expect(bgStyle).toContain('205');  // sky hue
+    expect(bgStyle).toContain('280');  // purple hue
+    expect(bgStyle).toContain('35');   // gold hue
   });
 
-  test('halftone divider strip is present', async ({ page }) => {
+  test('disco ball motif is present', async ({ page }) => {
     await page.goto(BASE);
-    // The halftone strip uses contrast filter
-    const strip = page.locator('[style*="filter: contrast(16)"]');
-    await expect(strip).toBeVisible();
+    const discoBall = page.locator('[style*="conic-gradient"]');
+    await expect(discoBall).toBeVisible();
+  });
+
+  test('sparkle SVGs are present for decoration', async ({ page }) => {
+    await page.goto(BASE);
+    const sparkles = page.locator('.sparkle');
+    const count = await sparkles.count();
+    expect(count).toBeGreaterThanOrEqual(5);
+  });
+
+  test('mouse parallax layers exist with depth data', async ({ page }) => {
+    await page.goto(BASE);
+    const layers = page.locator('.sparkle-layer[data-depth]');
+    const count = await layers.count();
+    expect(count).toBe(3);
+  });
+
+  test('wavy section dividers use SVG paths', async ({ page }) => {
+    await page.goto(BASE);
+    const wavyPaths = page.locator('main svg path');
+    const count = await wavyPaths.count();
+    expect(count).toBeGreaterThanOrEqual(2);
   });
 });
 

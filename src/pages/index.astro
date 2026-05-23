@@ -10,64 +10,143 @@ import '../styles/global.css'
     <title>You're Invited</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
 
-  <!-- Dual-color lighting on body -->
-  <body class="bg-pop-black text-pop-white min-h-screen overflow-x-hidden"
-        style="font-family: 'Inter', sans-serif;
+  <body class="min-h-screen overflow-x-hidden relative"
+        style="font-family: 'Poppins', sans-serif;
                background:
-                 radial-gradient(ellipse at 15% 20%, hsl(340, 82%, 60% / 0.12), transparent 50%),
-                 radial-gradient(ellipse at 85% 80%, hsl(205, 85%, 55% / 0.10), transparent 50%),
-                 hsl(215, 50%, 10%);">
+                 radial-gradient(ellipse at 30% 20%, hsl(280, 60%, 25% / 0.6), transparent 50%),
+                 radial-gradient(ellipse at 70% 80%, hsl(35, 100%, 40% / 0.3), transparent 50%),
+                 linear-gradient(180deg, #1a0a2e 0%, #2d1254 40%, #1a0a2e 100%);">
 
-    <!-- Halftone background texture (subtle) -->
-    <div class="fixed inset-0 pointer-events-none opacity-[0.04] z-0"
-         style="background: radial-gradient(closest-side, hsl(340, 82%, 60%), transparent) 0 / 8px 8px space;">
+    <!-- ═══ Sunburst background (radial composition) ═══ -->
+    <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.06]">
+      <svg viewBox="0 0 800 800" class="w-[150vmax] h-[150vmax]" style="animation: disco-rotate 120s linear infinite;">
+        <g fill="#FFD700">
+          {Array.from({ length: 24 }).map((_, i) => (
+            <rect x="399" y="0" width="2" height="400"
+                  transform={`rotate(${i * 15} 400 400)`} />
+          ))}
+        </g>
+      </svg>
     </div>
+
+    <!-- ═══ Floating sparkles (mouse-parallax depth layers) ═══ -->
+    <div id="sparkle-field" class="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+      <!-- Layer 1: slow/far sparkles -->
+      <div class="sparkle-layer" data-depth="0.02">
+        <svg class="sparkle" style="top: 12%; left: 8%; animation-delay: 0s;" viewBox="0 0 24 24" width="14" height="14">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#FFD700" />
+        </svg>
+        <svg class="sparkle" style="top: 45%; left: 85%; animation-delay: 1.2s;" viewBox="0 0 24 24" width="10" height="10">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#FF007F" />
+        </svg>
+        <svg class="sparkle" style="top: 78%; left: 22%; animation-delay: 2.4s;" viewBox="0 0 24 24" width="12" height="12">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#40E0D0" />
+        </svg>
+      </div>
+      <!-- Layer 2: medium sparkles -->
+      <div class="sparkle-layer" data-depth="0.05">
+        <svg class="sparkle" style="top: 25%; left: 72%; animation-delay: 0.7s;" viewBox="0 0 24 24" width="18" height="18">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#FFD700" />
+        </svg>
+        <svg class="sparkle" style="top: 65%; left: 15%; animation-delay: 1.8s;" viewBox="0 0 24 24" width="16" height="16">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#BCC6CC" />
+        </svg>
+        <svg class="sparkle" style="top: 88%; left: 65%; animation-delay: 3.1s;" viewBox="0 0 24 24" width="13" height="13">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#FF007F" />
+        </svg>
+      </div>
+      <!-- Layer 3: close/fast sparkles -->
+      <div class="sparkle-layer" data-depth="0.1">
+        <svg class="sparkle" style="top: 8%; left: 55%; animation-delay: 0.4s;" viewBox="0 0 24 24" width="22" height="22">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#FFD700" />
+        </svg>
+        <svg class="sparkle" style="top: 52%; left: 42%; animation-delay: 2.0s;" viewBox="0 0 24 24" width="20" height="20">
+          <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#5D3FD3" />
+        </svg>
+      </div>
+    </div>
+
+    <style>
+      .sparkle-layer {
+        position: absolute;
+        inset: 0;
+        transition: transform 0.15s ease-out;
+      }
+      .sparkle {
+        position: absolute;
+        animation: sparkle 3s ease-in-out infinite;
+      }
+    </style>
 
     <main class="relative z-10 max-w-[791px] mx-auto px-phi-lg py-phi-3xl space-y-phi-2xl">
 
-      <!-- ═══ HERO: Date as Display Type ═══ -->
-      <header class="space-y-phi-lg">
-        <!-- Purpose statement — confident, not a heading -->
-        <p class="text-phi-md font-medium tracking-wide text-pop-cyan uppercase"
-           style="font-family: 'Inter', sans-serif;">
+      <!-- ═══ Disco Ball Hero ═══ -->
+      <header class="text-center space-y-phi-lg">
+        <!-- Mini disco ball motif -->
+        <div class="mx-auto w-[89px] h-[89px] rounded-full relative"
+             style="background: conic-gradient(from 0deg, #BCC6CC, #FFD700, #BCC6CC, #5D3FD3, #BCC6CC, #FF007F, #BCC6CC, #FFD700);
+                    animation: disco-rotate 8s linear infinite;
+                    box-shadow: 0 0 34px hsl(45, 100%, 50% / 0.4), 0 0 55px hsl(280, 60%, 50% / 0.2);">
+          <!-- Facet grid overlay -->
+          <div class="absolute inset-0 rounded-full opacity-40"
+               style="background:
+                 repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(0,0,0,0.3) 8px, rgba(0,0,0,0.3) 9px),
+                 repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.3) 8px, rgba(0,0,0,0.3) 9px);">
+          </div>
+        </div>
+
+        <!-- Purpose statement -->
+        <p class="text-phi-md font-medium tracking-widest text-disco-gold uppercase"
+           style="font-family: 'Poppins', sans-serif;">
           You're invited to celebrate
         </p>
 
-        <!-- Date — largest, most dramatic, hero display -->
-        <h1 class="text-pop-yellow leading-none tracking-tight"
-            style="font-family: 'Dela Gothic One', sans-serif;
-                   font-size: clamp(3rem, 10vw, var(--font-size-phi-hero));
+        <!-- Date — hero display, 70s style -->
+        <h1 class="text-warm-cream leading-none"
+            style="font-family: 'Righteous', sans-serif;
+                   font-size: clamp(2.8rem, 9vw, var(--font-size-phi-hero));
                    text-shadow:
-                     3px 3px 0 hsl(348, 83%, 40%),
-                     -1px -1px 0 hsl(205, 85%, 55%);">
+                     3px 3px 0 #FF007F,
+                     6px 6px 0 #483D8B;
+                   letter-spacing: 0.02em;">
           July 11th, 2026
         </h1>
 
-        <!-- Time — bold but secondary, different treatment -->
-        <p class="text-phi-xl font-semibold text-pop-pink"
-           style="font-family: 'Dela Gothic One', sans-serif;
-                  text-shadow: 2px 2px 0 hsl(205, 85%, 55% / 0.5);">
+        <!-- Time -->
+        <p class="text-phi-xl font-bold text-hot-pink"
+           style="font-family: 'Righteous', sans-serif;
+                  text-shadow: 2px 2px 0 hsl(270, 60%, 35% / 0.6);">
           6:00 PM
         </p>
 
-        <!-- Location — medium emphasis -->
-        <p class="text-phi-md text-pop-white/80">
+        <!-- Location -->
+        <p class="text-phi-md text-metallic-silver">
           The Design Studio, 742 Evergreen Terrace
         </p>
       </header>
 
+      <!-- ═══ Wavy section divider ═══ -->
+      <div class="w-full h-[21px] overflow-hidden">
+        <svg viewBox="0 0 1200 30" class="w-full h-full" preserveAspectRatio="none">
+          <path d="M0,15 C200,0 400,30 600,15 C800,0 1000,30 1200,15"
+                stroke="#FFD700" stroke-width="2" fill="none" opacity="0.5" />
+          <path d="M0,18 C200,3 400,33 600,18 C800,3 1000,33 1200,18"
+                stroke="#FF007F" stroke-width="1.5" fill="none" opacity="0.35" />
+        </svg>
+      </div>
+
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
       <div class="grid gap-phi-xl" style="grid-template-columns: 1fr 0.618fr;">
 
-        <!-- 62% — Map with pop art frame -->
+        <!-- 62% — Map with groovy frame -->
         <section class="relative">
-          <!-- Bold pop art border -->
-          <div class="border-[3px] border-pop-yellow rounded-lg overflow-hidden"
+          <div class="rounded-xl overflow-hidden relative"
                style="aspect-ratio: 1.618 / 1;
-                      box-shadow: var(--shadow-elevation-medium);">
+                      border: 3px solid #FFD700;
+                      box-shadow: var(--shadow-elevation-medium), 0 0 21px hsl(45, 100%, 50% / 0.15);">
             <iframe
               class="w-full h-full"
               loading="lazy"
@@ -75,27 +154,32 @@ import '../styles/global.css'
               referrerpolicy="no-referrer-when-downgrade"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019112498507!2d-122.41941548468204!3d37.77492977975892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064b1e8d1b9%3A0x4a83ab0e2e0fcc!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1"
             ></iframe>
+            <!-- Gradient shine overlay (near-zero GPU cost) -->
+            <div class="absolute inset-0 pointer-events-none rounded-xl"
+                 style="background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, transparent 50%, rgba(255,0,127,0.05) 100%);">
+            </div>
           </div>
         </section>
 
         <!-- 38% — Actions panel -->
         <section class="flex flex-col gap-phi-lg justify-center">
-          <!-- RSVP Button — primary, pop art drama -->
+          <!-- RSVP Button — disco gold with layered shadow -->
           <button
             id="rsvp-btn"
-            class="w-full px-phi-xl py-phi-md bg-pop-red text-pop-white border-[3px] border-pop-black
-                   rounded-lg text-phi-base font-bold uppercase tracking-wider cursor-pointer
-                   transition-all duration-150"
-            style="font-family: 'Dela Gothic One', sans-serif;
-                   box-shadow: 4px 4px 0 hsl(205, 85%, 55%);
+            class="w-full px-phi-xl py-phi-md text-pop-black rounded-xl text-phi-base font-bold
+                   uppercase tracking-widest cursor-pointer transition-all duration-150"
+            style="font-family: 'Righteous', sans-serif;
+                   background: linear-gradient(135deg, #FFD700, #E1AD01);
+                   border: 3px solid #B7410E;
+                   box-shadow: 4px 4px 0 #FF007F, 0 0 13px hsl(45, 100%, 50% / 0.2);
                    min-height: 55px;"
-            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 hsl(205, 85%, 55%)'"
-            onmouseleave="this.style.boxShadow='4px 4px 0 hsl(205, 85%, 55%)'"
+            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #FF007F'"
+            onmouseleave="this.style.boxShadow='4px 4px 0 #FF007F, 0 0 13px hsl(45, 100%, 50% / 0.2)'"
           >
             RSVP
           </button>
 
-          <!-- Calendar Link — secondary but still pop art -->
+          <!-- Calendar Link -->
           <a
             id="cal-btn"
             href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Birthday+Celebration&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+a+celebration+of+creativity%2C+friendship%2C+and+another+trip+around+the+sun.&location=The+Design+Studio%2C+742+Evergreen+Terrace&ctz=America/New_York"
@@ -103,14 +187,15 @@ import '../styles/global.css'
             rel="noopener noreferrer"
             aria-label="Add this event to your Google Calendar"
             class="inline-flex items-center justify-center gap-phi-sm w-full px-phi-xl py-phi-md
-                   bg-pop-black text-pop-cyan border-[3px] border-pop-cyan
-                   rounded-lg text-phi-base font-bold uppercase tracking-wider no-underline
-                   transition-all duration-150 cursor-pointer"
-            style="font-family: 'Inter', sans-serif;
-                   box-shadow: 4px 4px 0 hsl(340, 82%, 50%);
+                   text-turquoise rounded-xl text-phi-base font-bold uppercase tracking-widest
+                   no-underline transition-all duration-150 cursor-pointer"
+            style="font-family: 'Poppins', sans-serif;
+                   background: rgba(64, 224, 208, 0.08);
+                   border: 3px solid #40E0D0;
+                   box-shadow: 4px 4px 0 #483D8B;
                    min-height: 55px;"
-            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 hsl(340, 82%, 50%)'"
-            onmouseleave="this.style.boxShadow='4px 4px 0 hsl(340, 82%, 50%)'"
+            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #483D8B'"
+            onmouseleave="this.style.boxShadow='4px 4px 0 #483D8B'"
           >
             <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -123,87 +208,117 @@ import '../styles/global.css'
         </section>
       </div>
 
-      <!-- ═══ Halftone Divider Strip ═══ -->
-      <div class="h-[34px] rounded-sm overflow-hidden"
-           style="background:
-             radial-gradient(closest-side, hsl(348, 83%, 47%), hsl(40, 30%, 96%)) 0 / 21px 21px space,
-             linear-gradient(90deg, hsl(210, 15%, 45%), hsl(40, 30%, 96%));
-           background-blend-mode: multiply;
-           filter: contrast(16);">
+      <!-- ═══ Wavy divider (bottom) ═══ -->
+      <div class="w-full h-[13px] overflow-hidden">
+        <svg viewBox="0 0 1200 20" class="w-full h-full" preserveAspectRatio="none">
+          <path d="M0,10 C150,0 300,20 450,10 C600,0 750,20 900,10 C1050,0 1200,20 1200,10"
+                stroke="#40E0D0" stroke-width="1.5" fill="none" opacity="0.4" />
+        </svg>
       </div>
 
       <!-- ═══ Footer ═══ -->
-      <footer class="text-phi-sm text-pop-white/40 space-y-phi-xs">
+      <footer class="text-phi-sm text-center space-y-phi-xs" style="color: hsl(270, 30%, 55%);">
         <p>Astro + Tailwind 4 + Cloudflare Pages</p>
         <p id="runtime-info"></p>
       </footer>
     </main>
 
     <!-- ═══ RSVP Modal ═══ -->
-    <div id="rsvp-modal" class="fixed inset-0 bg-pop-black/70 flex items-center justify-center p-phi-lg hidden z-50 backdrop-blur-sm">
-      <div class="bg-pop-black border-[3px] border-pop-yellow rounded-xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg"
-           style="box-shadow: var(--shadow-elevation-high), var(--glow-dual);">
-        <h2 class="text-phi-xl text-pop-yellow"
-            style="font-family: 'Dela Gothic One', sans-serif;">
+    <div id="rsvp-modal" class="fixed inset-0 flex items-center justify-center p-phi-lg hidden z-50"
+         style="background: rgba(26, 10, 46, 0.85); backdrop-filter: blur(4px);">
+      <div class="rounded-2xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg relative overflow-hidden"
+           style="background: linear-gradient(160deg, #2d1254, #1a0a2e);
+                  border: 3px solid #FFD700;
+                  box-shadow: var(--shadow-elevation-high), 0 0 34px hsl(45, 100%, 50% / 0.15);">
+        <!-- Shine overlay on modal -->
+        <div class="absolute inset-0 pointer-events-none"
+             style="background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.06), transparent 60%);"></div>
+
+        <h2 class="text-phi-xl text-disco-gold relative"
+            style="font-family: 'Righteous', sans-serif;
+                   text-shadow: 2px 2px 0 hsl(300, 100%, 40% / 0.4);">
           RSVP
         </h2>
-        <form id="rsvp-form" class="space-y-phi-md flex flex-col">
+        <form id="rsvp-form" class="space-y-phi-md flex flex-col relative">
           <input
             name="name"
             type="text"
             placeholder="Your name"
             required
-            class="w-full px-phi-md py-phi-sm bg-transparent border-[2px] border-pop-white/30
-                   rounded-lg text-phi-base text-pop-white placeholder-pop-white/40
-                   focus:outline-none focus:border-pop-cyan transition-colors"
+            class="w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+                   placeholder-metallic-silver/50 focus:outline-none transition-colors"
+            style="background: rgba(255,255,255,0.06);
+                   border: 2px solid hsl(270, 30%, 40%);
+                   caret-color: #FFD700;"
+            onfocus="this.style.borderColor='#FFD700'"
+            onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           />
           <textarea
             name="message"
             placeholder="A brief message (optional)"
             rows="3"
-            class="w-full px-phi-md py-phi-sm bg-transparent border-[2px] border-pop-white/30
-                   rounded-lg text-phi-base text-pop-white placeholder-pop-white/40
-                   resize-none focus:outline-none focus:border-pop-cyan transition-colors"
+            class="w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+                   placeholder-metallic-silver/50 resize-none focus:outline-none transition-colors"
+            style="background: rgba(255,255,255,0.06);
+                   border: 2px solid hsl(270, 30%, 40%);"
+            onfocus="this.style.borderColor='#FFD700'"
+            onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           ></textarea>
-          <fieldset class="flex gap-phi-xl text-pop-white">
+          <fieldset class="flex gap-phi-xl text-warm-cream">
             <label class="flex items-center gap-phi-sm cursor-pointer">
-              <input type="radio" name="attending" value="yes" required class="accent-pop-cyan w-[18px] h-[18px]" />
+              <input type="radio" name="attending" value="yes" required
+                     class="w-[18px] h-[18px]" style="accent-color: #FFD700;" />
               <span class="font-medium">I'll be there</span>
             </label>
             <label class="flex items-center gap-phi-sm cursor-pointer">
-              <input type="radio" name="attending" value="no" class="accent-pop-pink w-[18px] h-[18px]" />
+              <input type="radio" name="attending" value="no"
+                     class="w-[18px] h-[18px]" style="accent-color: #FF007F;" />
               <span class="font-medium">Can't make it</span>
             </label>
           </fieldset>
           <div class="flex gap-phi-md pt-phi-sm">
             <button type="submit"
-                    class="px-phi-xl py-phi-sm bg-pop-red text-pop-white border-[2px] border-pop-black
-                           rounded-lg font-bold uppercase tracking-wider cursor-pointer transition-all"
-                    style="box-shadow: 3px 3px 0 hsl(205, 85%, 55%);">
+                    class="px-phi-xl py-phi-sm text-pop-black rounded-lg font-bold uppercase
+                           tracking-wider cursor-pointer transition-all"
+                    style="font-family: 'Righteous', sans-serif;
+                           background: linear-gradient(135deg, #FFD700, #E1AD01);
+                           border: 2px solid #B7410E;
+                           box-shadow: 3px 3px 0 #FF007F;">
               Send
             </button>
             <button type="button" id="modal-close"
-                    class="px-phi-xl py-phi-sm bg-transparent text-pop-white/70 border-[2px] border-pop-white/30
-                           rounded-lg font-medium cursor-pointer hover:border-pop-white/60 transition-colors">
+                    class="px-phi-xl py-phi-sm rounded-lg font-medium cursor-pointer transition-colors"
+                    style="color: hsl(270, 30%, 65%);
+                           border: 2px solid hsl(270, 30%, 35%);
+                           background: transparent;"
+                    onmouseenter="this.style.borderColor='hsl(270, 30%, 55%)'"
+                    onmouseleave="this.style.borderColor='hsl(270, 30%, 35%)'">
               Cancel
             </button>
           </div>
         </form>
-        <div id="rsvp-success" class="hidden text-center space-y-phi-lg py-phi-xl">
-          <p class="text-phi-lg text-pop-yellow" style="font-family: 'Dela Gothic One', sans-serif;">
-            Thank you!
+        <div id="rsvp-success" class="hidden text-center space-y-phi-lg py-phi-xl relative">
+          <!-- Mini sparkle on success -->
+          <svg class="mx-auto mb-phi-sm" width="34" height="34" viewBox="0 0 24 24">
+            <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#FFD700"
+                     style="animation: sparkle 1.5s ease-in-out infinite;" />
+          </svg>
+          <p class="text-phi-lg text-disco-gold" style="font-family: 'Righteous', sans-serif;">
+            Far out!
           </p>
-          <p class="text-pop-white/70">Your response has been recorded.</p>
+          <p class="text-metallic-silver">Your response has been recorded.</p>
           <button id="success-close"
-                  class="px-phi-xl py-phi-sm text-pop-cyan border-[2px] border-pop-cyan
-                         rounded-lg font-medium cursor-pointer hover:bg-pop-cyan/10 transition-colors">
+                  class="px-phi-xl py-phi-sm text-turquoise rounded-lg font-medium cursor-pointer transition-colors"
+                  style="border: 2px solid #40E0D0;"
+                  onmouseenter="this.style.background='rgba(64,224,208,0.1)'"
+                  onmouseleave="this.style.background='transparent'">
             Close
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ═══ Responsive: stack on mobile ═══ -->
+    <!-- ═══ Responsive ═══ -->
     <style>
       @media (max-width: 640px) {
         [style*="grid-template-columns: 1fr 0.618fr"] {
@@ -213,7 +328,32 @@ import '../styles/global.css'
     </style>
 
     <script>
-      // RSVP Modal
+      // ── Mouse parallax on sparkle layers (desktop only) ──
+      const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (hasHover && !prefersReducedMotion) {
+        const layers = document.querySelectorAll('.sparkle-layer');
+        let ticking = false;
+
+        document.addEventListener('mousemove', (e) => {
+          if (!ticking) {
+            requestAnimationFrame(() => {
+              const cx = e.clientX - window.innerWidth / 2;
+              const cy = e.clientY - window.innerHeight / 2;
+              layers.forEach((layer) => {
+                const depth = parseFloat((layer as HTMLElement).dataset.depth || '0');
+                (layer as HTMLElement).style.transform =
+                  `translate3d(${cx * depth}px, ${cy * depth}px, 0)`;
+              });
+              ticking = false;
+            });
+            ticking = true;
+          }
+        });
+      }
+
+      // ── RSVP Modal ──
       const modal = document.getElementById('rsvp-modal')!;
       const form = document.getElementById('rsvp-form') as HTMLFormElement;
       const success = document.getElementById('rsvp-success')!;
@@ -257,7 +397,7 @@ import '../styles/global.css'
         }
       });
 
-      // Runtime info
+      // ── Runtime info ──
       document.getElementById('runtime-info')!.textContent =
         `Rendered ${typeof globalThis.caches !== 'undefined' ? 'on Cloudflare Workers (edge)' : 'locally (dev server)'}`;
     </script>
