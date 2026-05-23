@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Golden ratio spacing (Fibonacci) */
+  /* ── Golden Ratio Spacing (Fibonacci) ── */
   --spacing-phi-xs: 5px;
   --spacing-phi-sm: 8px;
   --spacing-phi-md: 13px;
@@ -10,17 +10,58 @@
   --spacing-phi-2xl: 55px;
   --spacing-phi-3xl: 89px;
 
-  /* Golden ratio typography */
-  --font-size-phi-sm: 0.812rem;
+  /* ── Golden Ratio Typography ── */
+  --font-size-phi-xs: 0.625rem;
+  --font-size-phi-sm: 0.875rem;
   --font-size-phi-base: 1rem;
-  --font-size-phi-lg: 1.618rem;
-  --font-size-phi-xl: 2.618rem;
-  --font-size-phi-2xl: 4.236rem;
+  --font-size-phi-md: 1.618rem;
+  --font-size-phi-lg: 2.618rem;
+  --font-size-phi-xl: 4.236rem;
+  --font-size-phi-hero: 6.854rem;
 
-  /* Colors — minimal, elegant */
-  --color-ink: #1a1a1a;
-  --color-paper: #faf9f6;
-  --color-muted: #6b6b6b;
-  --color-accent: #2d2d2d;
-  --color-border: #e0ddd8;
+  /* ── Pop Art Palette ── */
+  --color-pop-red: hsl(0, 100%, 50%);
+  --color-pop-yellow: hsl(50, 100%, 55%);
+  --color-pop-blue: hsl(220, 100%, 55%);
+  --color-pop-pink: hsl(330, 100%, 65%);
+  --color-pop-cyan: hsl(180, 100%, 45%);
+  --color-pop-black: hsl(0, 0%, 5%);
+  --color-pop-white: hsl(60, 20%, 97%);
+
+  /* ── Functional Colors ── */
+  --color-ink: hsl(0, 0%, 5%);
+  --color-paper: hsl(60, 20%, 97%);
+  --color-muted: hsl(0, 0%, 40%);
+  --color-accent: hsl(330, 100%, 65%);
+  --color-border: hsl(0, 0%, 5%);
+}
+
+/* ── Shadow Elevation System (contrasting hues) ── */
+:root {
+  --shadow-warm: 330deg 100% 50%;
+  --shadow-cool: 220deg 100% 50%;
+
+  --shadow-elevation-low:
+    0.3px 0.5px 0.7px hsl(var(--shadow-cool) / 0.2),
+    0.4px 0.8px 1px -1.2px hsl(var(--shadow-cool) / 0.2),
+    1px 2px 2.5px -2.5px hsl(var(--shadow-cool) / 0.2);
+
+  --shadow-elevation-medium:
+    0.3px 0.5px 0.7px hsl(var(--shadow-cool) / 0.25),
+    0.8px 1.6px 2px -0.8px hsl(var(--shadow-cool) / 0.25),
+    2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-cool) / 0.25),
+    5px 10px 12.6px -2.5px hsl(var(--shadow-cool) / 0.25);
+
+  --shadow-elevation-high:
+    0.3px 0.5px 0.7px hsl(var(--shadow-warm) / 0.2),
+    1.5px 2.9px 3.7px -0.4px hsl(var(--shadow-warm) / 0.2),
+    2.7px 5.4px 6.8px -0.7px hsl(var(--shadow-warm) / 0.2),
+    4.5px 8.9px 11.2px -1.1px hsl(var(--shadow-warm) / 0.2),
+    7.1px 14.3px 18px -1.4px hsl(var(--shadow-warm) / 0.2),
+    11.2px 22.3px 28.1px -1.8px hsl(var(--shadow-warm) / 0.2);
+
+  /* Dual-color neon glow */
+  --glow-dual:
+    -3px -3px 13px hsl(330, 100%, 60% / 0.4),
+     3px  3px 13px hsl(180, 100%, 50% / 0.4);
 }
