@@ -243,7 +243,7 @@ import '../styles/global.css'
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md text-pop-black rounded-xl text-phi-base font-bold
-                   uppercase tracking-widest cursor-pointer transition-all duration-150 relative overflow-hidden"
+                   uppercase tracking-widest cursor-pointer transition-all duration-300 relative overflow-hidden"
             style="font-family: 'Righteous', sans-serif;
                    background: linear-gradient(135deg, #FFD700, #E1AD01);
                    border: 3px solid #B7410E;
@@ -252,7 +252,16 @@ import '../styles/global.css'
             onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #FF007F'"
             onmouseleave="this.style.boxShadow='4px 4px 0 #FF007F, 0 0 13px hsl(45, 100%, 50% / 0.2)'"
           >
-            RSVP
+            <!-- Default state -->
+            <span id="rsvp-btn-default">RSVP</span>
+            <!-- Submitted state -->
+            <div id="rsvp-btn-status" class="hidden text-left space-y-phi-xs" style="font-family: 'Poppins', sans-serif;">
+              <div class="flex items-center justify-between">
+                <span id="rsvp-status-name" class="text-phi-base font-semibold truncate"></span>
+                <span id="rsvp-status-badge" class="text-phi-sm font-bold uppercase tracking-wider shrink-0 ml-phi-sm"></span>
+              </div>
+              <p id="rsvp-status-message" class="text-phi-sm font-normal normal-case tracking-normal opacity-70 truncate"></p>
+            </div>
             <div class="rsvp-shine absolute inset-0 pointer-events-none rounded-xl"
                  style="background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.5) 50%, transparent 60%);
                         background-size: 200% 100%;
@@ -428,7 +437,31 @@ import '../styles/global.css'
       const form = document.getElementById('rsvp-form') as HTMLFormElement;
       const success = document.getElementById('rsvp-success')!;
 
-      document.getElementById('rsvp-btn')!.addEventListener('click', () => {
+      // ── RSVP button state from localStorage ──
+      const rsvpBtn = document.getElementById('rsvp-btn')!;
+      const rsvpDefault = document.getElementById('rsvp-btn-default')!;
+      const rsvpStatus = document.getElementById('rsvp-btn-status')!;
+      const rsvpName = document.getElementById('rsvp-status-name')!;
+      const rsvpBadge = document.getElementById('rsvp-status-badge')!;
+      const rsvpMessage = document.getElementById('rsvp-status-message')!;
+
+      function showRsvpStatus() {
+        const saved = localStorage.getItem('rsvp');
+        if (!saved) return;
+        const data = JSON.parse(saved);
+        rsvpDefault.classList.add('hidden');
+        rsvpStatus.classList.remove('hidden');
+        rsvpName.textContent = data.name;
+        rsvpBadge.textContent = data.attending === 'yes' ? 'Going' : 'Not going';
+        rsvpBadge.style.color = data.attending === 'yes' ? '#5cb832' : '#e62e2e';
+        const msg = data.message || '';
+        rsvpMessage.textContent = msg.length > 100 ? msg.slice(0, 100) + '…' : msg;
+        rsvpMessage.classList.toggle('hidden', !msg);
+      }
+
+      showRsvpStatus();
+
+      rsvpBtn.addEventListener('click', () => {
         modal.classList.remove('hidden');
       });
 
@@ -459,6 +492,8 @@ import '../styles/global.css'
           });
           const result = await res.json();
           console.log('RSVP response:', result);
+          localStorage.setItem('rsvp', JSON.stringify(data));
+          showRsvpStatus();
           form.classList.add('hidden');
           success.classList.remove('hidden');
         } catch (err) {
