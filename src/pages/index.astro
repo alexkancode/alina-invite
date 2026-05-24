@@ -376,24 +376,6 @@ import '../styles/global.css'
             </button>
           </div>
         </form>
-        <div id="rsvp-success" class="hidden text-center space-y-phi-lg py-phi-xl relative">
-          <!-- Mini sparkle on success -->
-          <svg class="mx-auto mb-phi-sm" width="34" height="34" viewBox="0 0 24 24">
-            <polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" fill="#FFD700"
-                     style="animation: sparkle 1.5s ease-in-out infinite;" />
-          </svg>
-          <p class="text-phi-lg text-disco-gold" style="font-family: 'Righteous', sans-serif;">
-            Far out!
-          </p>
-          <p class="text-metallic-silver">Your response has been recorded.</p>
-          <button id="success-close"
-                  class="px-phi-xl py-phi-sm text-turquoise rounded-lg font-medium cursor-pointer transition-colors"
-                  style="border: 2px solid #40E0D0;"
-                  onmouseenter="this.style.background='rgba(64,224,208,0.1)'"
-                  onmouseleave="this.style.background='transparent'">
-            Close
-          </button>
-        </div>
       </div>
     </div>
 
@@ -435,7 +417,6 @@ import '../styles/global.css'
       // ── RSVP Modal ──
       const modal = document.getElementById('rsvp-modal')!;
       const form = document.getElementById('rsvp-form') as HTMLFormElement;
-      const success = document.getElementById('rsvp-success')!;
 
       // ── RSVP button state from localStorage ──
       const rsvpBtn = document.getElementById('rsvp-btn')!;
@@ -499,12 +480,6 @@ import '../styles/global.css'
         modal.classList.add('hidden');
       });
 
-      document.getElementById('success-close')!.addEventListener('click', () => {
-        modal.classList.add('hidden');
-        form.classList.remove('hidden');
-        success.classList.add('hidden');
-        form.reset();
-      });
 
       modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.classList.add('hidden');
@@ -524,8 +499,7 @@ import '../styles/global.css'
           console.log('RSVP response:', result);
           localStorage.setItem('rsvp', JSON.stringify(data));
           showRsvpStatus();
-          form.classList.add('hidden');
-          success.classList.remove('hidden');
+          modal.classList.add('hidden');
         } catch (err) {
           console.error('RSVP error:', err);
           alert('Something went wrong. Please try again.');
