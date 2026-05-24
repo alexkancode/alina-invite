@@ -151,6 +151,9 @@ import '../styles/global.css'
     <style>
       .bar-fade-right {}
       .bar-fade-left {}
+      #rsvp-btn:hover .rsvp-shine {
+        animation: shine-sweep-reverse 0.6s ease-in-out forwards !important;
+      }
       .sparkle-layer {
         position: absolute;
         inset: 0;
@@ -231,11 +234,6 @@ import '../styles/global.css'
             <div class="absolute inset-0 pointer-events-none rounded-xl"
                  style="background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, transparent 50%, rgba(255,0,127,0.05) 100%);">
             </div>
-            <div class="absolute inset-0 pointer-events-none rounded-xl shine-sweep"
-                 style="background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%);
-                        background-size: 200% 100%;
-                        animation: shine-sweep 0.6s ease-in-out 3.8s forwards;">
-            </div>
           </div>
         </section>
 
@@ -245,7 +243,7 @@ import '../styles/global.css'
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md text-pop-black rounded-xl text-phi-base font-bold
-                   uppercase tracking-widest cursor-pointer transition-all duration-150"
+                   uppercase tracking-widest cursor-pointer transition-all duration-150 relative overflow-hidden"
             style="font-family: 'Righteous', sans-serif;
                    background: linear-gradient(135deg, #FFD700, #E1AD01);
                    border: 3px solid #B7410E;
@@ -255,6 +253,11 @@ import '../styles/global.css'
             onmouseleave="this.style.boxShadow='4px 4px 0 #FF007F, 0 0 13px hsl(45, 100%, 50% / 0.2)'"
           >
             RSVP
+            <div class="rsvp-shine absolute inset-0 pointer-events-none rounded-xl"
+                 style="background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.5) 50%, transparent 60%);
+                        background-size: 200% 100%;
+                        animation: shine-sweep 0.6s ease-in-out 3.8s forwards;">
+            </div>
           </button>
 
           <!-- Calendar Link -->
