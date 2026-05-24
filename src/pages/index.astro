@@ -15,10 +15,7 @@ import '../styles/global.css'
 
   <body class="min-h-screen overflow-x-hidden relative"
         style="font-family: 'Poppins', sans-serif;
-               background:
-                 radial-gradient(ellipse at 30% 20%, hsl(280, 60%, 25% / 0.6), transparent 50%),
-                 radial-gradient(ellipse at 70% 80%, hsl(35, 100%, 40% / 0.3), transparent 50%),
-                 linear-gradient(180deg, #1a0a2e 0%, #2d1254 40%, #1a0a2e 100%);">
+               background: #f8f3e8;">
 
     <!-- ═══ Sliding bars from left (all touching, centered at 50vh) ═══ -->
     <div id="sliding-bar" class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
@@ -212,18 +209,6 @@ import '../styles/global.css'
         </p>
       </header>
 
-      <!-- ═══ Disco stripe band ═══ -->
-      <div class="disco-stripes w-full rounded-sm overflow-hidden" style="height: 21px;">
-        <div class="h-full flex">
-          <div class="flex-1" style="background: #FFD700;"></div>
-          <div class="flex-1" style="background: #FF007F;"></div>
-          <div class="flex-1" style="background: #483D8B;"></div>
-          <div class="flex-1" style="background: #40E0D0;"></div>
-          <div class="flex-1" style="background: #BCC6CC;"></div>
-          <div class="flex-1" style="background: #CC5500;"></div>
-          <div class="flex-1" style="background: #FFD700;"></div>
-        </div>
-      </div>
 
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
       <div class="grid gap-phi-xl" style="grid-template-columns: 1fr 0.618fr;">
@@ -295,17 +280,6 @@ import '../styles/global.css'
         </section>
       </div>
 
-      <!-- ═══ Disco stripe band (thin, reversed) ═══ -->
-      <div class="disco-stripes w-full rounded-sm overflow-hidden" style="height: 8px;">
-        <div class="h-full flex">
-          <div class="flex-1" style="background: #CC5500;"></div>
-          <div class="flex-1" style="background: #BCC6CC;"></div>
-          <div class="flex-1" style="background: #40E0D0;"></div>
-          <div class="flex-1" style="background: #483D8B;"></div>
-          <div class="flex-1" style="background: #FF007F;"></div>
-          <div class="flex-1" style="background: #FFD700;"></div>
-        </div>
-      </div>
 
       <!-- ═══ Footer ═══ -->
       <footer class="text-phi-sm text-center space-y-phi-xs" style="color: hsl(270, 30%, 55%);">
