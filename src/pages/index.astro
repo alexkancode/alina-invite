@@ -201,10 +201,10 @@ import '../styles/global.css'
       }
     </style>
 
-    <main class="relative z-10 max-w-[791px] mx-auto px-phi-lg py-phi-3xl space-y-phi-2xl">
+    <main class="relative z-10 max-w-[791px] mx-auto px-phi-lg py-phi-3xl">
 
       <!-- ═══ Disco Ball Hero ═══ -->
-      <header class="text-center space-y-phi-lg">
+      <header class="text-center space-y-phi-lg flex flex-col justify-end" style="min-height: 0;">
         <!-- Mini disco ball motif (hidden for now)
         <div class="mx-auto w-[89px] h-[89px] rounded-full relative"
              style="background: conic-gradient(from 0deg, #BCC6CC, #FFD700, #BCC6CC, #5D3FD3, #BCC6CC, #FF007F, #BCC6CC, #FFD700);
@@ -238,6 +238,8 @@ import '../styles/global.css'
         </p>
       </header>
 
+      <!-- Spacer matching stripe panel height -->
+      <div style="height: 187px;"></div>
 
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
       <div class="grid gap-phi-xl content-reveal" style="grid-template-columns: 1fr 0.618fr;
