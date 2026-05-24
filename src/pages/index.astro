@@ -20,84 +20,100 @@ import '../styles/global.css'
     <!-- ═══ Sliding bars from left (all touching, centered at 50vh) ═══ -->
     <div id="sliding-bar" class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh - 93px); height: 7px; z-index: 40; background: #e62e2e;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh - 86px); height: 20px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh - 66px); height: 10px; z-index: 40; background: #e85d20;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh - 56px); height: 17px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh - 39px); height: 13px; z-index: 40; background: #f0a818;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh - 26px); height: 14px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh - 12px); height: 16px; z-index: 40; background: #5cb832;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh + 4px); height: 11px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh + 15px); height: 19px; z-index: 40; background: #2480c0;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh + 34px); height: 8px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh + 42px); height: 22px; z-index: 40; background: #3b3fa0;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh + 64px); height: 5px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed left-0 w-[50vw] pointer-events-none bar-fade-right"
          style="top: calc(50vh + 69px); height: 25px; z-index: 40; background: #d03890;
-                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
+
+    <!-- ═══ Date text riding in with left stripes ═══ -->
+    <div class="fixed pointer-events-none"
+         style="top: 50vh;
+                left: 50%;
+                transform: translate(-100%, -50%) translateX(-50vw);
+                z-index: 41;
+                animation: ride-in-date 2s linear forwards;
+                animation-delay: 1s;
+                font-family: 'Righteous', sans-serif;
+                font-size: clamp(1.4rem, 3.5vw, 2.618rem);
+                color: #483D8B;
+                white-space: nowrap;
+                letter-spacing: 0.02em;">
+      July 11th, 2026
+    </div>
 
     <!-- ═══ Sliding bars from right ═══ -->
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh - 93px); height: 7px; z-index: 40; background: #e62e2e;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh - 86px); height: 20px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh - 66px); height: 10px; z-index: 40; background: #e85d20;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh - 56px); height: 17px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh - 39px); height: 13px; z-index: 40; background: #f0a818;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh - 26px); height: 14px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh - 12px); height: 16px; z-index: 40; background: #5cb832;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh + 4px); height: 11px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh + 15px); height: 19px; z-index: 40; background: #2480c0;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh + 34px); height: 8px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh + 42px); height: 22px; z-index: 40; background: #3b3fa0;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh + 64px); height: 5px; z-index: 40; background: #f0e6c8;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
     <div class="fixed right-0 w-[50vw] pointer-events-none bar-fade-left"
          style="top: calc(50vh + 69px); height: 25px; z-index: 40; background: #d03890;
-                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear infinite; animation-delay: 1s;"></div>
+                clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
 
     <!-- ═══ Sunburst background (radial composition) ═══ -->
     <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.06]">
@@ -242,15 +258,16 @@ import '../styles/global.css'
           <!-- RSVP Button — disco gold with layered shadow -->
           <button
             id="rsvp-btn"
-            class="w-full px-phi-xl py-phi-md text-pop-black rounded-xl text-phi-base font-bold
+            class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
                    uppercase tracking-widest cursor-pointer transition-all duration-300 relative overflow-hidden"
             style="font-family: 'Righteous', sans-serif;
-                   background: linear-gradient(135deg, #FFD700, #E1AD01);
-                   border: 3px solid #B7410E;
-                   box-shadow: 4px 4px 0 #FF007F, 0 0 13px hsl(45, 100%, 50% / 0.2);
+                   background: #f4c2c2;
+                   color: #483D8B;
+                   border: 3px solid #483D8B;
+                   box-shadow: 4px 4px 0 #483D8B;
                    min-height: 55px;"
-            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #FF007F'"
-            onmouseleave="this.style.boxShadow='4px 4px 0 #FF007F, 0 0 13px hsl(45, 100%, 50% / 0.2)'"
+            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #483D8B'"
+            onmouseleave="this.style.boxShadow='4px 4px 0 #483D8B'"
           >
             <!-- Default state -->
             <span id="rsvp-btn-default">RSVP</span>
@@ -258,7 +275,7 @@ import '../styles/global.css'
             <div id="rsvp-btn-status" class="hidden text-left space-y-phi-xs" style="font-family: 'Poppins', sans-serif;">
               <div class="flex items-center justify-between">
                 <span id="rsvp-status-name" class="text-phi-base font-semibold truncate"></span>
-                <span id="rsvp-status-badge" class="text-phi-sm font-bold uppercase tracking-wider shrink-0 ml-phi-sm"></span>
+                <span id="rsvp-status-badge" class="text-phi-sm font-bold uppercase tracking-wider shrink-0 ml-phi-sm px-phi-sm py-phi-xs rounded" style="background: #f0e6c8;"></span>
               </div>
               <p id="rsvp-status-message" class="text-phi-sm font-normal normal-case tracking-normal opacity-70 truncate"></p>
             </div>
