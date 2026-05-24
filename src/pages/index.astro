@@ -282,10 +282,6 @@ import '../styles/global.css'
 
 
       <!-- ═══ Footer ═══ -->
-      <footer class="text-phi-sm text-center space-y-phi-xs" style="color: hsl(270, 30%, 55%);">
-        <p>Astro + Tailwind 4 + Cloudflare Pages</p>
-        <p id="runtime-info"></p>
-      </footer>
     </main>
 
     <!-- ═══ RSVP Modal ═══ -->
@@ -462,9 +458,6 @@ import '../styles/global.css'
         }
       });
 
-      // ── Runtime info ──
-      document.getElementById('runtime-info')!.textContent =
-        `Rendered ${typeof globalThis.caches !== 'undefined' ? 'on Cloudflare Workers (edge)' : 'locally (dev server)'}`;
     </script>
   </body>
 </html>
