@@ -356,9 +356,9 @@ import '../styles/global.css'
             </label>
           </fieldset>
           <div class="flex gap-phi-md pt-phi-sm">
-            <button type="submit"
+            <button type="submit" id="rsvp-submit"
                     class="px-phi-xl py-phi-sm text-pop-black rounded-lg font-bold uppercase
-                           tracking-wider cursor-pointer transition-all"
+                           tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     style="font-family: 'Righteous', sans-serif;
                            background: linear-gradient(135deg, #FFD700, #E1AD01);
                            border: 2px solid #B7410E;
@@ -461,6 +461,26 @@ import '../styles/global.css'
 
       showRsvpStatus();
 
+      const submitBtn = document.getElementById('rsvp-submit') as HTMLButtonElement;
+      let savedSnapshot = '';
+
+      function getCurrentFormData() {
+        return JSON.stringify({
+          name: (form.elements.namedItem('name') as HTMLInputElement).value,
+          message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
+          attending: (form.querySelector('input[name="attending"]:checked') as HTMLInputElement)?.value || '',
+        });
+      }
+
+      function updateSubmitState() {
+        const current = getCurrentFormData();
+        const nameVal = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
+        submitBtn.disabled = !nameVal || current === savedSnapshot;
+      }
+
+      form.addEventListener('input', updateSubmitState);
+      form.addEventListener('change', updateSubmitState);
+
       rsvpBtn.addEventListener('click', () => {
         const saved = localStorage.getItem('rsvp');
         if (saved) {
@@ -470,6 +490,8 @@ import '../styles/global.css'
           const radio = form.querySelector(`input[name="attending"][value="${data.attending}"]`) as HTMLInputElement;
           if (radio) radio.checked = true;
         }
+        savedSnapshot = getCurrentFormData();
+        submitBtn.disabled = true;
         modal.classList.remove('hidden');
       });
 
