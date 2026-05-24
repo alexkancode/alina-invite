@@ -462,6 +462,14 @@ import '../styles/global.css'
       showRsvpStatus();
 
       rsvpBtn.addEventListener('click', () => {
+        const saved = localStorage.getItem('rsvp');
+        if (saved) {
+          const data = JSON.parse(saved);
+          (form.elements.namedItem('name') as HTMLInputElement).value = data.name || '';
+          (form.elements.namedItem('message') as HTMLTextAreaElement).value = data.message || '';
+          const radio = form.querySelector(`input[name="attending"][value="${data.attending}"]`) as HTMLInputElement;
+          if (radio) radio.checked = true;
+        }
         modal.classList.remove('hidden');
       });
 
