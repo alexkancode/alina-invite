@@ -166,18 +166,18 @@ import '../styles/global.css'
 
       <!-- ═══ Disco Ball Hero ═══ -->
       <header class="text-center space-y-phi-lg">
-        <!-- Mini disco ball motif -->
+        <!-- Mini disco ball motif (hidden for now)
         <div class="mx-auto w-[89px] h-[89px] rounded-full relative"
              style="background: conic-gradient(from 0deg, #BCC6CC, #FFD700, #BCC6CC, #5D3FD3, #BCC6CC, #FF007F, #BCC6CC, #FFD700);
                     animation: disco-rotate 8s linear infinite;
                     box-shadow: 0 0 34px hsl(45, 100%, 50% / 0.4), 0 0 55px hsl(280, 60%, 50% / 0.2);">
-          <!-- Facet grid overlay -->
           <div class="absolute inset-0 rounded-full opacity-40"
                style="background:
                  repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(0,0,0,0.3) 8px, rgba(0,0,0,0.3) 9px),
                  repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.3) 8px, rgba(0,0,0,0.3) 9px);">
           </div>
         </div>
+        -->
 
         <!-- Purpose statement -->
         <p class="text-phi-md font-medium tracking-widest text-disco-gold uppercase"
@@ -211,7 +211,8 @@ import '../styles/global.css'
 
 
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
-      <div class="grid gap-phi-xl" style="grid-template-columns: 1fr 0.618fr;">
+      <div class="grid gap-phi-xl content-reveal" style="grid-template-columns: 1fr 0.618fr;
+           opacity: 0; animation: reveal-up 0.8s ease-out 3s forwards;">
 
         <!-- 62% — Map with groovy frame -->
         <section class="relative">
@@ -226,9 +227,14 @@ import '../styles/global.css'
               referrerpolicy="no-referrer-when-downgrade"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019112498507!2d-122.41941548468204!3d37.77492977975892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064b1e8d1b9%3A0x4a83ab0e2e0fcc!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1"
             ></iframe>
-            <!-- Gradient shine overlay (near-zero GPU cost) -->
+            <!-- Gradient shine sweep (near-zero GPU cost) -->
             <div class="absolute inset-0 pointer-events-none rounded-xl"
                  style="background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, transparent 50%, rgba(255,0,127,0.05) 100%);">
+            </div>
+            <div class="absolute inset-0 pointer-events-none rounded-xl shine-sweep"
+                 style="background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%);
+                        background-size: 200% 100%;
+                        animation: shine-sweep 0.6s ease-in-out 3.8s forwards;">
             </div>
           </div>
         </section>
