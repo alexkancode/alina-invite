@@ -70,6 +70,11 @@ import '../styles/global.css'
     <style>
       .bar-fade-right {}
       .bar-fade-left {}
+      @media (hover: hover) {
+        .map-overlay:hover {
+          clip-path: circle(0% at 50% 50%) !important;
+        }
+      }
       #rsvp-btn:hover .rsvp-shine {
         animation: shine-sweep-reverse 0.6s ease-in-out forwards !important;
       }
@@ -117,12 +122,12 @@ import '../styles/global.css'
 
         <!-- Location -->
         <p class="text-phi-md text-metallic-silver">
-          The Design Studio, 742 Evergreen Terrace
+          3220 Alabama CT, Houston, TX 77027
         </p>
       </header>
 
       <!-- ═══ Stripe animation panel (in-flow) ═══ -->
-      <div class="relative w-screen -ml-phi-lg" style="height: 187px; left: 50%; transform: translateX(-50%);">
+      <div class="relative w-screen -ml-phi-lg my-[1rem]" style="height: 187px; left: 50%; transform: translateX(-50%);">
         <!-- Left bars -->
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 0; height: 7px; background: #e62e2e; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 7px; height: 20px; background: #f0e6c8; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
@@ -161,7 +166,7 @@ import '../styles/global.css'
                     animation: ride-in-date 2s linear forwards; animation-delay: 1s;
                     font-family: 'Righteous', sans-serif;
                     font-size: clamp(2.8rem, 9vw, var(--font-size-phi-hero));
-                    color: #FAF6ED; white-space: nowrap; letter-spacing: 0.02em;
+                    color: #6495ED; white-space: nowrap; letter-spacing: 0.02em;
                     text-shadow: 3px 3px 0 #FF007F, 6px 6px 0 #483D8B; line-height: 1;">
           July 11th
         </div>
@@ -174,7 +179,7 @@ import '../styles/global.css'
                     animation: ride-in-date-rtl 2s linear forwards; animation-delay: 1s;
                     font-family: 'Righteous', sans-serif;
                     font-size: clamp(2.8rem, 9vw, var(--font-size-phi-hero));
-                    color: #FAF6ED; white-space: nowrap; letter-spacing: 0.02em;
+                    color: #6495ED; white-space: nowrap; letter-spacing: 0.02em;
                     text-shadow: 3px 3px 0 #FF007F, 6px 6px 0 #483D8B; line-height: 1;">
           3-6pm
         </div>
@@ -195,11 +200,24 @@ import '../styles/global.css'
               loading="lazy"
               allowfullscreen
               referrerpolicy="no-referrer-when-downgrade"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019112498507!2d-122.41941548468204!3d37.77492977975892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064b1e8d1b9%3A0x4a83ab0e2e0fcc!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1"
+              src="https://www.google.com/maps?q=3220+Alabama+CT,+Houston,+TX+77027&output=embed"
             ></iframe>
-            <!-- Gradient shine sweep (near-zero GPU cost) -->
-            <div class="absolute inset-0 pointer-events-none rounded-xl"
-                 style="background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, transparent 50%, rgba(255,0,127,0.05) 100%);">
+            <!-- Knockout text overlay — cream bg with map showing through text -->
+            <div class="map-overlay absolute inset-0 rounded-xl flex items-center justify-center"
+                 style="background: #f0e6c8;
+                        clip-path: circle(100% at 50% 50%);
+                        transition: clip-path 0.7s ease-out;
+                        isolation: isolate;">
+              <p style="font-family: 'Righteous', sans-serif;
+                        color: #000;
+                        mix-blend-mode: screen;
+                        font-size: clamp(1.4rem, 4vw, 2.2rem);
+                        letter-spacing: 0.05em;
+                        text-align: center;
+                        line-height: 1.3;
+                        padding: 0 1rem;">
+                3220 Alabama CT<br>Houston, TX 77027
+              </p>
             </div>
           </div>
         </section>
@@ -240,7 +258,7 @@ import '../styles/global.css'
           <!-- Calendar Link -->
           <a
             id="cal-btn"
-            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Birthday+Celebration&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+a+celebration+of+creativity%2C+friendship%2C+and+another+trip+around+the+sun.&location=The+Design+Studio%2C+742+Evergreen+Terrace&ctz=America/New_York"
+            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Birthday+Celebration&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+a+celebration+of+creativity%2C+friendship%2C+and+another+trip+around+the+sun.&location=3220+Alabama+CT%2C+Houston%2C+TX+77027&ctz=America/New_York"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Add this event to your Google Calendar"
