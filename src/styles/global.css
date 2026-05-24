@@ -151,6 +151,17 @@
   100% { transform: translate(-100%, -50%) translateX(0); }
 }
 
+/* ── Date text rides in with right stripes (mirrored) ── */
+@keyframes ride-in-date-rtl {
+  0%   { transform: translate(100%, -50%) translateX(50vw); opacity: 0; }
+  8%   { opacity: 1; }
+  8%   { transform: translate(100%, -50%) translateX(calc(50vw - 35vw)); }
+  20%  { transform: translate(100%, -50%) translateX(calc(50vw - 42.5vw)); }
+  40%  { transform: translate(100%, -50%) translateX(calc(50vw - 46vw)); }
+  50%  { transform: translate(100%, -50%) translateX(calc(50vw - 47.5vw)); }
+  100% { transform: translate(100%, -50%) translateX(0); }
+}
+
 /* ── Star burst celebration ── */
 @keyframes star-burst {
   0% {
