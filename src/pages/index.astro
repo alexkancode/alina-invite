@@ -21,7 +21,7 @@ import '../styles/global.css'
     <!-- ═══ Sunburst background (radial composition) ═══ -->
     <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.06]">
       <svg viewBox="0 0 800 800" class="w-[150vmax] h-[150vmax]" style="animation: disco-rotate 120s linear infinite;">
-        <g fill="#FFD700">
+        <g fill="#CC5500">
           {Array.from({ length: 24 }).map((_, i) => (
             <rect x="399" y="0" width="2" height="400"
                   transform={`rotate(${i * 15} 400 400)`} />
@@ -102,23 +102,21 @@ import '../styles/global.css'
         -->
 
         <!-- Purpose statement -->
-        <p class="text-phi-md font-medium tracking-widest text-disco-gold uppercase"
-           style="font-family: 'Poppins', sans-serif;">
-          You're invited to celebrate
-        </p>
+        <svg viewBox="0 0 750 220" class="w-full max-w-[750px] mx-auto overflow-visible">
+          <defs>
+            <path id="text-arc" d="M 30,195 A 350,195 0 0,1 720,195" fill="none" />
+          </defs>
+          <text style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 500;
+                       letter-spacing: 0.15em; text-transform: uppercase;"
+                fill="#FFD700">
+            <textPath href="#text-arc" startOffset="50%" text-anchor="middle">
+              Let's celebrate Alina's first year of life!
+            </textPath>
+          </text>
+        </svg>
 
 
-        <!-- Time -->
-        <p class="text-phi-xl font-bold text-hot-pink"
-           style="font-family: 'Righteous', sans-serif;
-                  text-shadow: 2px 2px 0 hsl(270, 60%, 35% / 0.6);">
-          6:00 PM
-        </p>
 
-        <!-- Location -->
-        <p class="text-phi-md text-metallic-silver">
-          3220 Alabama CT, Houston, TX 77027
-        </p>
       </header>
 
       <!-- ═══ Stripe animation panel (in-flow) ═══ -->
@@ -181,14 +179,14 @@ import '../styles/global.css'
       </div>
 
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
-      <div class="grid gap-phi-xl content-reveal" style="grid-template-columns: 1fr 0.618fr;
+      <div class="grid gap-phi-xl content-reveal justify-center" style="grid-template-columns: auto auto;
            opacity: 0; animation: reveal-up 0.8s ease-out 3s forwards;">
 
         <!-- 62% — Map with groovy frame -->
-        <section class="relative">
+        <section class="relative" style="width: 187px;">
           <div class="rounded-xl overflow-hidden relative"
-               style="aspect-ratio: 1.618 / 1;
-                      border: 3px solid #FFD700;
+               style="width: 187px; height: 187px;
+                      border: 3px solid #483D8B;
                       box-shadow: var(--shadow-elevation-medium), 0 0 21px hsl(45, 100%, 50% / 0.15);">
             <iframe
               class="w-full h-full"
@@ -208,7 +206,7 @@ import '../styles/global.css'
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
                    uppercase tracking-widest cursor-pointer transition-all duration-300 relative overflow-hidden"
             style="font-family: 'Righteous', sans-serif;
-                   background: #f4c2c2;
+                   background: #faf7f2;
                    color: #483D8B;
                    border: 3px solid #483D8B;
                    box-shadow: 4px 4px 0 #483D8B;
@@ -241,10 +239,10 @@ import '../styles/global.css'
             rel="noopener noreferrer"
             aria-label="Add this event to your Google Calendar"
             class="inline-flex items-center justify-center gap-phi-sm w-full px-phi-xl py-phi-md
-                   text-turquoise rounded-xl text-phi-base font-bold uppercase tracking-widest
+                   rounded-xl text-phi-base font-bold uppercase tracking-widest text-[#483D8B]
                    no-underline transition-all duration-150 cursor-pointer"
             style="font-family: 'Poppins', sans-serif;
-                   background: rgba(64, 224, 208, 0.08);
+                   background: #faf7f2;
                    border: 3px solid #40E0D0;
                    box-shadow: 4px 4px 0 #483D8B;
                    min-height: 55px;"
@@ -257,7 +255,7 @@ import '../styles/global.css'
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            Save the Date
+            Add to Calendar
           </a>
         </section>
       </div>
