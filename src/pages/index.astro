@@ -500,11 +500,48 @@ import '../styles/global.css'
           localStorage.setItem('rsvp', JSON.stringify(data));
           showRsvpStatus();
           modal.classList.add('hidden');
+          if (data.attending === 'yes') burstStars();
         } catch (err) {
           console.error('RSVP error:', err);
           alert('Something went wrong. Please try again.');
         }
       });
+
+      // ── Star burst celebration (on "Going" submit) ──
+      function burstStars() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const btnRect = rsvpBtn.getBoundingClientRect();
+        const cx = btnRect.left + btnRect.width / 2;
+        const cy = btnRect.top;
+        const colors = ['#FFD700', '#FF007F', '#40E0D0', '#e62e2e', '#5cb832', '#3b3fa0', '#e85d20', '#f0a818'];
+        const count = 14;
+
+        for (let i = 0; i < count; i++) {
+          const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          star.setAttribute('viewBox', '0 0 24 24');
+          const size = 10 + Math.random() * 16;
+          star.style.cssText = `
+            position: fixed;
+            left: ${cx - size / 2}px;
+            top: ${cy}px;
+            width: ${size}px;
+            height: ${size}px;
+            z-index: 9999;
+            pointer-events: none;
+            --burst-x: ${(Math.random() - 0.5) * 160}px;
+            --burst-peak: ${-60 - Math.random() * 100}px;
+            animation: star-burst ${0.6 + Math.random() * 0.4}s ease-out forwards;
+            animation-delay: ${Math.random() * 0.15}s;
+          `;
+          const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          poly.setAttribute('points', '12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5');
+          poly.setAttribute('fill', colors[Math.floor(Math.random() * colors.length)]);
+          star.appendChild(poly);
+          document.body.appendChild(star);
+          star.addEventListener('animationend', () => star.remove());
+        }
+      }
 
     </script>
   </body>
