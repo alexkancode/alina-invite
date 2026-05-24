@@ -18,6 +18,11 @@ import '../styles/global.css'
                background: #f8f3e8;">
 
 
+    <!-- ═══ Disco ball (dead center, behind everything) ═══ -->
+    <div class="fixed inset-0 flex items-center justify-center pointer-events-none" style="z-index: -1;">
+      <img src="/disco-ball.gif" alt="" class="w-[600px] h-[600px] object-cover" style="opacity: 0.7;" />
+    </div>
+
     <!-- ═══ Sunburst background (radial composition) ═══ -->
     <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.06]">
       <svg viewBox="0 0 800 800" class="w-[150vmax] h-[150vmax]" style="animation: disco-rotate 120s linear infinite;">
@@ -102,9 +107,9 @@ import '../styles/global.css'
         -->
 
         <!-- Purpose statement -->
-        <svg viewBox="0 0 750 220" class="w-full max-w-[750px] mx-auto overflow-visible">
+        <svg viewBox="0 0 500 250" class="w-full max-w-[500px] mx-auto overflow-visible" style="margin-top: 120px;">
           <defs>
-            <path id="text-arc" d="M 30,195 A 350,195 0 0,1 720,195" fill="none" />
+            <path id="text-arc" d="M 30,220 A 220,220 0 0,1 470,220" fill="none" />
           </defs>
           <text style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 500;
                        letter-spacing: 0.15em; text-transform: uppercase;"
@@ -120,7 +125,7 @@ import '../styles/global.css'
       </header>
 
       <!-- ═══ Stripe animation panel (in-flow) ═══ -->
-      <div class="relative w-screen -ml-phi-lg my-[1rem]" style="height: 187px; left: 50%; transform: translateX(-50%);">
+      <div class="relative w-screen -ml-phi-lg" style="height: 187px; left: 50%; transform: translateX(-50%);">
         <!-- Left bars -->
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 0; height: 7px; background: #e62e2e; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 7px; height: 20px; background: #f0e6c8; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
@@ -159,8 +164,8 @@ import '../styles/global.css'
                     animation: ride-in-date 2s linear forwards; animation-delay: 1s;
                     font-family: 'Righteous', sans-serif;
                     font-size: clamp(2.8rem, 9vw, var(--font-size-phi-hero));
-                    color: #6495ED; white-space: nowrap; letter-spacing: 0.02em;
-                    text-shadow: 3px 3px 0 #FF007F, 6px 6px 0 #483D8B; line-height: 1;">
+                    color: #FFFFFF; white-space: nowrap; letter-spacing: 0.02em;
+                    text-shadow: 4px 4px 0 #483D8B; line-height: 1;">
           July 11th
         </div>
 
@@ -172,8 +177,8 @@ import '../styles/global.css'
                     animation: ride-in-date-rtl 2s linear forwards; animation-delay: 1s;
                     font-family: 'Righteous', sans-serif;
                     font-size: clamp(2.8rem, 9vw, var(--font-size-phi-hero));
-                    color: #6495ED; white-space: nowrap; letter-spacing: 0.02em;
-                    text-shadow: 3px 3px 0 #FF007F, 6px 6px 0 #483D8B; line-height: 1;">
+                    color: #FFFFFF; white-space: nowrap; letter-spacing: 0.02em;
+                    text-shadow: 4px 4px 0 #483D8B; line-height: 1;">
           3-6pm
         </div>
       </div>
@@ -243,7 +248,7 @@ import '../styles/global.css'
                    no-underline transition-all duration-150 cursor-pointer"
             style="font-family: 'Poppins', sans-serif;
                    background: #faf7f2;
-                   border: 3px solid #40E0D0;
+                   border: 3px solid #483D8B;
                    box-shadow: 4px 4px 0 #483D8B;
                    min-height: 55px;"
             onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #483D8B'"
