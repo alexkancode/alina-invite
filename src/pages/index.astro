@@ -26,10 +26,11 @@ import '../styles/global.css'
     -->
 
     <!-- ═══ Sunburst background (multi-color rays, parallax back layer) ═══ -->
-    <div class="sunburst-bg sparkle-layer fixed inset-0 pointer-events-none flex items-center justify-center"
+    <div class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index: -2;">
+    <div class="sunburst-bg sparkle-layer w-full h-full flex items-center justify-center overflow-visible"
          data-depth="0.008"
-         style="z-index: -2; opacity: 1;">
-      <svg viewBox="0 0 1000 1000" class="rounded-full overflow-hidden" style="width: 200vmax; height: 200vmax; animation: disco-rotate 180s linear infinite;">
+         style="opacity: 1;">
+      <svg viewBox="0 0 1000 1000" style="width: 400vmax; height: 400vmax; border-radius: 50%; animation: disco-rotate 180s linear infinite; flex-shrink: 0;">
         {(() => {
           const colors = ['#FFD700', '#E85D20', '#FFAA00', '#CC5500', '#FFD700', '#F08030', '#FFAA00', '#E85D20', '#F08030', '#CC5500', '#FFD700', '#E85D20'];
           const rays = [];
@@ -53,8 +54,9 @@ import '../styles/global.css'
           return rays;
         })()}
         <!-- Center circle -->
-        <circle cx="500" cy="500" r="60" fill="#f0c040" stroke="#2a1a0a" stroke-width="3" />
+        <circle cx="500" cy="500" r="60" fill="#f0c040" />
       </svg>
+    </div>
     </div>
 
     <!-- ═══ Floating sparkles (mouse-parallax depth layers) ═══ -->
