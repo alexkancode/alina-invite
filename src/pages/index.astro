@@ -2,7 +2,7 @@
 import '../styles/global.css'
 ---
 
-<html lang="en">
+<html lang="en" style="overflow-x: hidden;">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -125,7 +125,7 @@ import '../styles/global.css'
       </header>
 
       <!-- ═══ Stripe animation panel (in-flow) ═══ -->
-      <div class="stripe-panel relative w-screen -ml-phi-lg mb-[2rem]" style="height: 150px; left: 50%; transform: translateX(-50%);">
+      <div class="stripe-panel relative mb-[2rem]" style="height: 150px; width: 100vw; left: 50%; transform: translateX(-50%);">
         <!-- Left bars -->
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 0; height: 7px; background: #e62e2e; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 7px; height: 20px; background: transparent; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
@@ -386,7 +386,7 @@ import '../styles/global.css'
         .arc-text-svg {
           max-width: 90vw !important;
           position: absolute !important;
-          top: 200px;
+          top: 250px;
           left: 50%;
           transform: translateX(-50%);
           z-index: -1;
@@ -395,7 +395,7 @@ import '../styles/global.css'
 
         /* Disco ball higher on mobile */
         .disco-ball-container {
-          margin-top: -320px !important;
+          margin-top: -70px !important;
           left: 0 !important;
           right: 0 !important;
           justify-content: center !important;
