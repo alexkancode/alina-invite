@@ -48,7 +48,6 @@ import '../styles/global.css'
           return rays;
         })()}
         <!-- Center circle -->
-        <circle cx="500" cy="500" r="30" fill="#FFF5A0" />
       </svg>
     </div>
     </div>
@@ -224,9 +223,11 @@ import '../styles/global.css'
           <defs>
             <path id="text-arc" d="M 650,1350 A 650,650 0 0,1 2100,1350" fill="none" />
           </defs>
+          <!-- Sun circle centered below the arc -->
+          <circle cx="1375" cy="1300" r="600" fill="#FFF5A0" />
           <text style="font-family: 'Chicle', sans-serif; font-size: 132px; font-weight: 500;
                        letter-spacing: 0.05em;"
-                fill="#8B2FC9">
+                fill="#483D8B">
             <textPath href="#text-arc" startOffset="50%" text-anchor="middle">
               Let's celebrate Alina's first year of life!
             </textPath>
