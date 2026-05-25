@@ -53,7 +53,7 @@ import '../styles/global.css'
     </div>
 
     <!-- ═══ Corner clouds (stacked circles, tucked into corners) ═══ -->
-    <div class="fixed inset-0 pointer-events-none" style="z-index: -1;">
+    <div id="clouds-container" class="fixed inset-0 pointer-events-none" style="z-index: -1; transition: transform 1.5s ease-in-out;">
       <!-- Bottom-left cloud -->
       <div class="absolute" style="bottom: -40px; left: -40px;">
         <div class="cloud-bubble absolute rounded-full" style="width: 130px; height: 130px; background: #ffffff; bottom: 0; left: 0;"></div>
@@ -743,6 +743,7 @@ import '../styles/global.css'
         const stripePanel = document.querySelector('.stripe-panel')!;
         const sunburst = document.getElementById('sunburst-svg')!;
         const sparkles = document.getElementById('sparkle-field')!;
+        const clouds = document.getElementById('clouds-container')!;
 
         main.classList.add('cal-transition-hide');
         stripePanel.classList.add('cal-transition-hide');
@@ -751,6 +752,7 @@ import '../styles/global.css'
         sunburst.style.width = '120px';
         sunburst.style.height = '120px';
         sparkles.style.transform = 'scale(0.03)';
+        clouds.style.transform = 'scale(0.03)';
 
         // Show big calendar icon
         setTimeout(() => { bigIcon.style.opacity = '1'; }, 400);
@@ -763,6 +765,7 @@ import '../styles/global.css'
           sunburst.style.width = '';
           sunburst.style.height = '';
           sparkles.style.transform = '';
+          clouds.style.transform = '';
           setTimeout(() => {
             main.classList.remove('cal-transition-hide');
             stripePanel.classList.remove('cal-transition-hide');
