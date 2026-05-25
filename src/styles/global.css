@@ -166,6 +166,12 @@
   100% { transform: translate(100%, -50%) translateX(10px); }
 }
 
+/* ── Arc text fade out on mobile ── */
+@keyframes fade-out-arc {
+  from { opacity: 0.5; }
+  to   { opacity: 0; }
+}
+
 /* ── Star burst celebration ── */
 @keyframes star-burst {
   0% {
