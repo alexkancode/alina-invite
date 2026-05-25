@@ -349,10 +349,13 @@ import '../styles/global.css'
     <!-- ═══ Responsive ═══ -->
     <style>
       @media (max-width: 640px) {
-        /* Stack grid to single column, center items */
+        /* Stack grid to single column, center items, map last */
         [style*="grid-template-columns: auto auto"] {
           grid-template-columns: 1fr !important;
           justify-items: center;
+        }
+        .map-section {
+          order: 2 !important;
         }
 
         /* Reduce main padding on mobile */
@@ -379,9 +382,15 @@ import '../styles/global.css'
           font-size: clamp(1.6rem, 7vw, 3rem) !important;
         }
 
-        /* Arc text: reduce max width */
+        /* Arc text: behind content, centered */
         .arc-text-svg {
           max-width: 90vw !important;
+          position: absolute !important;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: -1;
+          opacity: 0.5;
         }
 
         /* Buttons full width on mobile */
