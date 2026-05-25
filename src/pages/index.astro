@@ -299,17 +299,6 @@ import '../styles/global.css'
             onfocus="this.style.borderColor='#FFD700'"
             onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           />
-          <textarea
-            name="message"
-            placeholder="A brief message (optional)"
-            rows="3"
-            class="w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
-                   placeholder-metallic-silver/50 resize-none focus:outline-none transition-colors"
-            style="background: rgba(255,255,255,0.06);
-                   border: 2px solid hsl(270, 30%, 40%);"
-            onfocus="this.style.borderColor='#FFD700'"
-            onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
-          ></textarea>
           <fieldset class="flex gap-phi-xl text-warm-cream">
             <label class="flex items-center gap-phi-sm cursor-pointer">
               <input type="radio" name="attending" value="yes" required
@@ -322,6 +311,17 @@ import '../styles/global.css'
               <span class="font-medium">Can't make it</span>
             </label>
           </fieldset>
+          <textarea
+            name="message"
+            placeholder="A brief message (optional)"
+            rows="3"
+            class="w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+                   placeholder-metallic-silver/50 resize-none focus:outline-none transition-colors"
+            style="background: rgba(255,255,255,0.06);
+                   border: 2px solid hsl(270, 30%, 40%);"
+            onfocus="this.style.borderColor='#FFD700'"
+            onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+          ></textarea>
           <div class="flex gap-phi-md pt-phi-sm">
             <button type="submit" id="rsvp-submit"
                     class="px-phi-xl py-phi-sm text-pop-black rounded-lg font-bold uppercase
