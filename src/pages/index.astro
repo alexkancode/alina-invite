@@ -107,7 +107,7 @@ import '../styles/global.css'
         -->
 
         <!-- Purpose statement -->
-        <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] mx-auto overflow-visible" >
+        <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] mx-auto overflow-visible"  >
           <defs>
             <path id="text-arc" d="M 165,1210 A 1210,1210 0 0,1 2585,1210" fill="none" />
           </defs>
@@ -382,15 +382,20 @@ import '../styles/global.css'
           font-size: clamp(1.6rem, 7vw, 3rem) !important;
         }
 
-        /* Arc text: behind content, centered */
+        /* Arc text: behind content, centered, pushed down */
         .arc-text-svg {
           max-width: 90vw !important;
           position: absolute !important;
-          top: 0;
+          top: 200px;
           left: 50%;
           transform: translateX(-50%);
           z-index: -1;
           opacity: 0.5;
+        }
+
+        /* Disco ball higher on mobile */
+        .disco-ball-container {
+          margin-top: -470px !important;
         }
 
         /* Buttons full width on mobile */
