@@ -59,47 +59,65 @@ import '../styles/global.css'
     </div>
     </div>
 
-    <!-- ═══ Corner clouds (stacked circles) ═══ -->
+    <!-- ═══ Corner clouds (stacked circles, tucked into corners) ═══ -->
     <div class="fixed inset-0 pointer-events-none" style="z-index: -1;">
       <!-- Bottom-left cloud -->
-      <div class="absolute" style="bottom: -30px; left: -20px;">
-        <div class="absolute rounded-full" style="width: 100px; height: 100px; background: #f5e0b8; bottom: 0; left: 0; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 120px; height: 120px; background: #f5e0b8; bottom: 10px; left: 60px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 90px; height: 90px; background: #f5e0b8; bottom: 25px; left: 140px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 80px; height: 80px; background: #f5e0b8; bottom: 5px; left: 200px; border: 2.5px solid #2a1a0a;"></div>
-        <!-- Fill cover to hide inner outlines -->
-        <div class="absolute rounded-full" style="width: 100px; height: 70px; background: #f5e0b8; bottom: 0; left: 10px;"></div>
-        <div class="absolute rounded-full" style="width: 120px; height: 70px; background: #f5e0b8; bottom: 0; left: 70px;"></div>
-        <div class="absolute rounded-full" style="width: 90px; height: 60px; background: #f5e0b8; bottom: 0; left: 150px;"></div>
+      <div class="absolute" style="bottom: -40px; left: -40px;">
+        <div class="absolute rounded-full" style="width: 120px; height: 120px; background: #f5e0b8; bottom: 0; left: 0; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 100px; height: 100px; background: #f5e0b8; bottom: 40px; left: 30px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 90px; height: 90px; background: #f5e0b8; bottom: 15px; left: 80px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 110px; height: 70px; background: #f5e0b8; bottom: 0; left: 0;"></div>
+        <div class="absolute rounded-full" style="width: 90px; height: 50px; background: #f5e0b8; bottom: 0; left: 50px;"></div>
       </div>
 
       <!-- Bottom-right cloud -->
-      <div class="absolute" style="bottom: -30px; right: -20px;">
-        <div class="absolute rounded-full" style="width: 110px; height: 110px; background: #f5e0b8; bottom: 0; right: 0; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 130px; height: 130px; background: #f5e0b8; bottom: 15px; right: 70px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 95px; height: 95px; background: #f5e0b8; bottom: 20px; right: 160px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 75px; height: 75px; background: #f5e0b8; bottom: 0; right: 220px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 110px; height: 70px; background: #f5e0b8; bottom: 0; right: 10px;"></div>
-        <div class="absolute rounded-full" style="width: 130px; height: 70px; background: #f5e0b8; bottom: 0; right: 80px;"></div>
-        <div class="absolute rounded-full" style="width: 95px; height: 60px; background: #f5e0b8; bottom: 0; right: 170px;"></div>
+      <div class="absolute" style="bottom: -40px; right: -40px;">
+        <div class="absolute rounded-full" style="width: 130px; height: 130px; background: #f5e0b8; bottom: 0; right: 0; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 100px; height: 100px; background: #f5e0b8; bottom: 45px; right: 35px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 85px; height: 85px; background: #f5e0b8; bottom: 20px; right: 90px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 120px; height: 70px; background: #f5e0b8; bottom: 0; right: 0;"></div>
+        <div class="absolute rounded-full" style="width: 85px; height: 50px; background: #f5e0b8; bottom: 0; right: 60px;"></div>
       </div>
 
-      <!-- Top-left cloud -->
-      <div class="absolute" style="top: -30px; left: -20px;">
-        <div class="absolute rounded-full" style="width: 90px; height: 90px; background: #f5e0b8; top: 0; left: 0; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 110px; height: 110px; background: #f5e0b8; top: 10px; left: 55px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 80px; height: 80px; background: #f5e0b8; top: 20px; left: 130px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 90px; height: 50px; background: #f5e0b8; top: 0; left: 10px;"></div>
-        <div class="absolute rounded-full" style="width: 110px; height: 60px; background: #f5e0b8; top: 0; left: 65px;"></div>
+      <!-- Top-left cloud (larger cluster + trailing bubbles) -->
+      <div class="absolute" style="top: -40px; left: -40px;">
+        <!-- Main cluster -->
+        <div class="absolute rounded-full" style="width: 120px; height: 120px; background: #f5e0b8; top: 0; left: 0; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 100px; height: 100px; background: #f5e0b8; top: 30px; left: 50px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 90px; height: 90px; background: #f5e0b8; top: 10px; left: 100px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 80px; height: 80px; background: #f5e0b8; top: 55px; left: 25px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 70px; height: 70px; background: #f5e0b8; top: 50px; left: 95px; border: 2.5px solid #2a1a0a;"></div>
+        <!-- Fill covers -->
+        <div class="absolute rounded-full" style="width: 110px; height: 70px; background: #f5e0b8; top: 0; left: 0;"></div>
+        <div class="absolute rounded-full" style="width: 100px; height: 55px; background: #f5e0b8; top: 25px; left: 40px;"></div>
+        <div class="absolute rounded-full" style="width: 90px; height: 50px; background: #f5e0b8; top: 50px; left: 20px;"></div>
+        <!-- Trailing bubbles down left side -->
+        <div class="absolute rounded-full" style="width: 55px; height: 55px; background: #f5e0b8; top: 120px; left: 5px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 40px; height: 40px; background: #f5e0b8; top: 180px; left: 15px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 30px; height: 30px; background: #f5e0b8; top: 230px; left: 8px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 22px; height: 22px; background: #f5e0b8; top: 270px; left: 20px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 16px; height: 16px; background: #f5e0b8; top: 305px; left: 10px; border: 2.5px solid #2a1a0a;"></div>
       </div>
 
-      <!-- Top-right cloud -->
-      <div class="absolute" style="top: -30px; right: -20px;">
-        <div class="absolute rounded-full" style="width: 95px; height: 95px; background: #f5e0b8; top: 0; right: 0; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 115px; height: 115px; background: #f5e0b8; top: 8px; right: 60px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 85px; height: 85px; background: #f5e0b8; top: 18px; right: 140px; border: 2.5px solid #2a1a0a;"></div>
-        <div class="absolute rounded-full" style="width: 95px; height: 50px; background: #f5e0b8; top: 0; right: 10px;"></div>
-        <div class="absolute rounded-full" style="width: 115px; height: 60px; background: #f5e0b8; top: 0; right: 70px;"></div>
+      <!-- Top-right cloud (cluster + trailing bubbles top and right) -->
+      <div class="absolute" style="top: -40px; right: -40px;">
+        <!-- Main cluster -->
+        <div class="absolute rounded-full" style="width: 115px; height: 115px; background: #f5e0b8; top: 0; right: 0; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 95px; height: 95px; background: #f5e0b8; top: 30px; right: 30px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 80px; height: 80px; background: #f5e0b8; top: 10px; right: 85px; border: 2.5px solid #2a1a0a;"></div>
+        <!-- Fill covers -->
+        <div class="absolute rounded-full" style="width: 105px; height: 60px; background: #f5e0b8; top: 0; right: 0;"></div>
+        <div class="absolute rounded-full" style="width: 80px; height: 45px; background: #f5e0b8; top: 0; right: 55px;"></div>
+        <!-- Trailing bubbles down right side -->
+        <div class="absolute rounded-full" style="width: 50px; height: 50px; background: #f5e0b8; top: 110px; right: 5px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 35px; height: 35px; background: #f5e0b8; top: 170px; right: 12px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 24px; height: 24px; background: #f5e0b8; top: 215px; right: 5px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 18px; height: 18px; background: #f5e0b8; top: 250px; right: 18px; border: 2.5px solid #2a1a0a;"></div>
+        <!-- Trailing bubbles along top -->
+        <div class="absolute rounded-full" style="width: 45px; height: 45px; background: #f5e0b8; top: 5px; right: 140px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 30px; height: 30px; background: #f5e0b8; top: 12px; right: 195px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 20px; height: 20px; background: #f5e0b8; top: 8px; right: 235px; border: 2.5px solid #2a1a0a;"></div>
+        <div class="absolute rounded-full" style="width: 14px; height: 14px; background: #f5e0b8; top: 18px; right: 265px; border: 2.5px solid #2a1a0a;"></div>
       </div>
     </div>
 
