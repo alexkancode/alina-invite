@@ -299,16 +299,16 @@ import '../styles/global.css'
             onfocus="this.style.borderColor='#FFD700'"
             onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           />
-          <fieldset class="flex gap-phi-xl text-warm-cream">
-            <label class="flex items-center gap-phi-sm cursor-pointer">
+          <fieldset class="flex flex-col sm:flex-row gap-phi-md sm:gap-phi-xl text-warm-cream">
+            <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
               <input type="radio" name="attending" value="yes" required
-                     class="w-[18px] h-[18px]" style="accent-color: #FFD700;" />
-              <span class="font-medium">I'll be there</span>
+                     class="w-[18px] h-[18px] shrink-0" style="accent-color: #FFD700;" />
+              <span class="font-medium select-none">I'll be there</span>
             </label>
-            <label class="flex items-center gap-phi-sm cursor-pointer">
+            <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
               <input type="radio" name="attending" value="no"
-                     class="w-[18px] h-[18px]" style="accent-color: #FF007F;" />
-              <span class="font-medium">Can't make it</span>
+                     class="w-[18px] h-[18px] shrink-0" style="accent-color: #FF007F;" />
+              <span class="font-medium select-none">Can't make it</span>
             </label>
           </fieldset>
           <textarea
