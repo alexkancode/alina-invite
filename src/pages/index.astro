@@ -29,21 +29,24 @@ import '../styles/global.css'
     <div class="sunburst-bg sparkle-layer fixed inset-0 pointer-events-none flex items-center justify-center"
          data-depth="0.008"
          style="z-index: -2; opacity: 1;">
-      <svg viewBox="0 0 1000 1000" class="w-[180vmax] h-[180vmax]"
-           style="animation: disco-rotate 180s linear infinite;">
+      <svg viewBox="0 0 1000 1000" class="rounded-full overflow-hidden" style="width: 200vmax; height: 200vmax; animation: disco-rotate 180s linear infinite;">
         {(() => {
           const colors = ['#FFD700', '#E85D20', '#FFAA00', '#CC5500', '#FFD700', '#F08030', '#FFAA00', '#E85D20', '#F08030', '#CC5500', '#FFD700', '#E85D20'];
           const rays = [];
           const count = 36;
           const angleStep = 360 / count;
+          const cx = 500, cy = 500, r = 600;
           for (let i = 0; i < count; i++) {
-            const color = colors[i % colors.length];
-            const width = (i % 3 === 0) ? 45 : (i % 3 === 1) ? 35 : 28;
+            const a1 = (i * angleStep - 90) * Math.PI / 180;
+            const a2 = ((i + 1) * angleStep - 90) * Math.PI / 180;
+            const x1 = cx + r * Math.cos(a1);
+            const y1 = cy + r * Math.sin(a1);
+            const x2 = cx + r * Math.cos(a2);
+            const y2 = cy + r * Math.sin(a2);
             rays.push(
               <polygon
-                points={`500,500 ${500 - width},0 ${500 + width},0`}
-                fill={color}
-                transform={`rotate(${i * angleStep} 500 500)`}
+                points={`${cx},${cy} ${x1},${y1} ${x2},${y2}`}
+                fill={colors[i % colors.length]}
               />
             );
           }
