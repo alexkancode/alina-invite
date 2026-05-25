@@ -82,27 +82,27 @@
 /* ── Sliding bar animation ── */
 @keyframes sliding-bar {
   0%   { clip-path: inset(0 100% 0 0);  }
-  5%   { clip-path: inset(0 30%  0 0);  }
-  12%  { clip-path: inset(0 10%  0 0);  }
-  22%  { clip-path: inset(0 3%   0 0);  }
-  35%  { clip-path: inset(0 0    0 0);  }
-  60%  { clip-path: inset(0 0    0 2%); }
-  75%  { clip-path: inset(0 0    0 15%); }
-  85%  { clip-path: inset(0 0    0 40%); }
-  93%  { clip-path: inset(0 0    0 70%); }
+  3%   { clip-path: inset(0 30%  0 0);  }
+  6%   { clip-path: inset(0 10%  0 0);  }
+  11%  { clip-path: inset(0 3%   0 0);  }
+  18%  { clip-path: inset(0 0    0 0);  }
+  75%  { clip-path: inset(0 0    0 0);  }
+  82%  { clip-path: inset(0 0    0 15%); }
+  88%  { clip-path: inset(0 0    0 40%); }
+  95%  { clip-path: inset(0 0    0 70%); }
   100% { clip-path: inset(0 0    0 100%); }
 }
 
 @keyframes sliding-bar-rtl {
   0%   { clip-path: inset(0 0 0 100%);  }
-  5%   { clip-path: inset(0 0 0 30%);   }
-  12%  { clip-path: inset(0 0 0 10%);   }
-  22%  { clip-path: inset(0 0 0 3%);    }
-  35%  { clip-path: inset(0 0 0 0);     }
-  60%  { clip-path: inset(0 2% 0 0);    }
-  75%  { clip-path: inset(0 15% 0 0);   }
-  85%  { clip-path: inset(0 40% 0 0);   }
-  93%  { clip-path: inset(0 70% 0 0);   }
+  3%   { clip-path: inset(0 0 0 30%);   }
+  6%   { clip-path: inset(0 0 0 10%);   }
+  11%  { clip-path: inset(0 0 0 3%);    }
+  18%  { clip-path: inset(0 0 0 0);     }
+  75%  { clip-path: inset(0 0 0 0);     }
+  82%  { clip-path: inset(0 15% 0 0);   }
+  88%  { clip-path: inset(0 40% 0 0);   }
+  95%  { clip-path: inset(0 70% 0 0);   }
   100% { clip-path: inset(0 100% 0 0);  }
 }
 
