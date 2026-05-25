@@ -149,7 +149,7 @@ import '../styles/global.css'
     </div>
 
     <!-- ═══ Floating sparkles (mouse-parallax depth layers) ═══ -->
-    <div id="sparkle-field" class="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+    <div id="sparkle-field" class="fixed inset-0 pointer-events-none z-[1] overflow-hidden" style="transition: transform 1.5s ease-in-out;">
       <!-- Layer 1: slow/far sparkles -->
       <div class="sparkle-layer" data-depth="0.02">
         <svg class="sparkle" style="top: 5%; left: 8%; animation-delay: 0s;" viewBox="0 0 24 24" width="14" height="14"><polygon points="12,0 14.5,9.5 24,12 14.5,14.5 12,24 9.5,14.5 0,12 9.5,9.5" stroke="#2a1a0a" stroke-width="1" fill="#FFD700" /></svg>
@@ -742,12 +742,14 @@ import '../styles/global.css'
         const main = document.querySelector('main')!;
         const stripePanel = document.querySelector('.stripe-panel')!;
         const sunburst = document.getElementById('sunburst-container')!;
+        const sparkles = document.getElementById('sparkle-field')!;
 
         main.classList.add('cal-transition-hide');
         stripePanel.classList.add('cal-transition-hide');
 
-        // Shrink rays to icon size
+        // Shrink rays and stars to icon size
         sunburst.style.transform = 'scale(0.03)';
+        sparkles.style.transform = 'scale(0.03)';
 
         // Show big calendar icon
         setTimeout(() => { bigIcon.style.opacity = '1'; }, 400);
@@ -758,6 +760,7 @@ import '../styles/global.css'
           // Restore everything
           bigIcon.style.opacity = '0';
           sunburst.style.transform = '';
+          sparkles.style.transform = '';
           setTimeout(() => {
             main.classList.remove('cal-transition-hide');
             stripePanel.classList.remove('cal-transition-hide');
