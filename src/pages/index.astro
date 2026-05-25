@@ -10,20 +10,22 @@ import '../styles/global.css'
     <title>You're Invited</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Chicle&family=Righteous&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Chicle&family=Righteous&family=Poppins:wght@400;500;600;700&family=Caprasimo&family=Fredoka:wght@600&family=Baloo+2:wght@700&family=Monoton&family=Bungee+Shade&family=Pacifico&family=Rubik+Bubbles&family=Shrikhand&display=swap" rel="stylesheet" />
   </head>
 
   <body class="min-h-screen overflow-x-hidden relative"
-        style="font-family: 'Poppins', sans-serif;
+        style="font-family: 'Righteous', sans-serif;
                background: #ffffff;">
 
 
-    <!-- ═══ Disco ball (hidden temporarily) ═══ -->
-    <!--
+    <!-- ═══ Disco ball ═══ -->
     <div class="disco-ball-container fixed inset-0 flex items-center justify-center pointer-events-none" style="z-index: -1; margin-top: -170px;">
-      <img src="/disco-ball.gif" alt="" class="w-[600px] h-[600px] object-cover" style="opacity: 1;" />
+      <div class="relative flex items-center justify-center" style="width: 600px; height: 600px;">
+        <img src="/disco-ball.gif" alt="" class="w-[600px] h-[600px] object-contain" />
+        <div class="absolute rounded-full" style="width: 600px; height: 600px; top: 0; left: 0; background: white; opacity: 0.5;"></div>
+        <div class="absolute" style="width: 600px; height: 600px; top: 20px; left: 0; background: white; opacity: 0.75; clip-path: circle(38% at 50% 50%);"></div>
+      </div>
     </div>
-    -->
 
     <!-- ═══ Sunburst background (multi-color rays, parallax back layer) ═══ -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index: -2;">
@@ -230,9 +232,9 @@ import '../styles/global.css'
           <defs>
             <path id="text-arc" d="M 165,1210 A 1210,1210 0 0,1 2585,1210" fill="none" />
           </defs>
-          <text style="font-family: 'Poppins', sans-serif; font-size: 132px; font-weight: 500;
-                       letter-spacing: 0.15em; text-transform: uppercase;"
-                fill="#483D8B">
+          <text style="font-family: 'Chicle', sans-serif; font-size: 132px; font-weight: 500;
+                       letter-spacing: 0.05em;"
+                fill="#8B2FC9">
             <textPath href="#text-arc" startOffset="50%" text-anchor="middle">
               Let's celebrate Alina's first year of life!
             </textPath>
@@ -283,7 +285,7 @@ import '../styles/global.css'
                     animation: ride-in-date 2s linear forwards; animation-delay: 1s;
                     font-family: 'Chicle', sans-serif;
                     font-size: clamp(2.8rem, 9vw, var(--font-size-phi-hero));
-                    color: #FFFFFF; white-space: nowrap; letter-spacing: 0.02em;
+                    color: #FFD700; white-space: nowrap; letter-spacing: 0.02em;
                     text-shadow: 4px 4px 0 #483D8B; line-height: 1;">
           July 11th
         </div>
@@ -296,7 +298,7 @@ import '../styles/global.css'
                     animation: ride-in-date-rtl 2s linear forwards; animation-delay: 1s;
                     font-family: 'Chicle', sans-serif;
                     font-size: clamp(2.8rem, 9vw, var(--font-size-phi-hero));
-                    color: #FFFFFF; white-space: nowrap; letter-spacing: 0.02em;
+                    color: #FFD700; white-space: nowrap; letter-spacing: 0.02em;
                     text-shadow: 4px 4px 0 #483D8B; line-height: 1;">
           3-6pm
         </div>
@@ -325,6 +327,8 @@ import '../styles/global.css'
         <!-- 38% — Actions panel -->
         <section class="flex flex-col gap-phi-lg justify-center">
           <!-- RSVP Button — disco gold with layered shadow -->
+          <div class="relative">
+            <span class="absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Pacifico', sans-serif; font-size: 1.5rem; color: #F0B8FF; -webkit-text-stroke: 1px #8B2FC9;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
@@ -341,7 +345,7 @@ import '../styles/global.css'
             <!-- Default state -->
             <span id="rsvp-btn-default">RSVP</span>
             <!-- Submitted state -->
-            <div id="rsvp-btn-status" class="hidden text-left space-y-phi-xs" style="font-family: 'Poppins', sans-serif;">
+            <div id="rsvp-btn-status" class="hidden text-left space-y-phi-xs" style="font-family: 'Righteous', sans-serif;">
               <div class="flex items-center justify-between">
                 <span id="rsvp-status-name" class="text-phi-base font-semibold truncate"></span>
                 <span id="rsvp-status-badge" class="text-phi-sm font-bold uppercase tracking-wider shrink-0 ml-phi-sm px-phi-sm py-phi-xs rounded" style="background: transparent;"></span>
@@ -349,11 +353,12 @@ import '../styles/global.css'
               <p id="rsvp-status-message" class="text-phi-sm font-normal normal-case tracking-normal opacity-70 truncate"></p>
             </div>
             <div class="rsvp-shine absolute inset-0 pointer-events-none rounded-xl"
-                 style="background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.5) 50%, transparent 60%);
+                 style="background: linear-gradient(105deg, transparent 40%, rgba(180,130,230,0.2) 50%, transparent 60%);
                         background-size: 200% 100%;
                         animation: shine-sweep 0.6s ease-in-out 3.8s forwards;">
             </div>
           </button>
+          </div>
 
           <!-- Calendar Link -->
           <a
@@ -365,7 +370,7 @@ import '../styles/global.css'
             class="inline-flex items-center justify-center gap-phi-sm w-full px-phi-xl py-phi-md
                    rounded-xl text-phi-base font-bold uppercase tracking-widest text-[#483D8B]
                    no-underline transition-all duration-150 cursor-pointer"
-            style="font-family: 'Poppins', sans-serif;
+            style="font-family: 'Righteous', sans-serif;
                    background: #faf7f2;
                    border: 3px solid #483D8B;
                    box-shadow: 4px 4px 0 #483D8B;
@@ -373,7 +378,7 @@ import '../styles/global.css'
             onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #483D8B'"
             onmouseleave="this.style.boxShadow='4px 4px 0 #483D8B'"
           >
-            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="#8B2FC9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
               <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -465,6 +470,7 @@ import '../styles/global.css'
       </div>
     </div>
 
+
     <!-- ═══ Responsive ═══ -->
     <style>
       @media (max-width: 640px) {
@@ -513,12 +519,9 @@ import '../styles/global.css'
           animation: fade-out-arc 0.6s ease-out 2.4s forwards !important;
         }
 
-        /* Disco ball higher on mobile */
+        /* Hide disco ball on mobile */
         .disco-ball-container {
-          margin-top: -70px !important;
-          left: 0 !important;
-          right: 0 !important;
-          justify-content: center !important;
+          display: none !important;
         }
 
         /* Buttons full width on mobile */
@@ -526,15 +529,14 @@ import '../styles/global.css'
           min-width: 250px;
         }
 
-        /* Map stays square but allow centering */
+        /* Map stays square but allow centering, shorter on mobile */
         .map-section {
           width: 100% !important;
           max-width: 280px;
         }
         .map-section > div {
           width: 100% !important;
-          height: auto !important;
-          aspect-ratio: 1 / 1;
+          height: 87px !important;
         }
 
         /* Modal tighter padding on mobile */
@@ -597,7 +599,7 @@ import '../styles/global.css'
         rsvpStatus.classList.remove('hidden');
         rsvpName.textContent = data.name;
         rsvpBadge.textContent = data.attending === 'yes' ? 'Going' : 'Not going';
-        rsvpBadge.style.color = data.attending === 'yes' ? '#5cb832' : '#e62e2e';
+        rsvpBadge.style.color = '#8B2FC9';
         const msg = data.message || '';
         rsvpMessage.textContent = msg.length > 100 ? msg.slice(0, 100) + '…' : msg;
         rsvpMessage.classList.toggle('hidden', !msg);
