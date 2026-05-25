@@ -18,25 +18,27 @@ import '../styles/global.css'
                background: #f5e0b8;">
 
 
-    <!-- ═══ Disco ball (dead center, behind everything) ═══ -->
+    <!-- ═══ Disco ball (hidden temporarily) ═══ -->
+    <!--
     <div class="disco-ball-container fixed inset-0 flex items-center justify-center pointer-events-none" style="z-index: -1; margin-top: -170px;">
-      <img src="/disco-ball.gif" alt="" class="w-[600px] h-[600px] object-cover" style="opacity: 0.7;" />
+      <img src="/disco-ball.gif" alt="" class="w-[600px] h-[600px] object-cover" style="opacity: 1;" />
     </div>
+    -->
 
     <!-- ═══ Sunburst background (multi-color rays, parallax back layer) ═══ -->
-    <div class="sunburst-bg sparkle-layer fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
+    <div class="sunburst-bg sparkle-layer fixed inset-0 pointer-events-none flex items-center justify-center"
          data-depth="0.008"
-         style="opacity: 0.12;">
+         style="z-index: -2; opacity: 1;">
       <svg viewBox="0 0 1000 1000" class="w-[180vmax] h-[180vmax]"
            style="animation: disco-rotate 180s linear infinite;">
         {(() => {
-          const colors = ['#f0c040', '#cc5500', '#f5d060', '#d06820', '#f0c040', '#e89030', '#f5d060', '#cc5500', '#e89030', '#d06820', '#f0c040', '#cc5500'];
+          const colors = ['#FFD700', '#E85D20', '#FFAA00', '#CC5500', '#FFD700', '#F08030', '#FFAA00', '#E85D20', '#F08030', '#CC5500', '#FFD700', '#E85D20'];
           const rays = [];
           const count = 36;
           const angleStep = 360 / count;
           for (let i = 0; i < count; i++) {
             const color = colors[i % colors.length];
-            const width = (i % 3 === 0) ? 18 : (i % 3 === 1) ? 12 : 8;
+            const width = (i % 3 === 0) ? 45 : (i % 3 === 1) ? 35 : 28;
             rays.push(
               <polygon
                 points={`500,500 ${500 - width},0 ${500 + width},0`}
