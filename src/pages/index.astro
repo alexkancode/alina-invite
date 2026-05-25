@@ -19,12 +19,12 @@ import '../styles/global.css'
 
 
     <!-- ═══ Disco ball (dead center, behind everything) ═══ -->
-    <div class="fixed inset-0 flex items-center justify-center pointer-events-none" style="z-index: -1; margin-top: -170px;">
+    <div class="disco-ball-container fixed inset-0 flex items-center justify-center pointer-events-none" style="z-index: -1; margin-top: -170px;">
       <img src="/disco-ball.gif" alt="" class="w-[600px] h-[600px] object-cover" style="opacity: 0.7;" />
     </div>
 
     <!-- ═══ Sunburst background (radial composition) ═══ -->
-    <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.06]">
+    <div class="sunburst-bg fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.06]">
       <svg viewBox="0 0 800 800" class="w-[150vmax] h-[150vmax]" style="animation: disco-rotate 120s linear infinite;">
         <g fill="#CC5500">
           {Array.from({ length: 24 }).map((_, i) => (
@@ -107,7 +107,7 @@ import '../styles/global.css'
         -->
 
         <!-- Purpose statement -->
-        <svg viewBox="0 0 2750 1375" class="w-full max-w-[600px] mx-auto overflow-visible" >
+        <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] mx-auto overflow-visible" >
           <defs>
             <path id="text-arc" d="M 165,1210 A 1210,1210 0 0,1 2585,1210" fill="none" />
           </defs>
@@ -125,7 +125,7 @@ import '../styles/global.css'
       </header>
 
       <!-- ═══ Stripe animation panel (in-flow) ═══ -->
-      <div class="relative w-screen -ml-phi-lg mb-[2rem]" style="height: 150px; left: 50%; transform: translateX(-50%);">
+      <div class="stripe-panel relative w-screen -ml-phi-lg mb-[2rem]" style="height: 150px; left: 50%; transform: translateX(-50%);">
         <!-- Left bars -->
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 0; height: 7px; background: #e62e2e; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
         <div class="absolute left-0 w-[50vw] bar-fade-right" style="top: 7px; height: 20px; background: transparent; clip-path: inset(0 100% 0 0); animation: sliding-bar 2s linear forwards; animation-delay: 1s;"></div>
@@ -157,7 +157,7 @@ import '../styles/global.css'
         <div class="absolute right-0 w-[50vw] bar-fade-left" style="top: 162px; height: 25px; background: #d03890; clip-path: inset(0 0 0 100%); animation: sliding-bar-rtl 2s linear forwards; animation-delay: 1s;"></div>
 
         <!-- Sliding text: left -->
-        <div class="absolute pointer-events-none"
+        <div class="slide-text absolute pointer-events-none"
              style="top: 50%; left: 50%;
                     transform: translate(-100%, -50%) translateX(-50vw);
                     z-index: 1;
@@ -170,7 +170,7 @@ import '../styles/global.css'
         </div>
 
         <!-- Sliding text: right -->
-        <div class="absolute pointer-events-none"
+        <div class="slide-text absolute pointer-events-none"
              style="top: 50%; right: 50%;
                     transform: translate(100%, -50%) translateX(50vw);
                     z-index: 1;
@@ -188,7 +188,7 @@ import '../styles/global.css'
            opacity: 0; animation: reveal-up 0.8s ease-out 3s forwards;">
 
         <!-- 62% — Map with groovy frame -->
-        <section class="relative" style="width: 187px;">
+        <section class="map-section relative" style="width: 187px;">
           <div class="rounded-xl overflow-hidden relative"
                style="width: 187px; height: 187px;
                       border: 3px solid #483D8B;
@@ -349,8 +349,67 @@ import '../styles/global.css'
     <!-- ═══ Responsive ═══ -->
     <style>
       @media (max-width: 640px) {
-        [style*="grid-template-columns: 1fr 0.618fr"] {
+        /* Stack grid to single column, center items */
+        [style*="grid-template-columns: auto auto"] {
           grid-template-columns: 1fr !important;
+          justify-items: center;
+        }
+
+        /* Reduce main padding on mobile */
+        main {
+          padding-left: 13px !important;
+          padding-right: 13px !important;
+          padding-top: 34px !important;
+          padding-bottom: 34px !important;
+        }
+
+        /* Scale down disco ball on small screens */
+        .disco-ball-container img {
+          width: 300px !important;
+          height: 300px !important;
+        }
+
+        /* Reduce stripe panel height */
+        .stripe-panel {
+          height: 120px !important;
+        }
+
+        /* Slide-in text smaller on mobile */
+        .slide-text {
+          font-size: clamp(1.6rem, 7vw, 3rem) !important;
+        }
+
+        /* Arc text: reduce max width */
+        .arc-text-svg {
+          max-width: 90vw !important;
+        }
+
+        /* Buttons full width on mobile */
+        #rsvp-btn, #cal-btn {
+          min-width: 250px;
+        }
+
+        /* Map stays square but allow centering */
+        .map-section {
+          width: 100% !important;
+          max-width: 280px;
+        }
+        .map-section > div {
+          width: 100% !important;
+          height: auto !important;
+          aspect-ratio: 1 / 1;
+        }
+
+        /* Modal tighter padding on mobile */
+        #rsvp-modal > div {
+          padding: 21px !important;
+          margin: 13px;
+        }
+
+        /* Reduce sunburst size */
+        .sunburst-bg svg {
+          width: 120vmax !important;
+          height: 120vmax !important;
         }
       }
     </style>
