@@ -18,7 +18,8 @@ import '../styles/global.css'
                background: #ffffff;">
 
 
-    <!-- ═══ Disco ball ═══ -->
+    <!-- ═══ Disco ball (hidden) ═══ -->
+    <!--
     <div class="disco-ball-container fixed inset-0 flex items-center justify-center pointer-events-none" style="z-index: -1; margin-top: -170px;">
       <div class="relative flex items-center justify-center" style="width: 600px; height: 600px;">
         <img src="/disco-ball.gif" alt="" class="w-[600px] h-[600px] object-contain" />
@@ -26,6 +27,7 @@ import '../styles/global.css'
         <div class="absolute" style="width: 600px; height: 600px; top: 20px; left: 0; background: white; opacity: 0.75; clip-path: circle(38% at 50% 50%);"></div>
       </div>
     </div>
+    -->
 
     <!-- ═══ Sunburst background (multi-color rays, parallax back layer) ═══ -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index: -2;">
@@ -328,7 +330,7 @@ import '../styles/global.css'
         <section class="flex flex-col gap-phi-lg justify-center">
           <!-- RSVP Button — disco gold with layered shadow -->
           <div class="relative">
-            <span class="absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Pacifico', sans-serif; font-size: 1.5rem; color: #F0B8FF; -webkit-text-stroke: 1px #8B2FC9;">Alina's Birthday</span>
+            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; -webkit-text-stroke: 1px #8B2FC9; -webkit-text-fill-color: transparent; background: linear-gradient(105deg, #F0B8FF 40%, rgba(255,255,255,0.9) 50%, #F0B8FF 60%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; animation: shine-sweep 0.6s ease-in-out 3.8s forwards;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
