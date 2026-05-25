@@ -24,7 +24,7 @@ import '../styles/global.css'
     <div id="sunburst-container" class="sunburst-bg sparkle-layer w-full h-full flex items-center justify-center overflow-visible"
          data-depth="0.008"
          style="opacity: 1; transition: transform 1.5s ease-in-out;">
-      <svg viewBox="0 0 1000 1000" style="width: 400vmax; height: 400vmax; border-radius: 50%; animation: disco-rotate 180s linear infinite; flex-shrink: 0;">
+      <svg id="sunburst-svg" viewBox="0 0 1000 1000" style="width: 400vmax; height: 400vmax; border-radius: 50%; animation: disco-rotate 180s linear infinite; flex-shrink: 0; transition: transform 1.5s ease-in-out, width 1.5s ease-in-out, height 1.5s ease-in-out;">
         {(() => {
           const colors = ['#C0E4FF', '#B0F0FF', '#CCE4FF', '#FFE8FF', '#C0E4FF', '#D0F0FF', '#CCE4FF', '#B8ECFF', '#B0F0FF', '#FFE8FF', '#D0F0FF', '#C0E4FF'];
           const rays = [];
@@ -741,14 +741,15 @@ import '../styles/global.css'
         // Hide everything except rays, sparkles, clouds, and the big icon
         const main = document.querySelector('main')!;
         const stripePanel = document.querySelector('.stripe-panel')!;
-        const sunburst = document.getElementById('sunburst-container')!;
+        const sunburst = document.getElementById('sunburst-svg')!;
         const sparkles = document.getElementById('sparkle-field')!;
 
         main.classList.add('cal-transition-hide');
         stripePanel.classList.add('cal-transition-hide');
 
         // Shrink rays and stars to icon size
-        sunburst.style.transform = 'scale(0.03)';
+        sunburst.style.width = '120px';
+        sunburst.style.height = '120px';
         sparkles.style.transform = 'scale(0.03)';
 
         // Show big calendar icon
@@ -759,7 +760,8 @@ import '../styles/global.css'
           window.open(calUrl, '_blank', 'noopener,noreferrer');
           // Restore everything
           bigIcon.style.opacity = '0';
-          sunburst.style.transform = '';
+          sunburst.style.width = '';
+          sunburst.style.height = '';
           sparkles.style.transform = '';
           setTimeout(() => {
             main.classList.remove('cal-transition-hide');
