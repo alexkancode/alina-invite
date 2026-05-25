@@ -215,7 +215,7 @@ import '../styles/global.css'
     <main class="relative z-10 max-w-[791px] mx-auto px-phi-lg py-phi-3xl">
 
       <!-- ═══ Disco Ball Hero ═══ -->
-      <header class="text-center space-y-phi-lg flex flex-col justify-end" style="min-height: 0;">
+      <header class="text-center space-y-phi-lg flex flex-col justify-end relative" style="min-height: 0;">
         <!-- Mini disco ball motif (hidden for now)
         <div class="mx-auto w-[89px] h-[89px] rounded-full relative"
              style="background: conic-gradient(from 0deg, #BCC6CC, #FFD700, #BCC6CC, #5D3FD3, #BCC6CC, #FF007F, #BCC6CC, #FFD700);
@@ -229,8 +229,8 @@ import '../styles/global.css'
         </div>
         -->
 
-        <!-- Purpose statement -->
-        <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] mx-auto overflow-visible"  >
+        <!-- Purpose statement (absolute, doesn't affect flow) -->
+        <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] overflow-visible" style="position: absolute; top: 300px; left: 50%; transform: translateX(-50%);" >
           <defs>
             <path id="text-arc" d="M 165,1210 A 1210,1210 0 0,1 2585,1210" fill="none" />
           </defs>
@@ -305,6 +305,9 @@ import '../styles/global.css'
           3-6pm
         </div>
       </div>
+
+      <!-- Spacer between stripes and content -->
+      <div class="stripe-content-spacer" style="height: 300px;"></div>
 
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
       <div class="grid gap-phi-xl content-reveal justify-center" style="grid-template-columns: auto auto;
@@ -504,13 +507,16 @@ import '../styles/global.css'
           height: 120px !important;
         }
 
-        /* Slide-in text bigger on mobile */
+        /* Slide-in text on mobile */
         .slide-text {
-          font-size: clamp(2.4rem, 10.5vw, 4.5rem) !important;
+          font-size: 50px !important;
+          line-height: 1 !important;
+          margin-top: 50px !important;
         }
 
         /* Arc text: behind content, centered, pushed down, fades out after reveal */
         .arc-text-svg {
+          display: none !important;
           max-width: 90vw !important;
           position: absolute !important;
           top: 250px;
@@ -545,6 +551,11 @@ import '../styles/global.css'
         #rsvp-modal > div {
           padding: 21px !important;
           margin: 13px;
+        }
+
+        /* Smaller spacer on mobile */
+        .stripe-content-spacer {
+          height: 150px !important;
         }
 
         /* Reduce sunburst size */
