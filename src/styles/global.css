@@ -216,7 +216,7 @@
   background-position: center;
 }
 
-/* Iridescent tiles — static gradient + hue-rotate (GPU-composited) */
+/* Iridescent tiles — static gradient, parent rotation does the shimmer */
 .mirror-tile.iridescent {
   background: linear-gradient(
     135deg,
@@ -225,10 +225,10 @@
     hsl(120, 60%, 80%),
     hsl(50, 80%, 78%)
   ) !important;
-  animation: iri-shift 4s linear infinite;
+  /* No animation — parent's rotateY naturally shifts which face catches light */
 }
 
-/* Bright specular highlight on iridescent tiles — "catches light" as ball spins */
+/* Bright specular highlight — static, painted once, cheap */
 .mirror-tile.iridescent::after {
   background: radial-gradient(
     circle at 30% 30%,
@@ -236,10 +236,6 @@
     rgba(255, 255, 255, 0.3) 30%,
     transparent 60%
   ) !important;
-}
-
-@keyframes iri-shift {
-  to { filter: hue-rotate(360deg); }
 }
 
 .mirror-tile::after {

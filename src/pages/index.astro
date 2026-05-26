@@ -837,10 +837,8 @@ import '../styles/global.css'
               `rotateX(${(phi * 180) / Math.PI - 90}deg) ` +
               `translateZ(${radius}px)`;
             if (Math.random() < 0.3) {
-              // Iridescent tile
+              // Iridescent tile — static gradient, parent rotation does shimmer
               tile.classList.add('iridescent');
-              tile.style.animationDelay = `${-(Math.random() * 4)}s`;
-              tile.style.animationDuration = `${3 + Math.random() * 3}s`;
             } else {
               // Photo tile
               tile.style.backgroundImage = `url('${photos[count % photos.length]}')`;
