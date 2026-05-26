@@ -229,7 +229,7 @@ import '../styles/global.css'
           <defs>
             <path id="text-arc" d="M 650,1350 A 650,650 0 0,1 2100,1350" fill="none" />
           </defs>
-          <!-- Sun circle centered below the arc -->
+          <!-- Sun circle (behind disco ball) -->
           <circle cx="1375" cy="1300" r="600" fill="#FFF5A0" />
           <text style="font-family: 'Chicle', sans-serif; font-size: 132px; font-weight: 500;
                        letter-spacing: 0.05em;"
@@ -240,7 +240,12 @@ import '../styles/global.css'
           </text>
         </svg>
 
-
+        <!-- Cartoon disco ball (replaces sun) -->
+        <div class="disco-ball-scene" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; aspect-ratio: 2750 / 1375; display: flex; align-items: end; justify-content: center; pointer-events: none;">
+          <div class="disco-ball-wrapper" style="perspective: 600px; margin-bottom: 2%;">
+            <div class="disco-ball-spin" id="discoBall" style="position: relative; width: 0; height: 0; transform-style: preserve-3d; animation: disco-ball-spin 8s linear infinite;"></div>
+          </div>
+        </div>
 
       </header>
 
@@ -513,7 +518,7 @@ import '../styles/global.css'
         }
 
         /* Arc text: behind content, centered, pushed down, fades out after reveal */
-        .arc-text-svg {
+        .arc-text-svg, .disco-ball-scene {
           display: none !important;
           max-width: 90vw !important;
           position: absolute !important;
@@ -715,6 +720,40 @@ import '../styles/global.css'
           star.addEventListener('animationend', () => star.remove());
         }
       }
+
+      // ── Build cartoon disco ball ──
+      function buildDiscoBall(containerId: string, radius: number, tileSize: number) {
+        const container = document.getElementById(containerId)!;
+        const latStep = tileSize / radius;
+        const gapFactor = 1.15;
+        const palette = ['#C0E4FF', '#B0F0FF', '#CCE4FF', '#FFE8FF', '#D0F0FF', '#B8ECFF', '#FFF5A0', '#FFD1FF'];
+        let count = 0;
+
+        for (let phi = latStep / 2; phi < Math.PI; phi += latStep) {
+          const ringRadius = radius * Math.sin(phi);
+          const numTiles = Math.max(2, Math.floor((2 * Math.PI * ringRadius) / (tileSize * gapFactor)));
+          const lonStep = (2 * Math.PI) / numTiles;
+
+          for (let i = 0; i < numTiles; i++) {
+            const theta = i * lonStep;
+            const tile = document.createElement('div');
+            tile.className = 'mirror-tile';
+            tile.style.width = tileSize + 'px';
+            tile.style.height = tileSize + 'px';
+            tile.style.left = -(tileSize / 2) + 'px';
+            tile.style.top = -(tileSize / 2) + 'px';
+            tile.style.transform =
+              `rotateY(${(theta * 180) / Math.PI}deg) ` +
+              `rotateX(${(phi * 180) / Math.PI - 90}deg) ` +
+              `translateZ(${radius}px)`;
+            tile.style.backgroundColor = palette[count % palette.length];
+            container.appendChild(tile);
+            count++;
+          }
+        }
+      }
+
+      buildDiscoBall('discoBall', 50, 12);
 
       // ── Calendar transition ──
       const calBtn = document.getElementById('cal-btn')!;
