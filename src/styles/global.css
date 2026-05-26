@@ -256,10 +256,12 @@
 .game-board {
   display: grid;
   grid-template-columns: repeat(var(--cols, 4), 1fr);
+  grid-template-rows: repeat(var(--rows, 4), 1fr);
   gap: 8px;
-  aspect-ratio: 1;
   width: 100%;
-  max-width: min(480px, 65vh);
+  height: 100%;
+  max-width: 480px;
+  max-height: 100%;
   margin: 0 auto;
   contain: layout style;
 }
