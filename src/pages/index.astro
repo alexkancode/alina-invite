@@ -230,7 +230,17 @@ import '../styles/global.css'
             <path id="text-arc" d="M 650,1350 A 650,650 0 0,1 2100,1350" fill="none" />
           </defs>
           <!-- Sun circle (behind disco ball) -->
-          <circle cx="1375" cy="1300" r="600" fill="#FFE8FF" />
+          <defs>
+            <linearGradient id="iri-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="hsl(280, 40%, 25%)" />
+              <stop offset="20%" stop-color="hsl(200, 50%, 20%)" />
+              <stop offset="40%" stop-color="hsl(160, 45%, 22%)" />
+              <stop offset="60%" stop-color="hsl(300, 35%, 28%)" />
+              <stop offset="80%" stop-color="hsl(220, 50%, 18%)" />
+              <stop offset="100%" stop-color="hsl(280, 40%, 25%)" />
+            </linearGradient>
+          </defs>
+          <circle cx="1375" cy="1300" r="600" fill="url(#iri-bg)" />
           <text style="font-family: 'Chicle', sans-serif; font-size: 132px; font-weight: 500;
                        letter-spacing: 0.05em;"
                 fill="#483D8B">
