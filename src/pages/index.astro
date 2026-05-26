@@ -355,8 +355,8 @@ import '../styles/global.css'
           <div class="relative">
             <!-- Navy layer (behind, offset down-left) -->
             <span class="birthday-label-shadow absolute left-0 right-0 text-center hidden sm:block" style="top: calc(-10px - 1rem + 3px); left: -2px; z-index: 0; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #483D8B;">Alina's Birthday</span>
-            <!-- Pink layer (on top) -->
-            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #FFB6D9;">Alina's Birthday</span>
+            <!-- White layer (on top) -->
+            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #FFFFFF;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
@@ -858,8 +858,8 @@ import '../styles/global.css'
             height: ${size}px;
             z-index: 9999;
             pointer-events: none;
-            --burst-x: ${(Math.random() - 0.5) * 160}px;
-            --burst-peak: ${-60 - Math.random() * 100}px;
+            --burst-x: ${(Math.random() - 0.5) * 250}px;
+            --burst-peak: ${-100 - Math.random() * 200}px;
             animation: star-burst ${0.6 + Math.random() * 0.4}s ease-out forwards;
             animation-delay: ${Math.random() * 0.15}s;
           `;
