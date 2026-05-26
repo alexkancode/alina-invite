@@ -230,7 +230,7 @@ import '../styles/global.css'
             <path id="text-arc" d="M 650,1350 A 650,650 0 0,1 2100,1350" fill="none" />
           </defs>
           <!-- Sun circle (behind disco ball) -->
-          <circle cx="1375" cy="1300" r="600" fill="#FFF5A0" />
+          <circle cx="1375" cy="1300" r="600" fill="#FFE8FF" />
           <text style="font-family: 'Chicle', sans-serif; font-size: 132px; font-weight: 500;
                        letter-spacing: 0.05em;"
                 fill="#483D8B">
@@ -726,7 +726,12 @@ import '../styles/global.css'
         const container = document.getElementById(containerId)!;
         const latStep = tileSize / radius;
         const gapFactor = 1.15;
-        const palette = ['#C0E4FF', '#B0F0FF', '#CCE4FF', '#FFE8FF', '#D0F0FF', '#B8ECFF', '#FFF5A0', '#FFD1FF'];
+        const photos = [
+          '/alina/IMG_0049.jpeg', '/alina/IMG_0539.jpeg', '/alina/IMG_0736.jpeg',
+          '/alina/IMG_7205.jpeg', '/alina/IMG_7380.jpeg', '/alina/IMG_8370.jpeg',
+          '/alina/IMG_8625.jpeg', '/alina/IMG_9286.jpeg', '/alina/IMG_9477.jpeg',
+          '/alina/IMG_9532.jpeg'
+        ];
         let count = 0;
 
         for (let phi = latStep / 2; phi < Math.PI; phi += latStep) {
@@ -746,14 +751,16 @@ import '../styles/global.css'
               `rotateY(${(theta * 180) / Math.PI}deg) ` +
               `rotateX(${(phi * 180) / Math.PI - 90}deg) ` +
               `translateZ(${radius}px)`;
-            tile.style.backgroundColor = palette[count % palette.length];
+            tile.style.backgroundImage = `url('${photos[count % photos.length]}')`;
+            tile.style.backgroundSize = 'cover';
+            tile.style.backgroundPosition = 'center';
             container.appendChild(tile);
             count++;
           }
         }
       }
 
-      buildDiscoBall('discoBall', 50, 12);
+      buildDiscoBall('discoBall', 130, 22);
 
       // ── Calendar transition ──
       const calBtn = document.getElementById('cal-btn')!;
