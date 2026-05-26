@@ -212,14 +212,22 @@
   backface-visibility: hidden;
   border: 1.5px solid rgba(0, 0, 0, 0.2);
   border-radius: 2px;
-  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.5);
-  background-image: linear-gradient(
+  background-size: cover;
+  background-position: center;
+}
+
+.mirror-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
     135deg,
-    transparent 0%, transparent 40%,
-    rgba(255, 255, 255, 0.35) 45%, rgba(255, 255, 255, 0.35) 55%,
-    transparent 60%, transparent 100%
+    transparent 0%, transparent 35%,
+    rgba(255, 255, 255, 0.35) 42%, rgba(255, 255, 255, 0.35) 58%,
+    transparent 65%, transparent 100%
   );
-  background-blend-mode: overlay;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 /* ── Reduced motion ── */
