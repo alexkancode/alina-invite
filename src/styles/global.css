@@ -216,6 +216,22 @@
   background-position: center;
 }
 
+/* Iridescent tiles — static gradient + hue-rotate (GPU-composited) */
+.mirror-tile.iridescent {
+  background: linear-gradient(
+    135deg,
+    hsl(300, 70%, 80%),
+    hsl(200, 80%, 75%),
+    hsl(120, 60%, 80%),
+    hsl(50, 80%, 78%)
+  ) !important;
+  animation: iri-shift 4s linear infinite;
+}
+
+@keyframes iri-shift {
+  to { filter: hue-rotate(360deg); }
+}
+
 .mirror-tile::after {
   content: '';
   position: absolute;

@@ -243,7 +243,7 @@ import '../styles/global.css'
         <!-- Cartoon disco ball (replaces sun) -->
         <div class="disco-ball-scene" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; aspect-ratio: 2750 / 1375; display: flex; align-items: end; justify-content: center; pointer-events: none;">
           <div class="disco-ball-wrapper" style="perspective: 600px; margin-bottom: 2%;">
-            <div class="disco-ball-spin" id="discoBall" style="position: relative; width: 0; height: 0; transform-style: preserve-3d; animation: disco-ball-spin 8s linear infinite;"></div>
+            <div class="disco-ball-spin" id="discoBall" style="position: relative; width: 0; height: 0; transform-style: preserve-3d; animation: disco-ball-spin 20s linear infinite;"></div>
           </div>
         </div>
 
@@ -751,9 +751,17 @@ import '../styles/global.css'
               `rotateY(${(theta * 180) / Math.PI}deg) ` +
               `rotateX(${(phi * 180) / Math.PI - 90}deg) ` +
               `translateZ(${radius}px)`;
-            tile.style.backgroundImage = `url('${photos[count % photos.length]}')`;
-            tile.style.backgroundSize = 'cover';
-            tile.style.backgroundPosition = 'center';
+            if (Math.random() < 0.3) {
+              // Iridescent tile
+              tile.classList.add('iridescent');
+              tile.style.animationDelay = `${-(Math.random() * 4)}s`;
+              tile.style.animationDuration = `${3 + Math.random() * 3}s`;
+            } else {
+              // Photo tile
+              tile.style.backgroundImage = `url('${photos[count % photos.length]}')`;
+              tile.style.backgroundSize = 'cover';
+              tile.style.backgroundPosition = 'center';
+            }
             container.appendChild(tile);
             count++;
           }
