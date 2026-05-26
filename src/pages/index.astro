@@ -499,7 +499,7 @@ import '../styles/global.css'
 
 
     <!-- ═══ Tile Match Game Modal ═══ -->
-    <div id="game-modal" class="fixed inset-0 hidden z-50" style="background: rgba(26, 10, 46, 0.9); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 16px;">
+    <div id="game-modal" class="fixed inset-0 hidden z-50 items-center justify-center" style="background: rgba(26, 10, 46, 0.9); backdrop-filter: blur(6px); padding: 16px;">
       <div class="game-modal-inner rounded-2xl"
            style="position: relative;
                   width: 90vw; max-width: 1100px;
@@ -1277,12 +1277,14 @@ import '../styles/global.css'
 
       document.getElementById('disco-ball-click')!.addEventListener('click', () => {
         gameModal.classList.remove('hidden');
+        gameModal.classList.add('flex');
         startGame(gameState.difficulty);
         fetchLeaderboard(gameState.difficulty);
       });
 
       document.getElementById('game-close')!.addEventListener('click', () => {
         gameModal.classList.add('hidden');
+        gameModal.classList.remove('flex');
         cancelAnimationFrame(gameState.timerRaf);
         gameState.phase = 'idle';
       });
@@ -1290,6 +1292,7 @@ import '../styles/global.css'
       gameModal.addEventListener('click', (e) => {
         if (e.target === gameModal) {
           gameModal.classList.add('hidden');
+          gameModal.classList.remove('flex');
           cancelAnimationFrame(gameState.timerRaf);
           gameState.phase = 'idle';
         }
