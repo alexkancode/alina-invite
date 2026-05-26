@@ -353,7 +353,7 @@ import '../styles/global.css'
         <section class="flex flex-col gap-phi-lg justify-center">
           <!-- RSVP Button — disco gold with layered shadow -->
           <div class="relative">
-            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; display: block; -webkit-text-fill-color: transparent; background: linear-gradient(105deg, #483D8B 40%, rgba(255,255,255,0.9) 50%, #483D8B 60%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; animation: shine-sweep 0.6s ease-in-out 5.8s forwards;">Alina's Birthday</span>
+            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; display: block; -webkit-text-fill-color: transparent; background: linear-gradient(180deg, #FFB6D9 0%, #FFB6D9 45%, #483D8B 55%, #483D8B 100%); -webkit-background-clip: text; background-clip: text;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
@@ -497,75 +497,127 @@ import '../styles/global.css'
 
 
     <!-- ═══ Tile Match Game Modal ═══ -->
-    <div id="game-modal" class="fixed inset-0 flex items-center justify-center p-phi-lg hidden z-50"
-         style="background: rgba(26, 10, 46, 0.9); backdrop-filter: blur(6px);">
-      <div class="game-modal-inner rounded-2xl p-phi-xl max-w-[520px] w-full relative overflow-hidden"
-           style="background: linear-gradient(160deg, #2d1254, #1a0a2e);
+    <div id="game-modal" class="fixed inset-0 hidden z-50" style="background: rgba(26, 10, 46, 0.9); backdrop-filter: blur(6px);">
+      <div class="game-modal-inner absolute rounded-2xl relative overflow-hidden"
+           style="top: 16px; left: 80px; right: 80px; bottom: 16px;
+                  background: linear-gradient(160deg, #2d1254, #1a0a2e);
                   border: 3px solid #FFD700;
                   box-shadow: var(--shadow-elevation-high), 0 0 34px hsl(45, 100%, 50% / 0.15);">
         <!-- Shine overlay -->
         <div class="absolute inset-0 pointer-events-none"
              style="background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.06), transparent 60%);"></div>
 
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-phi-lg relative">
+        <!-- Header bar -->
+        <div class="flex items-center justify-between px-phi-xl pt-phi-lg pb-phi-sm relative">
           <h2 class="text-phi-lg text-disco-gold"
               style="font-family: 'Righteous', sans-serif;
                      text-shadow: 2px 2px 0 hsl(300, 100%, 40% / 0.4);">
             Match the Tiles
           </h2>
+
+          <!-- HUD (inline with header on wide layout) -->
+          <div class="flex gap-phi-xl items-center text-warm-cream" style="font-family: 'Poppins', sans-serif;">
+            <span id="game-moves" class="text-phi-sm font-medium">Moves: 0</span>
+            <span id="game-timer" class="text-phi-sm font-medium tabular-nums">0:00</span>
+            <span id="game-score-display" class="text-phi-sm font-medium text-disco-gold">Score: —</span>
+          </div>
+
           <button id="game-close" class="text-metallic-silver hover:text-disco-gold transition-colors cursor-pointer"
                   style="font-size: 1.5rem; line-height: 1;">&#x2715;</button>
         </div>
 
-        <!-- HUD -->
-        <div class="flex justify-between items-center mb-phi-md relative text-warm-cream" style="font-family: 'Poppins', sans-serif;">
-          <span id="game-moves" class="text-phi-sm font-medium">Moves: 0</span>
-          <span id="game-timer" class="text-phi-sm font-medium tabular-nums">0:00</span>
-          <span id="game-score-display" class="text-phi-sm font-medium text-disco-gold">Score: —</span>
-        </div>
+        <!-- Two-column body -->
+        <div class="game-modal-body relative" style="display: grid; grid-template-columns: 1fr 300px; gap: 0; height: calc(100% - 64px);">
 
-        <!-- Difficulty selector -->
-        <div id="game-difficulty" class="flex gap-phi-sm mb-phi-md relative justify-center">
-          <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all"
-                  data-diff="easy"
-                  style="border: 2px solid hsl(270, 30%, 40%); color: hsl(270, 30%, 65%); background: transparent;">
-            Easy
-          </button>
-          <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all active-diff"
-                  data-diff="medium"
-                  style="border: 2px solid #FFD700; color: #FFD700; background: rgba(255,215,0,0.1);">
-            Medium
-          </button>
-          <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all"
-                  data-diff="hard"
-                  style="border: 2px solid hsl(270, 30%, 40%); color: hsl(270, 30%, 65%); background: transparent;">
-            Hard
-          </button>
-        </div>
+          <!-- Left: game board -->
+          <div class="flex flex-col items-center justify-center px-phi-xl py-phi-md overflow-auto">
+            <!-- Difficulty selector -->
+            <div id="game-difficulty" class="flex gap-phi-sm mb-phi-md">
+              <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all"
+                      data-diff="easy"
+                      style="border: 2px solid hsl(270, 30%, 40%); color: hsl(270, 30%, 65%); background: transparent;">
+                Easy
+              </button>
+              <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all active-diff"
+                      data-diff="medium"
+                      style="border: 2px solid #FFD700; color: #FFD700; background: rgba(255,215,0,0.1);">
+                Medium
+              </button>
+              <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all"
+                      data-diff="hard"
+                      style="border: 2px solid hsl(270, 30%, 40%); color: hsl(270, 30%, 65%); background: transparent;">
+                Hard
+              </button>
+            </div>
 
-        <!-- Game board -->
-        <div id="game-board" class="game-board relative mx-auto" style="--cols: 4;"></div>
+            <div id="game-board" class="game-board" style="--cols: 4;"></div>
+          </div>
 
-        <!-- Game over panel -->
-        <div id="game-over" class="hidden mt-phi-lg text-center relative">
-          <p class="text-phi-md text-disco-gold font-bold" style="font-family: 'Righteous', sans-serif;">
-            Nice! &#x1F389;
-          </p>
-          <p id="game-final-score" class="text-phi-sm text-warm-cream mt-phi-xs"></p>
-          <button id="game-play-again" class="mt-phi-md px-phi-xl py-phi-sm text-pop-black rounded-lg font-bold uppercase tracking-wider cursor-pointer transition-all"
-                  style="font-family: 'Righteous', sans-serif;
-                         background: linear-gradient(135deg, #FFD700, #E1AD01);
-                         border: 2px solid #B7410E;
-                         box-shadow: 3px 3px 0 #FF007F;">
-            Play Again
-          </button>
+          <!-- Right: sidebar (leaderboard + game over) -->
+          <div class="px-phi-lg py-phi-md overflow-auto" style="border-left: 1px solid rgba(255,215,0,0.15);">
+
+            <!-- Game over panel -->
+            <div id="game-over" class="hidden mb-phi-lg text-center">
+              <p class="text-phi-md text-disco-gold font-bold" style="font-family: 'Righteous', sans-serif;">
+                Nice! &#x1F389;
+              </p>
+              <p id="game-final-score" class="text-phi-sm text-warm-cream mt-phi-xs"></p>
+
+              <!-- Leaderboard name input (hidden if RSVP name exists) -->
+              <div id="game-name-row" class="mt-phi-md flex gap-phi-sm justify-center items-center">
+                <input type="text" id="game-player-name" maxlength="30" placeholder="Your name"
+                       class="px-phi-md py-phi-sm rounded-lg text-phi-sm text-warm-cream placeholder-metallic-silver/50 focus:outline-none transition-colors w-full"
+                       style="background: rgba(255,255,255,0.06); border: 2px solid hsl(270, 30%, 40%); caret-color: #FFD700;"
+                       onfocus="this.style.borderColor='#FFD700'"
+                       onblur="this.style.borderColor='hsl(270, 30%, 40%)'" />
+              </div>
+              <p id="game-name-greeting" class="hidden mt-phi-sm text-phi-xs text-metallic-silver"></p>
+
+              <div class="flex gap-phi-sm justify-center mt-phi-md">
+                <button id="game-submit-score" class="px-phi-lg py-phi-sm text-pop-black rounded-lg font-bold uppercase tracking-wider cursor-pointer transition-all text-phi-xs"
+                        style="font-family: 'Righteous', sans-serif;
+                               background: linear-gradient(135deg, #FFD700, #E1AD01);
+                               border: 2px solid #B7410E;
+                               box-shadow: 3px 3px 0 #FF007F;">
+                  Submit Score
+                </button>
+                <button id="game-play-again" class="px-phi-lg py-phi-sm rounded-lg font-medium cursor-pointer transition-colors text-phi-xs"
+                        style="color: hsl(270, 30%, 65%); border: 2px solid hsl(270, 30%, 35%); background: transparent;"
+                        onmouseenter="this.style.borderColor='hsl(270, 30%, 55%)'"
+                        onmouseleave="this.style.borderColor='hsl(270, 30%, 35%)'">
+                  Play Again
+                </button>
+              </div>
+              <p id="game-submit-status" class="hidden mt-phi-sm text-phi-xs"></p>
+            </div>
+
+            <!-- Leaderboard -->
+            <div id="game-leaderboard">
+              <h3 class="text-phi-sm text-disco-gold font-bold mb-phi-sm" style="font-family: 'Righteous', sans-serif;">
+                Leaderboard
+              </h3>
+              <div id="game-leaderboard-list" class="text-phi-xs text-warm-cream" style="font-family: 'Poppins', sans-serif;">
+                <p class="text-metallic-silver">Loading...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ═══ Responsive ═══ -->
     <style>
+      /* Game modal: stack columns on narrow screens */
+      @media (max-width: 768px) {
+        .game-modal-body {
+          grid-template-columns: 1fr !important;
+          overflow-y: auto !important;
+        }
+        .game-modal-body > div:last-child {
+          border-left: none !important;
+          border-top: 1px solid rgba(255,215,0,0.15);
+        }
+      }
       @media (max-width: 640px) {
         /* Stack grid to single column, center items, map last */
         [style*="grid-template-columns: auto auto"] {
@@ -606,6 +658,10 @@ import '../styles/global.css'
         /* Arc text: behind content, centered, pushed down, fades out after reveal */
         .arc-text-svg, .disco-ball-scene {
           display: none !important;
+        }
+        .birthday-label {
+          background: none !important;
+          -webkit-text-fill-color: #483D8B !important;
           max-width: 90vw !important;
           position: absolute !important;
           top: 250px;
@@ -861,6 +917,358 @@ import '../styles/global.css'
       }
 
       buildDiscoBall('discoBall', 130, 22);
+
+      // ── Tile Match Game ──
+      const TILE_PHOTOS = [
+        '/alina/minigame/IMG_0049.jpeg', '/alina/minigame/IMG_0539.jpeg', '/alina/minigame/IMG_0736.jpeg',
+        '/alina/minigame/IMG_7205.jpeg', '/alina/minigame/IMG_7380.jpeg', '/alina/minigame/IMG_8370.jpeg',
+        '/alina/minigame/IMG_8625.jpeg', '/alina/minigame/IMG_9286.jpeg', '/alina/minigame/IMG_9477.jpeg',
+        '/alina/minigame/IMG_9532.jpeg',
+      ];
+      const TILE_EMOJIS = ['🎈', '🎂', '🧁', '🎁', '🎀', '⭐', '🦋', '🌸', '🎵', '🍭', '🌈', '🎪'];
+      const DIFFICULTY_CONFIG: Record<string, { pairs: number; cols: number }> = {
+        easy:   { pairs: 6,  cols: 3 },
+        medium: { pairs: 8,  cols: 4 },
+        hard:   { pairs: 12, cols: 4 },
+      };
+
+      interface GameTile { id: number; pairId: number; emoji: string; el: HTMLElement; }
+
+      const gameState = {
+        phase: 'idle' as 'idle' | 'ready' | 'first_pick' | 'checking' | 'complete',
+        tiles: [] as GameTile[],
+        firstPick: null as GameTile | null,
+        matchedPairs: new Set<number>(),
+        moves: 0,
+        startTime: 0,
+        difficulty: 'medium',
+        timerRaf: 0,
+      };
+
+      const gameModal   = document.getElementById('game-modal')!;
+      const gameBoard    = document.getElementById('game-board')!;
+      const gameMovesEl  = document.getElementById('game-moves')!;
+      const gameTimerEl  = document.getElementById('game-timer')!;
+      const gameScoreEl  = document.getElementById('game-score-display')!;
+      const gameOverEl   = document.getElementById('game-over')!;
+      const gameFinalEl  = document.getElementById('game-final-score')!;
+      const gameNameRow  = document.getElementById('game-name-row')!;
+      const gameNameInput = document.getElementById('game-player-name') as HTMLInputElement;
+      const gameNameGreeting = document.getElementById('game-name-greeting')!;
+      const gameSubmitBtn = document.getElementById('game-submit-score') as HTMLButtonElement;
+      const gameSubmitStatus = document.getElementById('game-submit-status')!;
+      const gameLeaderboardList = document.getElementById('game-leaderboard-list')!;
+
+      let lastGameElapsed = 0;
+
+      function getPlayerName(): string | null {
+        const rsvp = localStorage.getItem('rsvp');
+        if (rsvp) {
+          try { return JSON.parse(rsvp).name || null; } catch { return null; }
+        }
+        return null;
+      }
+
+      async function fetchLeaderboard(difficulty: string) {
+        try {
+          const res = await fetch(`/api/leaderboard?difficulty=${difficulty}&limit=10`);
+          if (!res.ok) throw new Error('fetch failed');
+          const scores = await res.json() as Array<{ player: string; score: number; moves: number; time_ms: number }>;
+          if (scores.length === 0) {
+            gameLeaderboardList.innerHTML = '<p class="text-metallic-silver">No scores yet. Be the first!</p>';
+            return;
+          }
+
+          const currentPlayer = getPlayerName() || gameNameInput.value.trim();
+          const playerBest = currentPlayer
+            ? scores.filter(s => s.player === currentPlayer).reduce((best, s) => Math.max(best, s.score), 0)
+            : 0;
+
+          let html = '';
+          if (playerBest > 0) {
+            html += `<div class="flex justify-between items-center py-1 mb-phi-xs" style="border-bottom: 2px solid rgba(255,215,0,0.25);">
+              <span class="text-disco-gold text-phi-xs font-medium">Your best</span>
+              <span class="text-disco-gold tabular-nums font-bold">${playerBest.toLocaleString()}</span>
+            </div>`;
+          }
+
+          html += scores.map((s, i) => {
+            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="display:inline-block;width:1.3em;text-align:center;">${i + 1}</span>`;
+            const isMe = currentPlayer && s.player === currentPlayer;
+            const highlight = isMe ? 'color: #FFD700; font-weight: 600;' : '';
+            return `<div class="flex justify-between items-center py-1" style="border-bottom: 1px solid rgba(255,255,255,0.05); ${highlight}">
+              <span>${medal} ${s.player}</span>
+              <span class="tabular-nums" style="${isMe ? 'color: #FFD700;' : 'color: #FFD700;'}">${s.score.toLocaleString()}</span>
+            </div>`;
+          }).join('');
+
+          gameLeaderboardList.innerHTML = html;
+        } catch {
+          gameLeaderboardList.innerHTML = '<p class="text-metallic-silver">Could not load leaderboard</p>';
+        }
+      }
+
+      async function submitScore() {
+        const name = gameNameInput.value.trim();
+        if (!name) {
+          gameSubmitStatus.textContent = 'Please enter your name';
+          gameSubmitStatus.style.color = '#FF007F';
+          gameSubmitStatus.classList.remove('hidden');
+          gameNameInput.focus();
+          return;
+        }
+
+        gameSubmitBtn.disabled = true;
+        gameSubmitBtn.textContent = 'Submitting...';
+        gameSubmitStatus.classList.add('hidden');
+
+        try {
+          const res = await fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              player: name,
+              moves: gameState.moves,
+              timeMs: Math.round(lastGameElapsed),
+              difficulty: gameState.difficulty,
+            }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(err.error || 'Submit failed');
+          }
+
+          const { score } = await res.json();
+          gameSubmitStatus.textContent = `Score submitted: ${score.toLocaleString()}`;
+          gameSubmitStatus.style.color = '#40E0D0';
+          gameSubmitStatus.classList.remove('hidden');
+          gameSubmitBtn.textContent = 'Submitted!';
+
+          // Refresh leaderboard
+          await fetchLeaderboard(gameState.difficulty);
+        } catch (err: any) {
+          gameSubmitStatus.textContent = err.message || 'Something went wrong';
+          gameSubmitStatus.style.color = '#FF007F';
+          gameSubmitStatus.classList.remove('hidden');
+          gameSubmitBtn.disabled = false;
+          gameSubmitBtn.textContent = 'Submit Score';
+        }
+      }
+
+      function formatGameTime(ms: number): string {
+        const s = Math.floor(ms / 1000);
+        return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+      }
+
+      function calcGameScore(moves: number, timeMs: number, pairs: number): number {
+        const moveEff = pairs / moves;
+        const timeEff = Math.min(1, 120_000 / timeMs);
+        return Math.round((moveEff * 0.6 + timeEff * 0.4) * 10_000);
+      }
+
+      function shuffleArray<T>(arr: T[]): T[] {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function startGame(difficulty: string) {
+        const config = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.medium;
+        gameState.difficulty = difficulty;
+        gameState.moves = 0;
+        gameState.matchedPairs.clear();
+        gameState.firstPick = null;
+        gameState.phase = 'ready';
+        cancelAnimationFrame(gameState.timerRaf);
+        gameOverEl.classList.add('hidden');
+        gameScoreEl.textContent = 'Score: —';
+        gameMovesEl.textContent = 'Moves: 0';
+        gameTimerEl.textContent = '0:00';
+
+        gameBoard.style.setProperty('--cols', String(config.cols));
+
+        // Photos first, emoji fallback for any overflow
+        const faces: Array<{ type: 'photo' | 'emoji'; src: string }> = [];
+        for (let i = 0; i < config.pairs; i++) {
+          if (i < TILE_PHOTOS.length) {
+            faces.push({ type: 'photo', src: TILE_PHOTOS[i] });
+          } else {
+            faces.push({ type: 'emoji', src: TILE_EMOJIS[i - TILE_PHOTOS.length] });
+          }
+        }
+
+        const pairIds = shuffleArray(
+          Array.from({ length: config.pairs }, (_, i) => [i, i]).flat()
+        );
+
+        gameBoard.innerHTML = '';
+        gameState.tiles = pairIds.map((pairId, id) => {
+          const face = faces[pairId];
+          const el = document.createElement('div');
+          el.className = 'game-tile';
+          el.dataset.id = String(id);
+          const backContent = face.type === 'photo'
+            ? `<div class="game-tile-back game-tile-photo"><img src="${face.src}" alt="" draggable="false" /></div>`
+            : `<div class="game-tile-back" style="background: linear-gradient(135deg, rgba(93,63,211,0.15), rgba(72,61,139,0.2));">${face.src}</div>`;
+          el.innerHTML = `
+            <div class="game-tile-inner">
+              <div class="game-tile-front"></div>
+              ${backContent}
+            </div>`;
+          gameBoard.appendChild(el);
+          return { id, pairId, emoji: face.src, el };
+        });
+
+        gameState.startTime = 0;
+      }
+
+      function startTimerIfNeeded() {
+        if (gameState.startTime > 0) return;
+        gameState.startTime = performance.now();
+        function tick() {
+          if (gameState.phase === 'complete') return;
+          gameTimerEl.textContent = formatGameTime(performance.now() - gameState.startTime);
+          gameState.timerRaf = requestAnimationFrame(tick);
+        }
+        gameState.timerRaf = requestAnimationFrame(tick);
+      }
+
+      function flipTile(tile: GameTile, show: boolean) {
+        tile.el.classList.toggle('flipped', show);
+      }
+
+      function onGameComplete() {
+        gameState.phase = 'complete';
+        cancelAnimationFrame(gameState.timerRaf);
+        const elapsed = performance.now() - gameState.startTime;
+        lastGameElapsed = elapsed;
+        const config = DIFFICULTY_CONFIG[gameState.difficulty];
+        const score = calcGameScore(gameState.moves, elapsed, config.pairs);
+        gameTimerEl.textContent = formatGameTime(elapsed);
+        gameScoreEl.textContent = `Score: ${score.toLocaleString()}`;
+        gameFinalEl.textContent = `${gameState.moves} moves in ${formatGameTime(elapsed)} — Score: ${score.toLocaleString()}`;
+
+        // Reset submit button state
+        gameSubmitBtn.disabled = false;
+        gameSubmitBtn.textContent = 'Submit Score';
+        gameSubmitStatus.classList.add('hidden');
+
+        // Name handling: use RSVP name if available, otherwise show input
+        const rsvpName = getPlayerName();
+        if (rsvpName) {
+          gameNameRow.classList.add('hidden');
+          gameNameGreeting.textContent = `Playing as ${rsvpName}`;
+          gameNameGreeting.classList.remove('hidden');
+          gameNameInput.value = rsvpName;
+        } else {
+          gameNameRow.classList.remove('hidden');
+          gameNameGreeting.classList.add('hidden');
+          gameNameInput.value = '';
+          setTimeout(() => gameNameInput.focus(), 100);
+        }
+
+        gameOverEl.classList.remove('hidden');
+      }
+
+      gameBoard.addEventListener('click', (e) => {
+        const tileEl = (e.target as HTMLElement).closest('.game-tile') as HTMLElement | null;
+        if (!tileEl) return;
+        const id = Number(tileEl.dataset.id);
+        const tile = gameState.tiles[id];
+        if (!tile) return;
+
+        if (gameState.phase === 'checking' || gameState.phase === 'complete') return;
+        if (gameState.matchedPairs.has(tile.pairId)) return;
+        if (gameState.firstPick?.id === tile.id) return;
+
+        startTimerIfNeeded();
+        flipTile(tile, true);
+
+        if (gameState.phase === 'ready') {
+          gameState.firstPick = tile;
+          gameState.phase = 'first_pick';
+          return;
+        }
+
+        gameState.phase = 'checking';
+        gameState.moves++;
+        gameMovesEl.textContent = `Moves: ${gameState.moves}`;
+
+        if (tile.pairId === gameState.firstPick!.pairId) {
+          gameState.matchedPairs.add(tile.pairId);
+          tile.el.classList.add('matched');
+          gameState.firstPick!.el.classList.add('matched');
+          gameState.firstPick = null;
+          const config = DIFFICULTY_CONFIG[gameState.difficulty];
+          if (gameState.matchedPairs.size === config.pairs) {
+            onGameComplete();
+          } else {
+            gameState.phase = 'ready';
+          }
+        } else {
+          tile.el.classList.add('wrong');
+          gameState.firstPick!.el.classList.add('wrong');
+          const a = gameState.firstPick!;
+          const b = tile;
+          setTimeout(() => {
+            flipTile(a, false);
+            flipTile(b, false);
+            a.el.classList.remove('wrong');
+            b.el.classList.remove('wrong');
+            gameState.firstPick = null;
+            gameState.phase = 'ready';
+          }, 800);
+        }
+      });
+
+      document.getElementById('game-difficulty')!.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('.game-diff-btn') as HTMLElement | null;
+        if (!btn) return;
+        document.querySelectorAll('.game-diff-btn').forEach(b => {
+          (b as HTMLElement).style.borderColor = 'hsl(270, 30%, 40%)';
+          (b as HTMLElement).style.color = 'hsl(270, 30%, 65%)';
+          (b as HTMLElement).style.background = 'transparent';
+        });
+        btn.style.borderColor = '#FFD700';
+        btn.style.color = '#FFD700';
+        btn.style.background = 'rgba(255,215,0,0.1)';
+        startGame(btn.dataset.diff!);
+        fetchLeaderboard(btn.dataset.diff!);
+      });
+
+      document.getElementById('game-play-again')!.addEventListener('click', () => {
+        startGame(gameState.difficulty);
+      });
+
+      gameSubmitBtn.addEventListener('click', submitScore);
+
+      // Allow Enter in name input to submit
+      gameNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitScore();
+      });
+
+      document.getElementById('disco-ball-click')!.addEventListener('click', () => {
+        gameModal.classList.remove('hidden');
+        startGame(gameState.difficulty);
+        fetchLeaderboard(gameState.difficulty);
+      });
+
+      document.getElementById('game-close')!.addEventListener('click', () => {
+        gameModal.classList.add('hidden');
+        cancelAnimationFrame(gameState.timerRaf);
+        gameState.phase = 'idle';
+      });
+
+      gameModal.addEventListener('click', (e) => {
+        if (e.target === gameModal) {
+          gameModal.classList.add('hidden');
+          cancelAnimationFrame(gameState.timerRaf);
+          gameState.phase = 'idle';
+        }
+      });
 
       // ── Calendar transition ──
       const calBtn = document.getElementById('cal-btn')!;
