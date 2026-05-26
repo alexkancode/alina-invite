@@ -231,7 +231,7 @@ import '../styles/global.css'
         -->
 
         <!-- Purpose statement (absolute, doesn't affect flow) -->
-        <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] overflow-visible" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%);" >
+        <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] overflow-visible" style="position: absolute; top: 0px; left: 50%; transform: translateX(-50%);" >
           <defs>
             <path id="text-arc" d="M 650,1350 A 650,650 0 0,1 2100,1350" fill="none" />
           </defs>
@@ -257,7 +257,7 @@ import '../styles/global.css'
         </svg>
 
         <!-- Cartoon disco ball (replaces sun) -->
-        <div class="disco-ball-scene" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; aspect-ratio: 2750 / 1375; display: flex; align-items: end; justify-content: center; pointer-events: none;">
+        <div class="disco-ball-scene" style="position: absolute; top: 0px; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; aspect-ratio: 2750 / 1375; display: flex; align-items: end; justify-content: center; pointer-events: none;">
           <div class="disco-ball-wrapper" style="perspective: 600px; margin-bottom: 2%;">
             <div class="disco-ball-spin" id="discoBall" style="position: relative; width: 0; height: 0; transform-style: preserve-3d; animation: disco-ball-spin 20s linear infinite;"></div>
             <!-- Clickable hit area over the disco ball -->
@@ -327,7 +327,7 @@ import '../styles/global.css'
       </div>
 
       <!-- Spacer between stripes and content -->
-      <div class="stripe-content-spacer" style="height: 200px;"></div>
+      <div class="stripe-content-spacer" style="height: 300px;"></div>
 
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
       <div class="grid gap-phi-xl content-reveal justify-center" style="grid-template-columns: auto auto;
@@ -353,10 +353,8 @@ import '../styles/global.css'
         <section class="flex flex-col gap-phi-lg justify-center">
           <!-- RSVP Button — disco gold with layered shadow -->
           <div class="relative">
-            <!-- Navy layer (behind, offset down-left) -->
-            <span class="birthday-label-shadow absolute left-0 right-0 text-center hidden sm:block" style="top: calc(-10px - 1rem + 3px); left: -2px; z-index: 0; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #483D8B;">Alina's Birthday</span>
-            <!-- White layer (on top) -->
-            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #FFFFFF;">Alina's Birthday</span>
+            <!-- Navy layer with shine -->
+            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; display: block; -webkit-text-fill-color: transparent; background: linear-gradient(105deg, #483D8B 40%, rgba(255,255,255,0.9) 50%, #483D8B 60%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; animation: shine-sweep 0.6s ease-in-out 5.8s forwards;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
