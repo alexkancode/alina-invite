@@ -204,6 +204,14 @@ import '../styles/global.css'
       .sparkle {
         position: absolute;
         animation: sparkle 3s ease-in-out infinite;
+        cursor: pointer;
+        pointer-events: auto;
+      }
+      .sparkle.following {
+        position: fixed !important;
+        animation: none !important;
+        transition: transform 0.1s ease-out;
+        z-index: 9999;
       }
     </style>
 
@@ -730,6 +738,73 @@ import '../styles/global.css'
           star.addEventListener('animationend', () => star.remove());
         }
       }
+
+      // ── Sparkle follow mode ──
+      let sparkleFollowing = false;
+      let mouseX = 0, mouseY = 0;
+      const allSparkles = document.querySelectorAll('.sparkle');
+      const sparkleOffsets: { x: number; y: number; delay: number }[] = [];
+
+      // Generate random offsets for each sparkle in the cluster
+      allSparkles.forEach(() => {
+        sparkleOffsets.push({
+          x: (Math.random() - 0.5) * 60,
+          y: (Math.random() - 0.5) * 60,
+          delay: 0.05 + Math.random() * 0.2
+        });
+      });
+
+      // Store original positions for restoring
+      const originalStyles: string[] = [];
+      allSparkles.forEach(s => originalStyles.push((s as HTMLElement).getAttribute('style') || ''));
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animateSparkleFollow() {
+        if (!sparkleFollowing) return;
+        allSparkles.forEach((s, i) => {
+          const el = s as HTMLElement;
+          const off = sparkleOffsets[i];
+          el.style.left = (mouseX + off.x) + 'px';
+          el.style.top = (mouseY + off.y) + 'px';
+          el.style.transitionDuration = off.delay + 's';
+        });
+        requestAnimationFrame(animateSparkleFollow);
+      }
+
+      // Click any sparkle to toggle follow mode
+      allSparkles.forEach(s => {
+        s.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sparkleFollowing = !sparkleFollowing;
+
+          if (sparkleFollowing) {
+            // Detach from layers, go fixed
+            allSparkles.forEach((sp, i) => {
+              const el = sp as HTMLElement;
+              el.classList.add('following');
+              document.body.appendChild(el);
+            });
+            animateSparkleFollow();
+          } else {
+            // Restore to original layers
+            const layers = document.querySelectorAll('.sparkle-layer');
+            let idx = 0;
+            layers.forEach(layer => {
+              const count = layer.dataset.depth === '0.02' ? 8 : layer.dataset.depth === '0.05' ? 8 : 6;
+              for (let i = 0; i < count && idx < allSparkles.length; i++, idx++) {
+                const el = allSparkles[idx] as HTMLElement;
+                el.classList.remove('following');
+                el.setAttribute('style', originalStyles[idx]);
+                layer.appendChild(el);
+              }
+            });
+          }
+        });
+      });
 
       // ── Build cartoon disco ball ──
       function buildDiscoBall(containerId: string, radius: number, tileSize: number) {
