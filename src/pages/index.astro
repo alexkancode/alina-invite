@@ -538,7 +538,7 @@ import '../styles/global.css'
           <!-- Left: game board -->
           <div class="flex flex-col items-center px-phi-xl py-phi-md" style="min-height: 0; overflow: hidden;">
             <!-- Difficulty selector -->
-            <div id="game-difficulty" class="flex gap-phi-sm mb-phi-md">
+            <div id="game-difficulty" class="hidden">
               <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all"
                       data-diff="easy"
                       style="border: 2px solid hsl(270, 30%, 40%); color: hsl(270, 30%, 65%); background: transparent;">
@@ -954,9 +954,7 @@ import '../styles/global.css'
       ];
       const TILE_EMOJIS = ['🎈', '🎂', '🧁', '🎁', '🎀', '⭐', '🦋', '🌸', '🎵', '🍭', '🌈', '🎪'];
       const DIFFICULTY_CONFIG: Record<string, { pairs: number; cols: number }> = {
-        easy:   { pairs: 6,  cols: 3 },
         medium: { pairs: 8,  cols: 4 },
-        hard:   { pairs: 12, cols: 4 },
       };
 
       interface GameTile { id: number; pairId: number; emoji: string; el: HTMLElement; }
