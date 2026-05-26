@@ -356,6 +356,32 @@
   80%      { transform: rotateY(180deg) translateX(3px); }
 }
 
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #483D8B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FFB6D9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF80C0;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #FFB6D9 #483D8B;
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
