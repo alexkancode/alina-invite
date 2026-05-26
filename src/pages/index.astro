@@ -15,7 +15,7 @@ import '../styles/global.css'
 
   <body class="min-h-screen overflow-x-hidden relative"
         style="font-family: 'Righteous', sans-serif;
-               background: #ffffff;">
+               background: #6BB8FF;">
 
 
 
@@ -53,7 +53,7 @@ import '../styles/global.css'
     </div>
 
     <!-- ═══ Corner clouds (stacked circles, tucked into corners) ═══ -->
-    <div id="clouds-container" class="fixed inset-0 pointer-events-none" style="z-index: -1; transition: transform 1.5s ease-in-out 1s;">
+    <div id="clouds-container" class="fixed inset-0 pointer-events-none" style="z-index: -1;">
       <!-- Bottom-left cloud -->
       <div class="absolute" style="bottom: -40px; left: -40px;">
         <div class="cloud-bubble absolute rounded-full" style="width: 130px; height: 130px; background: #ffffff; bottom: 0; left: 0;"></div>
@@ -330,7 +330,7 @@ import '../styles/global.css'
         <section class="flex flex-col gap-phi-lg justify-center">
           <!-- RSVP Button — disco gold with layered shadow -->
           <div class="relative">
-            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #483D8B;">Alina's Birthday</span>
+            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; display: block; -webkit-text-fill-color: transparent; background: linear-gradient(105deg, #483D8B 40%, rgba(255,255,255,0.9) 50%, #483D8B 60%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; animation: shine-sweep 0.6s ease-in-out 5.8s forwards;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
@@ -365,7 +365,7 @@ import '../styles/global.css'
           <!-- Calendar Link -->
           <a
             id="cal-btn"
-            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Birthday+Celebration&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+a+celebration+of+creativity%2C+friendship%2C+and+another+trip+around+the+sun.&location=3220+Alabama+CT%2C+Houston%2C+TX+77027&ctz=America/New_York"
+            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Alina%27s+Birthday&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+a+celebration+of+creativity%2C+friendship%2C+and+another+trip+around+the+sun.&location=3220+Alabama+CT%2C+Houston%2C+TX+77027&ctz=America/New_York"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Add this event to your Google Calendar"
@@ -720,6 +720,21 @@ import '../styles/global.css'
       const calBtn = document.getElementById('cal-btn')!;
       const calUrl = calBtn.getAttribute('href')!;
 
+      // Restore everything on back-navigation (bfcache)
+      window.addEventListener('pageshow', (e) => {
+        if (e.persisted) {
+          const s = document.getElementById('sunburst-svg');
+          const sp = document.getElementById('sparkle-field');
+          const m = document.querySelector('main');
+          const st = document.querySelector('.stripe-panel');
+          if (s) { s.style.width = '400vmax'; s.style.height = '400vmax'; }
+          if (sp) (sp as HTMLElement).style.transform = '';
+          if (m) m.classList.remove('cal-transition-hide');
+          if (st) st.classList.remove('cal-transition-hide');
+          document.querySelectorAll('.cal-big-icon').forEach(el => el.remove());
+        }
+      });
+
       calBtn.addEventListener('click', (e) => {
         e.preventDefault();
 
@@ -752,26 +767,30 @@ import '../styles/global.css'
         sunburst.style.width = '120px';
         sunburst.style.height = '120px';
         sparkles.style.transform = 'scale(0.03)';
-        clouds.style.transform = 'scale(0.3)';
 
         // Show big calendar icon
         setTimeout(() => { bigIcon.style.opacity = '1'; }, 400);
 
-        // Open calendar after 3 seconds
+        // Flip the icon in the last 0.5s
+        setTimeout(() => {
+          const svg = bigIcon.querySelector('svg')!;
+          (svg as HTMLElement).style.animation = 'cal-flip 0.5s ease-in-out';
+        }, 1000);
+
+        // Open calendar after 1.5s
         setTimeout(() => {
           window.open(calUrl, '_blank', 'noopener,noreferrer');
           // Restore everything
           bigIcon.style.opacity = '0';
-          sunburst.style.width = '';
-          sunburst.style.height = '';
+          sunburst.style.width = '400vmax';
+          sunburst.style.height = '400vmax';
           sparkles.style.transform = '';
-          clouds.style.transform = '';
           setTimeout(() => {
             main.classList.remove('cal-transition-hide');
             stripePanel.classList.remove('cal-transition-hide');
             bigIcon.remove();
           }, 500);
-        }, 3000);
+        }, 1500);
       });
 
     </script>
