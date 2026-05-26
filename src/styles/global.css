@@ -255,11 +255,13 @@
 /* ── Tile Match Game ── */
 .game-board {
   display: grid;
-  grid-template-columns: repeat(var(--cols, 4), minmax(0, 80px));
-  grid-auto-rows: minmax(0, 80px);
+  grid-template-columns: repeat(var(--cols, 4), 1fr);
   gap: 8px;
   justify-content: center;
-  max-height: 100%;
+  align-content: start;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: min(500px, 70vh);
   margin: 0 auto;
   contain: layout style;
 }
@@ -268,15 +270,13 @@
   aspect-ratio: 1;
   perspective: 600px;
   cursor: pointer;
-  max-width: 80px;
-  max-height: 80px;
   touch-action: manipulation;
+  position: relative;
 }
 
 .game-tile-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   transition: transform 0.45s ease-out;
   transform-style: preserve-3d;
   will-change: transform;
@@ -315,6 +315,24 @@
   font-size: 1.8rem;
   line-height: 1;
   border: 2px solid rgba(255, 182, 217, 0.4);
+}
+
+.game-tile-photo {
+  padding: 0;
+  display: block;
+}
+
+.game-tile-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  border-radius: inherit;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .game-tile-photo {
