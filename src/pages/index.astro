@@ -232,7 +232,7 @@ import '../styles/global.css'
 
         <!-- Purpose statement (absolute, doesn't affect flow) -->
         <!-- Arc text + disco ball unit (bounces in after slide-in) -->
-        <div class="arc-disco-unit" style="position: absolute; top: 0px; left: 50%; transform: translateX(-50%) translateY(-120vh); width: max-content; animation: bounce-in 1.2s ease-in 5.5s forwards;">
+        <div class="arc-disco-unit" style="position: absolute; top: 0px; left: 50%; transform: translateX(-50%) translateY(-120vh); width: max-content; animation: bounce-in 1.2s ease-in 6s forwards;">
         <svg viewBox="0 0 2750 1375" class="arc-text-svg w-full max-w-[600px] overflow-visible" style="display: block;" >
           <defs>
             <path id="text-arc" d="M 650,1350 A 650,650 0 0,1 2100,1350" fill="none" />
@@ -252,7 +252,7 @@ import '../styles/global.css'
           <div class="disco-ball-wrapper" style="perspective: 600px; position: relative;">
             <!-- Iridescent background circle behind tiles -->
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 260px; height: 260px; border-radius: 50%; background: linear-gradient(135deg, hsl(280, 40%, 25%), hsl(200, 50%, 20%), hsl(160, 45%, 22%), hsl(300, 35%, 28%), hsl(220, 50%, 18%), hsl(280, 40%, 25%)); z-index: 0;"></div>
-            <div class="disco-ball-spin" id="discoBall" style="position: relative; width: 0; height: 0; transform-style: preserve-3d; animation: disco-ball-spin 20s linear infinite; z-index: 1;"></div>
+            <div class="disco-ball-spin" id="discoBall" style="position: relative; width: 0; height: 0; transform-style: flat; animation: disco-ball-spin 20s linear infinite; animation-play-state: paused; z-index: 1;"></div>
             <!-- Clickable hit area over the disco ball -->
             <div id="disco-ball-click" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 260px; height: 260px; border-radius: 50%; pointer-events: auto; cursor: pointer; z-index: 10;" title="Play a game!"></div>
           </div>
@@ -348,7 +348,7 @@ import '../styles/global.css'
           <!-- RSVP Button — disco gold with layered shadow -->
           <div class="relative">
             <!-- Navy layer with shine -->
-            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; display: block; -webkit-text-fill-color: transparent; background: linear-gradient(105deg, #483D8B 40%, rgba(255,210,235,0.9) 50%, #483D8B 60%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; animation: shine-sweep 0.6s ease-in-out 7.7s forwards;">Alina's Birthday</span>
+            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; display: block; -webkit-text-fill-color: transparent; background: linear-gradient(105deg, #483D8B 40%, rgba(255,210,235,0.9) 50%, #483D8B 60%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; animation: shine-sweep 0.6s ease-in-out 8.2s forwards;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
@@ -375,7 +375,7 @@ import '../styles/global.css'
             <div class="rsvp-shine absolute inset-0 pointer-events-none rounded-xl"
                  style="background: linear-gradient(105deg, transparent 40%, rgba(255,210,235,0.4) 50%, transparent 60%);
                         background-size: 200% 100%;
-                        animation: shine-sweep 0.6s ease-in-out 7.7s forwards;">
+                        animation: shine-sweep 0.6s ease-in-out 8.2s forwards;">
             </div>
           </button>
           </div>
@@ -888,6 +888,16 @@ import '../styles/global.css'
           document.body.appendChild(star);
           star.addEventListener('animationend', () => star.remove());
         }
+      }
+
+      // ── Enable 3D + spin after bounce lands ──
+      const arcUnit = document.querySelector('.arc-disco-unit');
+      const discoBallSpin = document.getElementById('discoBall');
+      if (arcUnit && discoBallSpin) {
+        arcUnit.addEventListener('animationend', () => {
+          discoBallSpin.style.transformStyle = 'preserve-3d';
+          discoBallSpin.style.animationPlayState = 'running';
+        });
       }
 
       // ── Sparkle follow mode (tabled for now) ──
