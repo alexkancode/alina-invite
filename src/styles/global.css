@@ -228,6 +228,16 @@
   animation: iri-shift 4s linear infinite;
 }
 
+/* Bright specular highlight on iridescent tiles — "catches light" as ball spins */
+.mirror-tile.iridescent::after {
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.3) 30%,
+    transparent 60%
+  ) !important;
+}
+
 @keyframes iri-shift {
   to { filter: hue-rotate(360deg); }
 }
