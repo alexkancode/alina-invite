@@ -763,14 +763,32 @@ import '../styles/global.css'
         mouseY = e.clientY;
       });
 
+      // Bouncy follow — each sparkle has its own velocity that springs toward the target
+      const sparklePos: { x: number; y: number; vx: number; vy: number }[] = [];
+      allSparkles.forEach(() => sparklePos.push({ x: 0, y: 0, vx: 0, vy: 0 }));
+
       function animateSparkleFollow() {
         if (!sparkleFollowing) return;
         allSparkles.forEach((s, i) => {
           const el = s as HTMLElement;
           const off = sparkleOffsets[i];
-          el.style.left = (mouseX + off.x) + 'px';
-          el.style.top = (mouseY + off.y) + 'px';
-          el.style.transitionDuration = off.delay + 's';
+          const targetX = mouseX + off.x;
+          const targetY = mouseY + off.y;
+          const pos = sparklePos[i];
+
+          // Spring physics: pull toward target, dampen velocity
+          const stiffness = 0.06 + off.delay * 0.15;
+          const damping = 0.75;
+
+          pos.vx += (targetX - pos.x) * stiffness;
+          pos.vy += (targetY - pos.y) * stiffness;
+          pos.vx *= damping;
+          pos.vy *= damping;
+          pos.x += pos.vx;
+          pos.y += pos.vy;
+
+          el.style.left = pos.x + 'px';
+          el.style.top = pos.y + 'px';
         });
         requestAnimationFrame(animateSparkleFollow);
       }
@@ -825,7 +843,15 @@ import '../styles/global.css'
             });
 
             // Start following after woosh completes
-            setTimeout(() => animateSparkleFollow(), 800);
+            setTimeout(() => {
+              allSparkles.forEach((sp, i) => {
+                sparklePos[i].x = mouseX + sparkleOffsets[i].x;
+                sparklePos[i].y = mouseY + sparkleOffsets[i].y;
+                sparklePos[i].vx = 0;
+                sparklePos[i].vy = 0;
+              });
+              animateSparkleFollow();
+            }, 800);
           } else {
             // Restore to original layers
             const layers = document.querySelectorAll('.sparkle-layer');
