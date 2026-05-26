@@ -174,13 +174,15 @@
   to   { opacity: 0; }
 }
 
-/* ── Bounce in for arc text + disco ball ── */
+/* ── Bounce drop for arc text + disco ball ── */
 @keyframes bounce-in {
-  0%   { transform: translateX(-50%) scale(0); }
-  50%  { transform: translateX(-50%) scale(1.1); }
-  70%  { transform: translateX(-50%) scale(0.95); }
-  85%  { transform: translateX(-50%) scale(1.03); }
-  100% { transform: translateX(-50%) scale(1); }
+  0%   { transform: translateX(-50%) translateY(-120vh); }
+  45%  { transform: translateX(-50%) translateY(0); }
+  55%  { transform: translateX(-50%) translateY(-40px); }
+  70%  { transform: translateX(-50%) translateY(0); }
+  80%  { transform: translateX(-50%) translateY(-12px); }
+  90%  { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(0); }
 }
 
 /* ── Star burst celebration (radial from center) ── */
