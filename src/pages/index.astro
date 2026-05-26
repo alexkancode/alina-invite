@@ -353,7 +353,10 @@ import '../styles/global.css'
         <section class="flex flex-col gap-phi-lg justify-center">
           <!-- RSVP Button — disco gold with layered shadow -->
           <div class="relative">
-            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; display: block; -webkit-text-fill-color: transparent; background: linear-gradient(180deg, #FFB6D9 0%, #FFB6D9 45%, #483D8B 55%, #483D8B 100%); -webkit-background-clip: text; background-clip: text;">Alina's Birthday</span>
+            <!-- Navy layer (behind, offset down-left) -->
+            <span class="birthday-label-shadow absolute left-0 right-0 text-center hidden sm:block" style="top: calc(-10px - 1rem + 3px); left: -2px; z-index: 0; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #483D8B;">Alina's Birthday</span>
+            <!-- Pink layer (on top) -->
+            <span class="birthday-label absolute left-0 right-0 text-center" style="top: calc(-10px - 1rem); z-index: 1; font-family: 'Righteous', sans-serif; font-size: 1.5rem; color: #FFB6D9;">Alina's Birthday</span>
           <button
             id="rsvp-btn"
             class="w-full px-phi-xl py-phi-md rounded-xl text-phi-base font-bold
@@ -423,14 +426,14 @@ import '../styles/global.css'
          style="background: rgba(26, 10, 46, 0.85); backdrop-filter: blur(4px);">
       <div class="rounded-2xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg relative overflow-hidden"
            style="background: linear-gradient(160deg, #2d1254, #1a0a2e);
-                  border: 3px solid #FFD700;
-                  box-shadow: var(--shadow-elevation-high), 0 0 34px hsl(45, 100%, 50% / 0.15);">
+                  border: 3px solid #FFB6D9;
+                  box-shadow: var(--shadow-elevation-high), 0 0 34px hsl(330, 100%, 80% / 0.15);">
         <!-- Shine overlay on modal -->
         <div class="absolute inset-0 pointer-events-none"
-             style="background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.06), transparent 60%);"></div>
+             style="background: radial-gradient(ellipse at 30% 20%, rgba(255,182,217,0.06), transparent 60%);"></div>
 
-        <h2 class="text-phi-xl text-disco-gold relative"
-            style="font-family: 'Righteous', sans-serif;
+        <h2 class="text-phi-xl relative"
+            style="font-family: 'Righteous', sans-serif; color: #FFB6D9;
                    text-shadow: 2px 2px 0 hsl(300, 100%, 40% / 0.4);">
           RSVP
         </h2>
@@ -444,14 +447,14 @@ import '../styles/global.css'
                    placeholder-metallic-silver/50 focus:outline-none transition-colors"
             style="background: rgba(255,255,255,0.06);
                    border: 2px solid hsl(270, 30%, 40%);
-                   caret-color: #FFD700;"
-            onfocus="this.style.borderColor='#FFD700'"
+                   caret-color: #FFB6D9;"
+            onfocus="this.style.borderColor='#FFB6D9'"
             onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           />
           <fieldset class="flex flex-col sm:flex-row gap-phi-md sm:gap-phi-xl text-warm-cream">
             <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
               <input type="radio" name="attending" value="yes" required
-                     class="w-[18px] h-[18px] shrink-0" style="accent-color: #FFD700;" />
+                     class="w-[18px] h-[18px] shrink-0" style="accent-color: #FFB6D9;" />
               <span class="font-medium select-none">I'll be there</span>
             </label>
             <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
@@ -468,17 +471,18 @@ import '../styles/global.css'
                    placeholder-metallic-silver/50 resize-none focus:outline-none transition-colors"
             style="background: rgba(255,255,255,0.06);
                    border: 2px solid hsl(270, 30%, 40%);"
-            onfocus="this.style.borderColor='#FFD700'"
+            onfocus="this.style.borderColor='#FFB6D9'"
             onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           ></textarea>
           <div class="flex gap-phi-md pt-phi-sm">
             <button type="submit" id="rsvp-submit"
-                    class="px-phi-xl py-phi-sm text-pop-black rounded-lg font-bold uppercase
+                    class="px-phi-xl py-phi-sm rounded-lg font-bold uppercase
                            tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     style="font-family: 'Righteous', sans-serif;
-                           background: linear-gradient(135deg, #FFD700, #E1AD01);
-                           border: 2px solid #B7410E;
-                           box-shadow: 3px 3px 0 #FF007F;">
+                           background: linear-gradient(135deg, #FFB6D9, #F5A0C0);
+                           color: #2d1254;
+                           border: 2px solid #d06090;
+                           box-shadow: 3px 3px 0 #483D8B;">
               Send
             </button>
             <button type="button" id="modal-close"
@@ -501,16 +505,16 @@ import '../styles/global.css'
       <div class="game-modal-inner absolute rounded-2xl relative overflow-hidden"
            style="top: 16px; left: 80px; right: 80px; bottom: 16px;
                   background: linear-gradient(160deg, #2d1254, #1a0a2e);
-                  border: 3px solid #FFD700;
-                  box-shadow: var(--shadow-elevation-high), 0 0 34px hsl(45, 100%, 50% / 0.15);">
+                  border: 3px solid #FFB6D9;
+                  box-shadow: var(--shadow-elevation-high), 0 0 34px hsl(330, 100%, 80% / 0.15);">
         <!-- Shine overlay -->
         <div class="absolute inset-0 pointer-events-none"
-             style="background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.06), transparent 60%);"></div>
+             style="background: radial-gradient(ellipse at 30% 20%, rgba(255,182,217,0.06), transparent 60%);"></div>
 
         <!-- Header bar -->
         <div class="flex items-center justify-between px-phi-xl pt-phi-lg pb-phi-sm relative">
-          <h2 class="text-phi-lg text-disco-gold"
-              style="font-family: 'Righteous', sans-serif;
+          <h2 class="text-phi-lg"
+              style="font-family: 'Righteous', sans-serif; color: #FFB6D9;
                      text-shadow: 2px 2px 0 hsl(300, 100%, 40% / 0.4);">
             Match the Tiles
           </h2>
@@ -519,10 +523,10 @@ import '../styles/global.css'
           <div class="flex gap-phi-xl items-center text-warm-cream" style="font-family: 'Poppins', sans-serif;">
             <span id="game-moves" class="text-phi-sm font-medium">Moves: 0</span>
             <span id="game-timer" class="text-phi-sm font-medium tabular-nums">0:00</span>
-            <span id="game-score-display" class="text-phi-sm font-medium text-disco-gold">Score: —</span>
+            <span id="game-score-display" class="text-phi-sm font-medium text-[#FFB6D9]">Score: —</span>
           </div>
 
-          <button id="game-close" class="text-metallic-silver hover:text-disco-gold transition-colors cursor-pointer"
+          <button id="game-close" class="text-metallic-silver hover:text-[#FFB6D9] transition-colors cursor-pointer"
                   style="font-size: 1.5rem; line-height: 1;">&#x2715;</button>
         </div>
 
@@ -540,7 +544,7 @@ import '../styles/global.css'
               </button>
               <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all active-diff"
                       data-diff="medium"
-                      style="border: 2px solid #FFD700; color: #FFD700; background: rgba(255,215,0,0.1);">
+                      style="border: 2px solid #FFB6D9; color: #FFB6D9; background: rgba(255,182,217,0.1);">
                 Medium
               </button>
               <button class="game-diff-btn px-phi-md py-phi-xs rounded-lg text-phi-xs font-medium cursor-pointer transition-all"
@@ -558,7 +562,7 @@ import '../styles/global.css'
 
             <!-- Game over panel -->
             <div id="game-over" class="hidden mb-phi-lg text-center">
-              <p class="text-phi-md text-disco-gold font-bold" style="font-family: 'Righteous', sans-serif;">
+              <p class="text-phi-md text-[#FFB6D9] font-bold" style="font-family: 'Righteous', sans-serif;">
                 Nice! &#x1F389;
               </p>
               <p id="game-final-score" class="text-phi-sm text-warm-cream mt-phi-xs"></p>
@@ -567,8 +571,8 @@ import '../styles/global.css'
               <div id="game-name-row" class="mt-phi-md flex gap-phi-sm justify-center items-center">
                 <input type="text" id="game-player-name" maxlength="30" placeholder="Your name"
                        class="px-phi-md py-phi-sm rounded-lg text-phi-sm text-warm-cream placeholder-metallic-silver/50 focus:outline-none transition-colors w-full"
-                       style="background: rgba(255,255,255,0.06); border: 2px solid hsl(270, 30%, 40%); caret-color: #FFD700;"
-                       onfocus="this.style.borderColor='#FFD700'"
+                       style="background: rgba(255,255,255,0.06); border: 2px solid hsl(270, 30%, 40%); caret-color: #FFB6D9;"
+                       onfocus="this.style.borderColor='#FFB6D9'"
                        onblur="this.style.borderColor='hsl(270, 30%, 40%)'" />
               </div>
               <p id="game-name-greeting" class="hidden mt-phi-sm text-phi-xs text-metallic-silver"></p>
@@ -576,7 +580,7 @@ import '../styles/global.css'
               <div class="flex gap-phi-sm justify-center mt-phi-md">
                 <button id="game-submit-score" class="px-phi-lg py-phi-sm text-pop-black rounded-lg font-bold uppercase tracking-wider cursor-pointer transition-all text-phi-xs"
                         style="font-family: 'Righteous', sans-serif;
-                               background: linear-gradient(135deg, #FFD700, #E1AD01);
+                               background: linear-gradient(135deg, #FFB6D9, #F5A0C0);
                                border: 2px solid #B7410E;
                                box-shadow: 3px 3px 0 #FF007F;">
                   Submit Score
@@ -593,7 +597,7 @@ import '../styles/global.css'
 
             <!-- Leaderboard -->
             <div id="game-leaderboard">
-              <h3 class="text-phi-sm text-disco-gold font-bold mb-phi-sm" style="font-family: 'Righteous', sans-serif;">
+              <h3 class="text-phi-sm text-[#FFB6D9] font-bold mb-phi-sm" style="font-family: 'Righteous', sans-serif;">
                 Leaderboard
               </h3>
               <div id="game-leaderboard-list" class="text-phi-xs text-warm-cream" style="font-family: 'Poppins', sans-serif;">
@@ -660,8 +664,7 @@ import '../styles/global.css'
           display: none !important;
         }
         .birthday-label {
-          background: none !important;
-          -webkit-text-fill-color: #483D8B !important;
+          color: #483D8B !important;
           max-width: 90vw !important;
           position: absolute !important;
           top: 250px;
@@ -987,18 +990,18 @@ import '../styles/global.css'
           let html = '';
           if (playerBest > 0) {
             html += `<div class="flex justify-between items-center py-1 mb-phi-xs" style="border-bottom: 2px solid rgba(255,215,0,0.25);">
-              <span class="text-disco-gold text-phi-xs font-medium">Your best</span>
-              <span class="text-disco-gold tabular-nums font-bold">${playerBest.toLocaleString()}</span>
+              <span class="text-[#FFB6D9] text-phi-xs font-medium">Your best</span>
+              <span class="text-[#FFB6D9] tabular-nums font-bold">${playerBest.toLocaleString()}</span>
             </div>`;
           }
 
           html += scores.map((s, i) => {
             const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="display:inline-block;width:1.3em;text-align:center;">${i + 1}</span>`;
             const isMe = currentPlayer && s.player === currentPlayer;
-            const highlight = isMe ? 'color: #FFD700; font-weight: 600;' : '';
+            const highlight = isMe ? 'color: #FFB6D9; font-weight: 600;' : '';
             return `<div class="flex justify-between items-center py-1" style="border-bottom: 1px solid rgba(255,255,255,0.05); ${highlight}">
               <span>${medal} ${s.player}</span>
-              <span class="tabular-nums" style="${isMe ? 'color: #FFD700;' : 'color: #FFD700;'}">${s.score.toLocaleString()}</span>
+              <span class="tabular-nums" style="${isMe ? 'color: #FFB6D9;' : 'color: #FFB6D9;'}">${s.score.toLocaleString()}</span>
             </div>`;
           }).join('');
 
@@ -1232,9 +1235,9 @@ import '../styles/global.css'
           (b as HTMLElement).style.color = 'hsl(270, 30%, 65%)';
           (b as HTMLElement).style.background = 'transparent';
         });
-        btn.style.borderColor = '#FFD700';
-        btn.style.color = '#FFD700';
-        btn.style.background = 'rgba(255,215,0,0.1)';
+        btn.style.borderColor = '#FFB6D9';
+        btn.style.color = '#FFB6D9';
+        btn.style.background = 'rgba(255,182,217,0.1)';
         startGame(btn.dataset.diff!);
         fetchLeaderboard(btn.dataset.diff!);
       });
