@@ -782,13 +782,50 @@ import '../styles/global.css'
           sparkleFollowing = !sparkleFollowing;
 
           if (sparkleFollowing) {
-            // Detach from layers, go fixed
+            // Wooshy curved path to mouse for each sparkle
             allSparkles.forEach((sp, i) => {
               const el = sp as HTMLElement;
+              const rect = el.getBoundingClientRect();
+              const startX = rect.left;
+              const startY = rect.top;
+
+              // Random curve control point (offset to side for arc)
+              const curveX = (Math.random() - 0.5) * 300;
+              const curveY = (Math.random() - 0.5) * 200;
+              const midX = (startX + mouseX) / 2 + curveX;
+              const midY = (startY + mouseY) / 2 + curveY;
+              const dur = 0.4 + Math.random() * 0.5;
+              const delay = Math.random() * 0.15;
+
               el.classList.add('following');
               document.body.appendChild(el);
+
+              // Animate through curved path via keyframes
+              el.style.left = startX + 'px';
+              el.style.top = startY + 'px';
+              el.style.transition = 'none';
+              el.style.transform = 'rotate(0deg) scale(1)';
+
+              const anim = el.animate([
+                { left: startX + 'px', top: startY + 'px', transform: 'rotate(0deg) scale(1)', offset: 0 },
+                { left: midX + 'px', top: midY + 'px', transform: `rotate(${180 + Math.random() * 360}deg) scale(1.5)`, offset: 0.5 },
+                { left: (mouseX + sparkleOffsets[i].x) + 'px', top: (mouseY + sparkleOffsets[i].y) + 'px', transform: 'rotate(720deg) scale(1)', offset: 1 }
+              ], {
+                duration: dur * 1000,
+                delay: delay * 1000,
+                easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)',
+                fill: 'forwards'
+              });
+
+              anim.onfinish = () => {
+                el.style.left = (mouseX + sparkleOffsets[i].x) + 'px';
+                el.style.top = (mouseY + sparkleOffsets[i].y) + 'px';
+                el.style.transition = '';
+              };
             });
-            animateSparkleFollow();
+
+            // Start following after woosh completes
+            setTimeout(() => animateSparkleFollow(), 800);
           } else {
             // Restore to original layers
             const layers = document.querySelectorAll('.sparkle-layer');
