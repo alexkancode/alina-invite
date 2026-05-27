@@ -5,20 +5,29 @@ const BASE = 'http://localhost:4321';
 // These tests run against the live Astro dev server.
 // Start it with `npm run dev` before running tests.
 
-async function post(body: unknown) {
+let testIpCounter = 0;
+
+function uniqueIp(): string {
+  testIpCounter++;
+  return `10.0.${Math.floor(testIpCounter / 256)}.${testIpCounter % 256}`;
+}
+
+async function post(body: unknown, ip?: string) {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (ip) headers['x-forwarded-for'] = ip;
   return fetch(`${BASE}/api/rsvp`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(body),
   });
 }
 
-async function get() {
-  return fetch(`${BASE}/api/rsvp`);
+async function get(params = '') {
+  const url = params ? `${BASE}/api/rsvp?${params}` : `${BASE}/api/rsvp`;
+  return fetch(url);
 }
 
 beforeAll(async () => {
-  // Verify server is running
   try {
     await fetch(BASE);
   } catch {
@@ -30,7 +39,8 @@ describe('POST /api/rsvp', () => {
   // ── Happy paths ──
 
   it('accepts a valid RSVP with attendance yes', async () => {
-    const res = await post({ name: 'Alice', message: 'See you there!', attending: 'yes' });
+    const ip = uniqueIp();
+    const res = await post({ name: 'Alice', message: 'See you there!', attending: 'yes' }, ip);
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.success).toBe(true);
@@ -41,7 +51,8 @@ describe('POST /api/rsvp', () => {
   });
 
   it('accepts a valid RSVP with attendance no', async () => {
-    const res = await post({ name: 'Bob', message: 'Sorry, can\'t make it', attending: 'no' });
+    const ip = uniqueIp();
+    const res = await post({ name: 'Bob', message: 'Sorry, can\'t make it', attending: 'no' }, ip);
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.success).toBe(true);
@@ -49,7 +60,8 @@ describe('POST /api/rsvp', () => {
   });
 
   it('accepts RSVP without a message (optional field)', async () => {
-    const res = await post({ name: 'Charlie', attending: 'yes' });
+    const ip = uniqueIp();
+    const res = await post({ name: 'Charlie', attending: 'yes' }, ip);
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.success).toBe(true);
@@ -57,22 +69,45 @@ describe('POST /api/rsvp', () => {
   });
 
   it('accepts RSVP with empty string message', async () => {
-    const res = await post({ name: 'Dana', message: '', attending: 'yes' });
+    const ip = uniqueIp();
+    const res = await post({ name: 'Dana', message: '', attending: 'yes' }, ip);
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.entry.message).toBe('');
   });
 
   it('returns entry with ISO timestamp', async () => {
-    const res = await post({ name: 'Eve', attending: 'no' });
+    const ip = uniqueIp();
+    const res = await post({ name: 'Eve', attending: 'no' }, ip);
     const json = await res.json();
     const date = new Date(json.entry.timestamp);
     expect(date.getTime()).not.toBeNaN();
   });
 
   it('returns Content-Type application/json', async () => {
-    const res = await post({ name: 'Frank', attending: 'yes' });
+    const ip = uniqueIp();
+    const res = await post({ name: 'Frank', attending: 'yes' }, ip);
     expect(res.headers.get('content-type')).toBe('application/json');
+  });
+
+  it('allows same IP to update their RSVP', async () => {
+    const ip = uniqueIp();
+    await post({ name: 'Updater', attending: 'yes' }, ip);
+    const res = await post({ name: 'Updater-v2', attending: 'no', message: 'changed mind' }, ip);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.entry.name).toBe('Updater-v2');
+    expect(json.entry.attending).toBe('no');
+  });
+
+  it('rejects name taken by a different IP', async () => {
+    const ip1 = uniqueIp();
+    const ip2 = uniqueIp();
+    await post({ name: 'UniqueName', attending: 'yes' }, ip1);
+    const res = await post({ name: 'UniqueName', attending: 'no' }, ip2);
+    expect(res.status).toBe(409);
+    const json = await res.json();
+    expect(json.error).toBeTruthy();
   });
 
   // ── Unhappy paths ──
@@ -129,12 +164,50 @@ describe('GET /api/rsvp', () => {
 
   it('reflects previously posted RSVPs', async () => {
     const unique = `Tester-${Date.now()}`;
-    await post({ name: unique, message: 'tracking test', attending: 'yes' });
+    const ip = uniqueIp();
+    await post({ name: unique, message: 'tracking test', attending: 'yes' }, ip);
 
     const res = await get();
     const json = await res.json();
     const found = json.rsvps.find((r: { name: string }) => r.name === unique);
     expect(found).toBeTruthy();
     expect(found.message).toBe('tracking test');
+  });
+});
+
+describe('GET /api/rsvp?check=name', () => {
+  it('returns exists:false for unknown name', async () => {
+    const res = await get(`check=NobodyHere-${Date.now()}`);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.exists).toBe(false);
+  });
+
+  it('returns exists:true and sameIp:true for own RSVP', async () => {
+    const ip = uniqueIp();
+    const name = `Checker-${Date.now()}`;
+    await post({ name, attending: 'yes' }, ip);
+
+    const res = await fetch(`${BASE}/api/rsvp?check=${encodeURIComponent(name)}`, {
+      headers: { 'x-forwarded-for': ip },
+    });
+    const json = await res.json();
+    expect(json.exists).toBe(true);
+    expect(json.sameIp).toBe(true);
+    expect(json.attending).toBe('yes');
+  });
+
+  it('returns exists:true and sameIp:false for another IP', async () => {
+    const ip1 = uniqueIp();
+    const ip2 = uniqueIp();
+    const name = `OtherChecker-${Date.now()}`;
+    await post({ name, attending: 'no' }, ip1);
+
+    const res = await fetch(`${BASE}/api/rsvp?check=${encodeURIComponent(name)}`, {
+      headers: { 'x-forwarded-for': ip2 },
+    });
+    const json = await res.json();
+    expect(json.exists).toBe(true);
+    expect(json.sameIp).toBe(false);
   });
 });

@@ -10,24 +10,27 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "generate-types": "wrangler types",
     "test:api": "vitest run",
     "test:e2e": "npx playwright test",
-    "test": "vitest run && npx playwright test"
+    "test": "vitest run && npx playwright test",
+    "start": "node ./dist/server/entry.mjs",
+    "migrate": "npx tsx scripts/migrate.ts"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.5.4",
+    "@astrojs/node": "^10.1.1",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.7",
+    "pg": "^8.21.0",
     "profanease": "^2.0.3",
-    "tailwindcss": "^4.3.0",
-    "wrangler": "^4.94.0"
+    "tailwindcss": "^4.3.0"
   },
   "overrides": {
     "vite": "^7"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
+    "@types/pg": "^8.20.0",
+    "tsx": "^4.22.3",
     "vitest": "^3.2.4"
   }
 }
