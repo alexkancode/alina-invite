@@ -311,7 +311,7 @@ describe('GET /api/leaderboard — happy paths', () => {
     const unique = `Fields-${Date.now()}`;
     await postScore(validPayload({ player: unique }));
 
-    const res = await getScores();
+    const res = await getScores('difficulty=medium&limit=50');
     const json = await res.json();
     const entry = json.find((s: any) => s.player === unique);
     expect(entry).toBeTruthy();
@@ -327,7 +327,7 @@ describe('GET /api/leaderboard — happy paths', () => {
     const unique = `Reflect-${Date.now()}`;
     await postScore(validPayload({ player: unique }));
 
-    const res = await getScores();
+    const res = await getScores('difficulty=medium&limit=50');
     const json = await res.json();
     const found = json.find((s: any) => s.player === unique);
     expect(found).toBeTruthy();
