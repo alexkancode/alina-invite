@@ -410,6 +410,14 @@ import '../styles/global.css'
       </div>
 
 
+      <!-- ═══ RSVP Guest List ═══ -->
+      <div id="rsvp-guest-list" class="mt-phi-2xl pt-phi-lg" style="border-top: 2px solid rgba(72, 61, 139, 0.2);">
+        <h3 class="text-center mb-phi-md" style="font-family: 'Righteous', sans-serif; font-size: 1.1rem; color: #483D8B;">Who's Coming</h3>
+        <div id="rsvp-guests" class="flex flex-wrap justify-center gap-phi-md">
+          <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
+        </div>
+      </div>
+
       <!-- ═══ Footer ═══ -->
     </main>
 
@@ -842,6 +850,7 @@ import '../styles/global.css'
           showRsvpStatus();
           modal.classList.add('hidden');
           document.body.classList.remove('accent-pink');
+          loadGuestList();
           if (data.attending === 'yes') burstStars();
         } catch (err) {
           console.error('RSVP error:', err);
@@ -889,6 +898,29 @@ import '../styles/global.css'
           star.addEventListener('animationend', () => star.remove());
         }
       }
+
+      // ── RSVP Guest List ──
+      async function loadGuestList() {
+        const container = document.getElementById('rsvp-guests')!;
+        try {
+          const res = await fetch('/api/rsvp');
+          const data = await res.json();
+          if (!data.rsvps || data.rsvps.length === 0) {
+            container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">No RSVPs yet — be the first!</p>';
+            return;
+          }
+          container.innerHTML = data.rsvps.map((r: { name: string; attending: string }) => `
+            <div class="flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg" style="min-width: 80px; background: rgba(72, 61, 139, 0.06);">
+              <span class="font-medium text-phi-sm" style="color: #483D8B;">${r.name}</span>
+              <span class="text-phi-xs" style="color: ${r.attending === 'yes' ? '#8B2FC9' : 'rgba(72, 61, 139, 0.4)'};">${r.attending === 'yes' ? 'Going ✓' : 'Not going'}</span>
+            </div>
+          `).join('');
+        } catch {
+          container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Could not load guest list</p>';
+        }
+      }
+
+      loadGuestList();
 
       // ── Enable 3D + spin after bounce lands ──
       const arcUnit = document.querySelector('.arc-disco-unit');
