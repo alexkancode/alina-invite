@@ -827,7 +827,13 @@ import '../styles/global.css'
             const res = await fetch(`/api/rsvp?check=${encodeURIComponent(val)}`);
             const data = await res.json();
 
-            if (!data.exists) {
+            if (data.flagged) {
+              nameBadge.classList.remove('hidden');
+              nameBadge.style.background = 'rgba(255,70,70,0.15)';
+              nameBadge.style.color = '#FF7070';
+              nameBadge.textContent = 'Sorry, that has been flagged as inappropriate.';
+              nameBlocked = true;
+            } else if (!data.exists) {
               nameBadge.classList.add('hidden');
               nameBlocked = false;
             } else if (data.sameIp) {
@@ -898,6 +904,16 @@ import '../styles/global.css'
           });
           const result = await res.json();
           console.log('RSVP response:', result);
+
+          if (!res.ok) {
+            // Show error in the name badge area
+            nameBadge.classList.remove('hidden');
+            nameBadge.style.background = 'rgba(255,70,70,0.15)';
+            nameBadge.style.color = '#FF7070';
+            nameBadge.textContent = result.error || 'Something went wrong.';
+            return;
+          }
+
           localStorage.setItem('rsvp', JSON.stringify(data));
           showRsvpStatus();
           modal.classList.add('hidden');
@@ -906,7 +922,10 @@ import '../styles/global.css'
           if (data.attending === 'yes') burstStars();
         } catch (err) {
           console.error('RSVP error:', err);
-          alert('Something went wrong. Please try again.');
+          nameBadge.classList.remove('hidden');
+          nameBadge.style.background = 'rgba(255,70,70,0.15)';
+          nameBadge.style.color = '#FF7070';
+          nameBadge.textContent = 'Something went wrong. Please try again.';
         }
       });
 
