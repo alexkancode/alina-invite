@@ -439,6 +439,7 @@ import '../styles/global.css'
         </h2>
         <form id="rsvp-form" class="space-y-phi-md flex flex-col relative">
           <input
+            id="rsvp-name-input"
             name="name"
             type="text"
             placeholder="Your name"
@@ -451,6 +452,7 @@ import '../styles/global.css'
             onfocus="this.style.borderColor='#FFB6D9'"
             onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           />
+          <div id="rsvp-name-badge" class="hidden text-phi-xs rounded px-phi-sm py-phi-xs" style="margin-top: -4px;"></div>
           <fieldset class="flex flex-col sm:flex-row gap-phi-md sm:gap-phi-xl text-warm-cream">
             <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
               <input type="radio" name="attending" value="yes" required
@@ -805,6 +807,56 @@ import '../styles/global.css'
 
       form.addEventListener('input', updateSubmitState);
       form.addEventListener('change', updateSubmitState);
+
+      // ── Name uniqueness check (debounced) ──
+      const nameInput = document.getElementById('rsvp-name-input') as HTMLInputElement;
+      const nameBadge = document.getElementById('rsvp-name-badge')!;
+      let nameCheckTimeout: ReturnType<typeof setTimeout>;
+      let nameBlocked = false;
+
+      nameInput.addEventListener('input', () => {
+        clearTimeout(nameCheckTimeout);
+        nameBadge.classList.add('hidden');
+        nameBlocked = false;
+
+        const val = nameInput.value.trim();
+        if (val.length < 2) return;
+
+        nameCheckTimeout = setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/rsvp?check=${encodeURIComponent(val)}`);
+            const data = await res.json();
+
+            if (!data.exists) {
+              nameBadge.classList.add('hidden');
+              nameBlocked = false;
+            } else if (data.sameIp) {
+              // Same person updating
+              nameBadge.classList.remove('hidden');
+              nameBadge.style.background = 'rgba(255,182,217,0.15)';
+              nameBadge.style.color = '#FFB6D9';
+              nameBadge.textContent = `${val} already RSVP'd as ${data.attending === 'yes' ? 'Going' : 'Not going'} — you can update`;
+              nameBlocked = false;
+            } else {
+              // Different person, name taken
+              nameBadge.classList.remove('hidden');
+              nameBadge.style.background = 'rgba(255,70,70,0.15)';
+              nameBadge.style.color = '#FF7070';
+              nameBadge.textContent = `${val} is already taken — please use a different name`;
+              nameBlocked = true;
+            }
+            updateSubmitState();
+          } catch { /* ignore check errors */ }
+        }, 300);
+      });
+
+      // Patch updateSubmitState to account for name blocking
+      const _origUpdateSubmit = updateSubmitState;
+      updateSubmitState = function() {
+        const current = getCurrentFormData();
+        const nameVal = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
+        submitBtn.disabled = !nameVal || current === savedSnapshot || nameBlocked;
+      };
 
       rsvpBtn.addEventListener('click', () => {
         const saved = localStorage.getItem('rsvp');

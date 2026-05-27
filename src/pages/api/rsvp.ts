@@ -3,15 +3,23 @@ import type { APIRoute } from 'astro';
 export const prerender = false;
 
 // In-memory store keyed by IP for deduplication (would be Supabase/D1 in production)
-const rsvpsByIp = new Map<string, { name: string; message: string; attending: string; timestamp: string }>();
+export const rsvpsByIp = new Map<string, { name: string; message: string; attending: string; timestamp: string }>();
 
-function getClientIp(request: Request): string {
-  // Cloudflare Workers
+export function getClientIp(request: Request): string {
   return request.headers.get('CF-Connecting-IP')
-    // Proxied / forwarded
     ?? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    // Local dev fallback
     ?? '127.0.0.1';
+}
+
+/** Find if a name is already taken and by which IP */
+export function findByName(name: string): { ip: string; entry: { name: string; message: string; attending: string; timestamp: string } } | null {
+  const normalized = name.trim().toLowerCase();
+  for (const [ip, entry] of rsvpsByIp) {
+    if (entry.name.trim().toLowerCase() === normalized) {
+      return { ip, entry };
+    }
+  }
+  return null;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -26,6 +34,16 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const ip = getClientIp(request);
+
+  // Check if name is taken by a different IP
+  const existing = findByName(name);
+  if (existing && existing.ip !== ip) {
+    return new Response(JSON.stringify({ error: 'Name already taken by another guest' }), {
+      status: 409,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const entry = {
     name,
     message: message || '',
@@ -43,8 +61,33 @@ export const POST: APIRoute = async ({ request }) => {
   });
 };
 
-export const GET: APIRoute = async () => {
-  // Return all RSVPs without exposing IP addresses
+export const GET: APIRoute = async ({ request }) => {
+  const url = new URL(request.url);
+  const checkName = url.searchParams.get('check');
+
+  // Name check mode: GET /api/rsvp?check=Bob
+  if (checkName) {
+    const ip = getClientIp(request);
+    const existing = findByName(checkName);
+
+    if (!existing) {
+      return new Response(JSON.stringify({ exists: false }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response(JSON.stringify({
+      exists: true,
+      sameIp: existing.ip === ip,
+      attending: existing.entry.attending,
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Default: list all RSVPs (no IPs exposed)
   const rsvps = Array.from(rsvpsByIp.values());
   console.log(`[RSVP] Listing ${rsvps.length} responses`);
   return new Response(JSON.stringify({ rsvps, count: rsvps.length }), {
