@@ -38,8 +38,9 @@ check_railway_cli() {
 check_auth() {
     log_info "Checking Railway authentication..."
 
-    if railway auth status 2>/dev/null | grep -q "Authenticated"; then
-        log_success "Already authenticated with Railway"
+    if railway whoami 2>/dev/null | grep -q "Logged in as"; then
+        local user=$(railway whoami 2>/dev/null)
+        log_success "Already authenticated: $user"
         return 0
     fi
 
@@ -112,7 +113,7 @@ setup_database() {
     fi
 
     log_info "Adding PostgreSQL database..."
-    railway add --database postgresql
+    railway add --database postgres
 
     # Wait for database to be ready
     log_info "Waiting for database to initialize..."
