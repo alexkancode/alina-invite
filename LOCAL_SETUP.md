@@ -1,3 +1,15 @@
+This file coveres:
+  - Prerequisites: Node 22+, Docker Desktop, Playwright browsers                                           
+  - First-time setup: clone → npm install → docker up → migrate → dev
+  - Day-to-day: start/stop/restart commands                                                                
+  - Clean restart: nuke database, re-migrate                                                               
+  - Full rebuild: after pulling changes       
+  - Tests: API, E2E, and combined                                                                          
+  - Production build: local preview and Docker image              
+  - Environment variables: table of all vars                                                               
+  - Troubleshooting: port conflicts, database issues, stale CSS   
+  - Link to architecture doc at the bottom      
+
 # Local Development Setup
 
 How to run, stop, and restart the app on your machine.
@@ -33,8 +45,8 @@ How to run, stop, and restart the app on your machine.
 ## First-Time Setup
 
 ```bash
-# Clone and enter the repo
-cd /path/to/repo
+# Enter the repo directory
+cd /home/alex/Desktop/dev/test/test/repo
 
 # Install dependencies
 npm install
