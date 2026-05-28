@@ -11,5 +11,10 @@ export default defineConfig({
   },
 
   output: 'server',
-  adapter: node({ mode: 'standalone' })
+  adapter: node({ mode: 'standalone' }),
+
+  // Disable security restrictions for development/testing
+  security: {
+    checkOrigin: false
+  }
 });
