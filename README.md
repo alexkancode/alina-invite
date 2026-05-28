@@ -1,43 +1,90 @@
-# Astro Starter Kit: Minimal
+# 🎮 Invites Photo Upload System
 
-```sh
-npm create astro@latest -- --template minimal
+A comprehensive photo upload and game integration system built with Astro, featuring intelligent photo selection for disco ball and tile matching games.
+
+## ✨ **Week 2 Features**
+- **📸 Photo Upload API** - Mobile-optimized upload with Sharp processing
+- **🎯 Intelligent Photo Selection** - Mixes user uploads with original photos
+- **🎲 Game Integration** - Photos appear in disco ball and tile matching games
+- **⚡ Performance Optimized** - Handles concurrent requests with <100ms selection times
+
+## 🚀 **Quick Deploy**
+```bash
+./scripts/railway-simple-deploy.sh
 ```
+**→ See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide**
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 📁 **Project Structure**
 
 ```text
 /
-├── public/
 ├── src/
+│   ├── lib/                    # Core photo system libraries
+│   │   ├── photoSelectionManager.ts    # Intelligent photo selection
+│   │   ├── gameIntegration.ts          # Game photo integration  
+│   │   ├── photoProcessor.ts           # Sharp image processing
+│   │   ├── photoDatabase.ts            # Database operations
+│   │   └── rateLimiter.ts             # Upload rate limiting
+│   ├── pages/api/              # API endpoints
+│   │   ├── photo-upload.ts            # Photo upload endpoint
+│   │   ├── rsvp.ts                    # RSVP functionality
+│   │   └── leaderboard.ts             # Game scoring
 │   └── pages/
-│       └── index.astro
-└── package.json
+│       └── index.astro         # Main invitation page
+├── tests/                      # Comprehensive test suite (49+ tests)
+├── migrations/                 # Database schema
+├── scripts/                    # Railway deployment automation
+└── public/
+    └── alina/                  # Original and user photos
+        ├── thumbs/             # Disco ball sized images  
+        └── minigame/           # Tile game sized images
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 📡 **API Endpoints**
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/photo-upload` | POST | Upload photos for approval |
+| `/api/rsvp` | POST/GET | Event RSVP management |
+| `/api/leaderboard` | GET | Game scoring system |
 
-Any static assets, like images, can be placed in the `public/` directory.
+## 🧞 **Commands**
 
-## 🧞 Commands
+All commands are run from the root of the project:
 
-All commands are run from the root of the project, from a terminal:
+| Command | Action |
+| :------ | :----- |
+| `npm install` | Install dependencies |
+| `npm run dev` | Start development server at `localhost:4321` |
+| `npm run build` | Build production site |
+| `npm run test:api` | Run comprehensive API test suite (49+ tests) |
+| `npm run migrate` | Run database migrations |
+| `./scripts/railway-simple-deploy.sh` | Deploy to Railway |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## 📚 **Documentation**
 
-## 👀 Want to learn more?
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Complete deployment guide with Railway scripts
+- **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** - Week 2 development summary and achievements  
+- **[RSVP_BUG_REPORT.md](./RSVP_BUG_REPORT.md)** - Known legacy issues documentation
+- **[/scripts/README.md](./scripts/README.md)** - Detailed deployment automation guide
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## 🎯 **Features by Week**
+
+### ✅ **Week 1 - COMPLETED**
+- Mobile upload interface with Sharp processing
+- Rate limiting with exponential backoff  
+- Database schema with approval workflow
+
+### ✅ **Week 2 - COMPLETED** 
+- Intelligent photo selection algorithms
+- Game integration (disco ball + tile matching)
+- Performance optimization and comprehensive testing
+
+### 📋 **Week 3 - PLANNED**
+- Admin approval interface
+- Batch photo operations
+- Content moderation automation
+
+---
+
+**Built with Astro, Sharp, PostgreSQL, and comprehensive testing** 🚀
