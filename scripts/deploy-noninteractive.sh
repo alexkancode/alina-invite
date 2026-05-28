@@ -106,8 +106,14 @@ setup_project() {
 setup_database() {
     log_info "Setting up PostgreSQL database..."
 
-    # Check if database already exists
-    if railway variables | grep -q "DATABASE_URL"; then
+    # Check if we're currently connected to a postgres service
+    if railway status | grep -q "postgres"; then
+        log_success "Database service already exists"
+        return 0
+    fi
+
+    # Check if database variables exist in the project
+    if railway variables 2>/dev/null | grep -q "DATABASE_URL"; then
         log_success "Database already configured"
         return 0
     fi
@@ -133,6 +139,34 @@ setup_database() {
 
     log_error "Database setup timed out"
     exit 1
+}
+
+# Set up web service for the application
+setup_web_service() {
+    log_info "Setting up web application service..."
+
+    # Check if we're connected to a non-database service
+    if railway status | grep -q "Service:" && ! railway status | grep -q "postgres"; then
+        log_success "Web service already connected"
+        return 0
+    fi
+
+    # If we're connected to postgres-db, we need to create the web service
+    if railway status | grep -q "postgres"; then
+        log_info "Creating web application service..."
+
+        # Try to add a web service
+        if ! railway service create alina-birthday-app 2>/dev/null; then
+            log_warning "Could not create new service, trying to connect to existing..."
+        fi
+
+        # Try to connect to the web service
+        if railway service alina-birthday-app 2>/dev/null; then
+            log_success "Connected to web service: alina-birthday-app"
+        else
+            log_warning "Using current service context for deployment"
+        fi
+    fi
 }
 
 # Set environment variables
@@ -227,6 +261,7 @@ main() {
 
     # Infrastructure setup
     setup_database
+    setup_web_service
     set_environment
 
     # Application deployment
