@@ -13,8 +13,20 @@
     "test:api": "vitest run",
     "test:e2e": "npx playwright test",
     "test": "vitest run && npx playwright test",
-    "start": "node ./dist/server/entry.mjs",
-    "migrate": "npx tsx scripts/migrate.ts"
+    "start": "npm run migrate && node ./dist/server/entry.mjs",
+    "start:dev": "node ./dist/server/entry.mjs",
+    "migrate": "npx tsx scripts/migrate.ts",
+    "railway:deploy": "./scripts/railway-deploy-complete.sh",
+    "railway:deploy:prefixed": "./scripts/railway-deploy-prefixed.sh",
+    "railway:inventory": "./scripts/railway-inventory.sh",
+    "railway:cleanup-analysis": "./scripts/railway-cleanup-analysis.sh",
+    "railway:status": "./scripts/railway-status.sh",
+    "railway:backup": "./scripts/railway-backup.sh",
+    "railway:dev": "./scripts/railway-dev.sh",
+    "party:deploy": "npm run build && railway service link party-app && railway up --detach",
+    "party:status": "railway service link party-app && railway service status && railway logs --lines 5",
+    "party:logs": "railway service link party-app && railway logs --follow",
+    "party:backup": "railway service link postgres && railway database backup --name backup-$(date +%Y%m%d-%H%M%S)"
   },
   "dependencies": {
     "@astrojs/node": "^10.1.1",
