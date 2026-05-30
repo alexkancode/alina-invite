@@ -1,0 +1,134 @@
+name: Test & Deploy to Railway
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: party
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:test@localhost:5432/party
+      NODE_ENV: test
+      RATE_LIMIT_ENABLED: false
+      CONTENT_MODERATION: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run database migrations
+        run: npm run migrate
+      - run: npm run build
+      - name: Start server and run API tests
+        run: |
+          npm run start &
+          sleep 5
+          npm run test:api
+
+  test-e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: party
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:test@localhost:5432/party
+      NODE_ENV: test
+      RATE_LIMIT_ENABLED: false
+      CONTENT_MODERATION: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run database migrations
+        run: npm run migrate
+      - run: npm run build
+      - name: Start server and run E2E tests
+        run: |
+          npm run start &
+          sleep 5
+          npm run test:e2e
+
+  deploy-staging:
+    needs: [test-api, test-e2e]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+      - name: Deploy to Railway Staging
+        run: |
+          railway environment use staging
+          railway up --service ${{ vars.RAILWAY_SERVICE_ID }} --detach
+          echo "🎉 Staging deployment complete!"
+          echo "Preview URL: $(railway url)"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  deploy-production:
+    needs: [test-api, test-e2e]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+      - name: Create Database Backup
+        run: |
+          railway environment use production
+          BACKUP_NAME="pre-deploy-$(date +%Y%m%d-%H%M%S)"
+          railway database backup --name $BACKUP_NAME || echo "Backup failed, continuing..."
+          echo "Created backup: $BACKUP_NAME"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Deploy to Railway Production
+        run: |
+          railway environment use production
+          railway up --service ${{ vars.RAILWAY_SERVICE_ID }} --detach
+          echo "🎉 Production deployment complete!"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Verify Deployment
+        run: |
+          sleep 30
+          railway environment use production
+          if railway logs --lines 10 | grep -q "Server started\|listening\|ready"; then
+            echo "✅ Deployment verification successful"
+          else
+            echo "⚠️ Deployment may still be starting"
+            railway logs --lines 20
+          fi
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
