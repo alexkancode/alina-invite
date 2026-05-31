@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css'
+import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs'
+import MusicSearchWidget from '../components/MusicSearchWidget.astro'
 ---
 
 <html lang="en" style="overflow-x: hidden;">
@@ -211,6 +213,20 @@ import '../styles/global.css'
         position: absolute;
         animation: sparkle 3s ease-in-out infinite;
       }
+      .guest-list-fade-in {
+        opacity: 0;
+        animation: fade-in-guests 0.8s ease-out 5.2s forwards;
+      }
+      @keyframes fade-in-guests {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
 
     <main class="relative z-10 max-w-[791px] mx-auto px-phi-lg py-phi-3xl">
@@ -411,8 +427,7 @@ import '../styles/global.css'
 
 
       <!-- ═══ RSVP Guest List ═══ -->
-      <div id="rsvp-guest-list" class="mt-phi-2xl pt-phi-lg" style="border-top: 2px solid rgba(72, 61, 139, 0.2);">
-        <h3 class="text-center mb-phi-md" style="font-family: 'Righteous', sans-serif; font-size: 1.1rem; color: #483D8B;">Who's Coming</h3>
+      <div id="rsvp-guest-list" class="mt-phi-2xl guest-list-fade-in">
         <div id="rsvp-guests" class="flex flex-wrap justify-center gap-phi-md">
           <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
         </div>
@@ -460,11 +475,17 @@ import '../styles/global.css'
               <span class="font-medium select-none">I'll be there</span>
             </label>
             <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
-              <input type="radio" name="attending" value="no"
+              <input type="radio" name="attending" value="no" required
                      class="w-[18px] h-[18px] shrink-0" style="accent-color: #FF007F;" />
               <span class="font-medium select-none">Can't make it</span>
             </label>
           </fieldset>
+          <div class="space-y-phi-sm">
+            <label class="block text-phi-sm font-medium text-warm-cream">
+              Your favorite 70's song (optional)
+            </label>
+            <MusicSearchWidget />
+          </div>
           <textarea
             name="message"
             placeholder="A brief message (optional)"
@@ -772,6 +793,7 @@ import '../styles/global.css'
       const rsvpBadge = document.getElementById('rsvp-status-badge')!;
       const rsvpMessage = document.getElementById('rsvp-status-message')!;
 
+
       function showRsvpStatus() {
         const saved = localStorage.getItem('rsvp');
         if (!saved) return;
@@ -781,9 +803,18 @@ import '../styles/global.css'
         rsvpName.textContent = data.name;
         rsvpBadge.textContent = data.attending === 'yes' ? 'Going' : 'Not going';
         rsvpBadge.style.color = '#8B2FC9';
-        const msg = data.message || '';
-        rsvpMessage.textContent = msg.length > 100 ? msg.slice(0, 100) + '…' : msg;
-        rsvpMessage.classList.toggle('hidden', !msg);
+
+        // Show message with optional song info
+        let displayText = data.message || '';
+        if (data.favoriteSong?.title && data.favoriteSong?.artist) {
+          const songText = `♪ ${data.favoriteSong.title} - ${data.favoriteSong.artist}`;
+          displayText = displayText ? `${displayText} | ${songText}` : songText;
+        }
+
+        rsvpMessage.textContent = displayText.length > 100 ? displayText.slice(0, 100) + '…' : displayText;
+        rsvpMessage.classList.toggle('hidden', !displayText);
+
+        // Keep calendar button simple - always "Add to Calendar"
       }
 
       showRsvpStatus();
@@ -792,17 +823,27 @@ import '../styles/global.css'
       let savedSnapshot = '';
 
       function getCurrentFormData() {
+        const songSelect = form.elements.namedItem('favoriteSong') as HTMLSelectElement;
+        const songData = songSelect.value ? JSON.parse(songSelect.value) : null;
+
         return JSON.stringify({
           name: (form.elements.namedItem('name') as HTMLInputElement).value,
           message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
           attending: (form.querySelector('input[name="attending"]:checked') as HTMLInputElement)?.value || '',
+          favoriteSong: songData,
         });
       }
 
       function updateSubmitState() {
         const current = getCurrentFormData();
         const nameVal = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
-        submitBtn.disabled = !nameVal || current === savedSnapshot;
+        const attendingVal = (form.querySelector('input[name="attending"]:checked') as HTMLInputElement)?.value;
+
+        // Only require name and attending selection - message and song are optional
+        const hasRequiredFields = nameVal && attendingVal;
+        const hasChanges = current !== savedSnapshot;
+
+        submitBtn.disabled = !hasRequiredFields || (!hasChanges && savedSnapshot);
       }
 
       form.addEventListener('input', updateSubmitState);
@@ -861,7 +902,13 @@ import '../styles/global.css'
       updateSubmitState = function() {
         const current = getCurrentFormData();
         const nameVal = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
-        submitBtn.disabled = !nameVal || current === savedSnapshot || nameBlocked;
+        const attendingVal = (form.querySelector('input[name="attending"]:checked') as HTMLInputElement)?.value;
+
+        // Only require name and attending selection - message and song are optional
+        const hasRequiredFields = nameVal && attendingVal;
+        const hasChanges = current !== savedSnapshot;
+
+        submitBtn.disabled = !hasRequiredFields || (!hasChanges && savedSnapshot) || nameBlocked;
       };
 
       rsvpBtn.addEventListener('click', () => {
@@ -872,6 +919,13 @@ import '../styles/global.css'
           (form.elements.namedItem('message') as HTMLTextAreaElement).value = data.message || '';
           const radio = form.querySelector(`input[name="attending"][value="${data.attending}"]`) as HTMLInputElement;
           if (radio) radio.checked = true;
+
+          // Restore favorite song selection
+          const songSelect = form.elements.namedItem('favoriteSong') as HTMLSelectElement;
+          if (data.favoriteSong) {
+            const songValue = JSON.stringify(data.favoriteSong);
+            songSelect.value = songValue;
+          }
         }
         savedSnapshot = getCurrentFormData();
         submitBtn.disabled = true;
@@ -914,7 +968,12 @@ import '../styles/global.css'
             return;
           }
 
-          localStorage.setItem('rsvp', JSON.stringify(data));
+          // Store RSVP data and calendar URL
+          const rsvpData = { ...data, id: result.entry.id, calendarUrl: result.calendarUrl };
+          localStorage.setItem('rsvp', JSON.stringify(rsvpData));
+
+          // Toast notification removed - keeping it simple
+
           showRsvpStatus();
           modal.classList.add('hidden');
           document.body.classList.remove('accent-pink');
@@ -980,12 +1039,24 @@ import '../styles/global.css'
             container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">No RSVPs yet — be the first!</p>';
             return;
           }
-          container.innerHTML = data.rsvps.map((r: { name: string; attending: string }) => `
+          container.innerHTML = data.rsvps.map((r: {
+            name: string;
+            attending: string;
+            favorite_song_title?: string;
+            favorite_song_artist?: string;
+            favorite_song_year?: number;
+          }) => {
+            const songInfo = r.favorite_song_title && r.favorite_song_artist
+              ? `<span class="text-phi-xs opacity-70" style="color: #483D8B; font-style: italic;">♪ ${r.favorite_song_title} - ${r.favorite_song_artist}</span>`
+              : '';
+
+            return `
             <div class="flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg" style="min-width: 80px; background: rgba(72, 61, 139, 0.06);">
               <span class="font-medium text-phi-sm" style="color: #483D8B;">${r.name}</span>
               <span class="text-phi-xs" style="color: ${r.attending === 'yes' ? '#8B2FC9' : 'rgba(72, 61, 139, 0.4)'};">${r.attending === 'yes' ? 'Going ✓' : 'Not going'}</span>
-            </div>
-          `).join('');
+              ${songInfo}
+            </div>`;
+          }).join('');
         } catch {
           container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Could not load guest list</p>';
         }
@@ -1005,17 +1076,47 @@ import '../styles/global.css'
 
       // ── Sparkle follow mode (tabled for now) ──
 
-      // ── Build cartoon disco ball ──
-      function buildDiscoBall(containerId: string, radius: number, tileSize: number) {
+      // ── Build cartoon disco ball ── (Industry Standard: Progressive Enhancement)
+      async function buildDiscoBall(containerId: string, radius: number, tileSize: number) {
         const container = document.getElementById(containerId)!;
         const latStep = tileSize / radius;
         const gapFactor = 1.15;
-        const photos = [
-          '/alina/thumbs/IMG_0049.jpeg', '/alina/thumbs/IMG_0539.jpeg', '/alina/thumbs/IMG_0736.jpeg',
-          '/alina/thumbs/IMG_7205.jpeg', '/alina/thumbs/IMG_7380.jpeg', '/alina/thumbs/IMG_8370.jpeg',
-          '/alina/thumbs/IMG_8625.jpeg', '/alina/thumbs/IMG_9286.jpeg', '/alina/thumbs/IMG_9477.jpeg',
-          '/alina/thumbs/IMG_9532.jpeg'
-        ];
+
+        // Progressive Enhancement: Try dynamic photos first, fallback to static
+        let photos: string[] = [];
+        let photoSource = 'fallback';
+
+        try {
+          console.log('🎯 Disco Ball: Fetching dynamic photos (including admin photos)...');
+          const response = await fetch('/api/photos/disco-ball?count=20&strategy=balanced');
+
+          if (!response.ok) {
+            throw new Error(`API responded with ${response.status}`);
+          }
+
+          const data = await response.json();
+          photos = data.photos;
+          photoSource = data.metadata.source;
+
+          console.log(`✨ Disco Ball: Using ${photoSource} photos!`, {
+            total: photos.length,
+            userPhotos: data.metadata.userPhotos,
+            adminPhotos: data.metadata.adminPhotos,
+            originalPhotos: data.metadata.originalPhotos
+          });
+
+        } catch (error) {
+          console.warn('⚠️ Disco Ball: Dynamic photos failed, using static fallback:', error);
+          // Graceful degradation to static photos
+          photos = [
+            '/alina/thumbs/IMG_0049.jpeg', '/alina/thumbs/IMG_0539.jpeg', '/alina/thumbs/IMG_0736.jpeg',
+            '/alina/thumbs/IMG_7205.jpeg', '/alina/thumbs/IMG_7380.jpeg', '/alina/thumbs/IMG_8370.jpeg',
+            '/alina/thumbs/IMG_8625.jpeg', '/alina/thumbs/IMG_9286.jpeg', '/alina/thumbs/IMG_9477.jpeg',
+            '/alina/thumbs/IMG_9532.jpeg'
+          ];
+          photoSource = 'fallback';
+        }
+
         let count = 0;
 
         for (let phi = latStep / 2; phi < Math.PI; phi += latStep) {
@@ -1050,16 +1151,47 @@ import '../styles/global.css'
         }
       }
 
-      buildDiscoBall('discoBall', 130, 22);
+      // Initialize disco ball with dynamic photos
+      buildDiscoBall('discoBall', 130, 22).catch(error => {
+        console.error('💥 Failed to build disco ball:', error);
+      });
 
-      // ── Tile Match Game ──
-      const TILE_PHOTOS = [
+      // ── Tile Match Game ── (Industry Standard: Progressive Enhancement)
+      let TILE_PHOTOS: string[] = []; // Dynamic photos loaded from API
+      const FALLBACK_TILE_PHOTOS = [
         '/alina/minigame/IMG_0049.jpeg', '/alina/minigame/IMG_0539.jpeg', '/alina/minigame/IMG_0736.jpeg',
         '/alina/minigame/IMG_7205.jpeg', '/alina/minigame/IMG_7380.jpeg', '/alina/minigame/IMG_8370.jpeg',
         '/alina/minigame/IMG_8625.jpeg', '/alina/minigame/IMG_9286.jpeg', '/alina/minigame/IMG_9477.jpeg',
         '/alina/minigame/IMG_9532.jpeg',
       ];
       const TILE_EMOJIS = ['🎈', '🎂', '🧁', '🎁', '🎀', '⭐', '🦋', '🌸', '🎵', '🍭', '🌈', '🎪'];
+
+      // Load dynamic photos for tile game
+      async function loadTilePhotos(): Promise<string[]> {
+        try {
+          console.log('🎯 Tile Game: Fetching dynamic photos (including admin photos)...');
+          const response = await fetch('/api/photos/minigame?count=12&strategy=balanced');
+
+          if (!response.ok) {
+            throw new Error(`API responded with ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          console.log(`✨ Tile Game: Using ${data.metadata.source} photos!`, {
+            total: data.photos.length,
+            userPhotos: data.metadata.userPhotos,
+            adminPhotos: data.metadata.adminPhotos,
+            originalPhotos: data.metadata.originalPhotos
+          });
+
+          return data.photos;
+
+        } catch (error) {
+          console.warn('⚠️ Tile Game: Dynamic photos failed, using static fallback:', error);
+          return FALLBACK_TILE_PHOTOS;
+        }
+      }
       const DIFFICULTY_CONFIG: Record<string, { pairs: number; cols: number }> = {
         medium: { pairs: 8,  cols: 4 },
       };
@@ -1207,7 +1339,7 @@ import '../styles/global.css'
         return arr;
       }
 
-      function startGame(difficulty: string) {
+      async function startGame(difficulty: string) {
         const config = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.medium;
         gameState.difficulty = difficulty;
         gameState.moves = 0;
@@ -1219,6 +1351,9 @@ import '../styles/global.css'
         gameScoreEl.textContent = 'Score: —';
         gameMovesEl.textContent = 'Moves: 0';
         gameTimerEl.textContent = '0:00';
+
+        // Load dynamic photos (Progressive Enhancement pattern)
+        TILE_PHOTOS = await loadTilePhotos();
 
         const totalTiles = config.pairs * 2;
         const rows = Math.ceil(totalTiles / config.cols);
@@ -1370,12 +1505,16 @@ import '../styles/global.css'
         btn.style.borderColor = '#FFB6D9';
         btn.style.color = '#FFB6D9';
         btn.style.background = 'rgba(255,182,217,0.1)';
-        startGame(btn.dataset.diff!);
+        startGame(btn.dataset.diff!).catch(error => {
+          console.error('💥 Failed to start tile game:', error);
+        });
         fetchLeaderboard(btn.dataset.diff!);
       });
 
       document.getElementById('game-play-again')!.addEventListener('click', () => {
-        startGame(gameState.difficulty);
+        startGame(gameState.difficulty).catch(error => {
+          console.error('💥 Failed to restart tile game:', error);
+        });
       });
 
       gameSubmitBtn.addEventListener('click', submitScore);
@@ -1388,7 +1527,9 @@ import '../styles/global.css'
       document.getElementById('disco-ball-click')!.addEventListener('click', () => {
         gameModal.classList.remove('hidden');
         gameModal.classList.add('flex');
-        startGame(gameState.difficulty);
+        startGame(gameState.difficulty).catch(error => {
+          console.error('💥 Failed to start tile game from disco ball:', error);
+        });
         fetchLeaderboard(gameState.difficulty);
       });
 
