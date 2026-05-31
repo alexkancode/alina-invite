@@ -1,0 +1,260 @@
+---
+interface Props {
+  songTitle: string;
+  artist: string;
+  containerId: string;
+}
+
+const { songTitle, artist, containerId } = Astro.props;
+---
+
+<div class="youtube-preview-container" id={`container-${containerId}`}>
+  <!-- Player container (hidden initially) -->
+  <div class="youtube-player" id={containerId} style="display: none;"></div>
+
+  <!-- Loading state -->
+  <div class="youtube-loading" id={`loading-${containerId}`} style="display: none;">
+    <div class="loading-spinner"></div>
+    <span>Loading preview...</span>
+  </div>
+
+  <!-- Error state -->
+  <div class="youtube-error" id={`error-${containerId}`} style="display: none;">
+    <span class="error-icon">⚠️</span>
+    <span class="error-text">Preview not available</span>
+    <a class="fallback-link" target="_blank" rel="noopener">Open in YouTube</a>
+  </div>
+</div>
+
+<style>
+  .youtube-preview-container {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+    margin-top: 8px;
+  }
+
+  .youtube-player {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .youtube-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+  }
+
+  .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,182,217,0.3);
+    border-left: 2px solid #FFB6D9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .youtube-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+  }
+
+  .error-icon {
+    margin-right: 6px;
+  }
+
+  .fallback-link {
+    color: #FFB6D9;
+    text-decoration: underline;
+    font-size: 10px;
+  }
+
+  .fallback-link:hover {
+    color: #ffffff;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    .youtube-preview-container {
+      margin-top: 6px;
+    }
+  }
+</style>
+
+<script>
+  import { youtubePlayerService, type YouTubePlayerOptions } from '../lib/youtubePlayerService.js';
+
+  interface YouTubePreviewManager {
+    containerId: string;
+    songTitle: string;
+    artist: string;
+    isLoaded: boolean;
+    fallbackUrl: string;
+  }
+
+  class YouTubePreview {
+    private managers: Map<string, YouTubePreviewManager> = new Map();
+
+    /**
+     * Initialize a YouTube preview for a song
+     */
+    async initPreview(containerId: string, songTitle: string, artist: string): Promise<void> {
+      const manager: YouTubePreviewManager = {
+        containerId,
+        songTitle,
+        artist,
+        isLoaded: false,
+        fallbackUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${songTitle} ${artist} official`)}`
+      };
+
+      this.managers.set(containerId, manager);
+      await this.loadPreview(containerId);
+    }
+
+    /**
+     * Load YouTube preview with progressive enhancement
+     */
+    private async loadPreview(containerId: string): Promise<void> {
+      const manager = this.managers.get(containerId);
+      if (!manager) return;
+
+      this.showLoading(containerId);
+
+      try {
+        // For demo: Use a known video ID (replace with actual search)
+        const videoId = await this.findVideoId(manager.songTitle, manager.artist);
+
+        if (!videoId) {
+          throw new Error('No video found');
+        }
+
+        // Get optimal dimensions
+        const dimensions = youtubePlayerService.getOptimalDimensions(youtubePlayerService.isMobile());
+
+        const playerOptions: YouTubePlayerOptions = {
+          containerId,
+          videoId,
+          width: parseInt(dimensions.width) || undefined,
+          height: parseInt(dimensions.height),
+          autoplay: false,
+          previewMode: true, // Auto-pause after 30 seconds
+          audioOnly: youtubePlayerService.isMobile(),
+          onReady: () => {
+            this.showPlayer(containerId);
+            manager.isLoaded = true;
+          },
+          onError: (error) => {
+            console.warn('YouTube embed error:', error);
+            this.showError(containerId, manager.fallbackUrl);
+          }
+        };
+
+        await youtubePlayerService.createPlayer(playerOptions);
+
+      } catch (error) {
+        console.warn('Failed to load YouTube preview:', error);
+        this.showError(containerId, manager.fallbackUrl);
+      }
+    }
+
+    /**
+     * Find video ID for song (simplified version)
+     * In production, this would use YouTube Data API or search scraping
+     */
+    private async findVideoId(title: string, artist: string): Promise<string | null> {
+      // Demo: Return known video IDs for popular 70s songs
+      const demoVideoIds: { [key: string]: string } = {
+        'bohemian rhapsody queen': 'fJ9rUzIMcZQ',
+        'hotel california eagles': 'BciS5krYL80',
+        'stairway to heaven led zeppelin': 'QkF3oxziUI4',
+        'dancing queen abba': 'xFrGuyw1V8s',
+        'imagine john lennon': 'YkgkThdzX-8'
+      };
+
+      const searchKey = `${title} ${artist}`.toLowerCase();
+
+      for (const [key, videoId] of Object.entries(demoVideoIds)) {
+        if (searchKey.includes(key.split(' ')[0]) && searchKey.includes(key.split(' ')[1])) {
+          return videoId;
+        }
+      }
+
+      return null; // Would trigger fallback to external link
+    }
+
+    /**
+     * Show loading state
+     */
+    private showLoading(containerId: string): void {
+      const loading = document.getElementById(`loading-${containerId}`);
+      const player = document.getElementById(containerId);
+      const error = document.getElementById(`error-${containerId}`);
+
+      if (loading) loading.style.display = 'flex';
+      if (player) player.style.display = 'none';
+      if (error) error.style.display = 'none';
+    }
+
+    /**
+     * Show player when ready
+     */
+    private showPlayer(containerId: string): void {
+      const loading = document.getElementById(`loading-${containerId}`);
+      const player = document.getElementById(containerId);
+      const error = document.getElementById(`error-${containerId}`);
+
+      if (loading) loading.style.display = 'none';
+      if (player) player.style.display = 'block';
+      if (error) error.style.display = 'none';
+    }
+
+    /**
+     * Show error state with fallback link
+     */
+    private showError(containerId: string, fallbackUrl: string): void {
+      const loading = document.getElementById(`loading-${containerId}`);
+      const player = document.getElementById(containerId);
+      const error = document.getElementById(`error-${containerId}`);
+      const fallbackLink = error?.querySelector('.fallback-link') as HTMLAnchorElement;
+
+      if (loading) loading.style.display = 'none';
+      if (player) player.style.display = 'none';
+      if (error) error.style.display = 'flex';
+      if (fallbackLink) fallbackLink.href = fallbackUrl;
+    }
+
+    /**
+     * Cleanup preview
+     */
+    destroyPreview(containerId: string): void {
+      youtubePlayerService.destroyPlayer(containerId);
+      this.managers.delete(containerId);
+    }
+
+    /**
+     * Cleanup all previews
+     */
+    cleanup(): void {
+      this.managers.forEach((_, containerId) => {
+        this.destroyPreview(containerId);
+      });
+      youtubePlayerService.cleanup();
+    }
+  }
+
+  // Export for external use
+  window.YouTubePreview = new YouTubePreview();
+</script>

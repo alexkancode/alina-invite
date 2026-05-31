@@ -10,7 +10,13 @@ export default defineConfig({
       'tests/photo-database.test.ts',
       'tests/rate-limiter.test.ts',
       'tests/photo-selection.test.ts',
-      'tests/game-integration.test.ts'
+      'tests/game-integration.test.ts',
+      'tests/calendar.test.ts',
+      // New photo integration tests
+      'tests/unit/**/*.test.ts',
+      'tests/photo-integration.test.ts',
+      // Music search tests
+      'tests/unit/music-search.test.ts'
     ],
     // Set timeout for image processing tests
     testTimeout: 10000,

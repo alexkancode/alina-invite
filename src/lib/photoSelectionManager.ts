@@ -1,4 +1,7 @@
 import { getApprovedPhotos } from './photoDatabase.js';
+import { readdir } from 'fs/promises';
+import { existsSync } from 'fs';
+import path from 'path';
 
 export type GameType = 'disco-ball' | 'minigame';
 export type SelectionStrategy = 'balanced' | 'prefer-user' | 'original-only' | 'random';
@@ -55,7 +58,33 @@ export class PhotoSelectionManager {
   }
 
   /**
-   * Select photos for a game with intelligent mixing of user and original photos
+   * Get admin-uploaded photos for the specified game type
+   */
+  private async getAdminPhotos(gameType: GameType): Promise<string[]> {
+    const folderName = gameType === 'disco-ball' ? 'thumbs' : 'minigame';
+    const dirPath = path.join(process.cwd(), 'public', 'alina', folderName);
+
+    try {
+      if (!existsSync(dirPath)) {
+        return [];
+      }
+
+      const files = await readdir(dirPath);
+
+      // Filter for admin-uploaded photos (prefix: admin-)
+      const adminFiles = files
+        .filter(file => file.startsWith('admin-') && file.endsWith('.jpeg'))
+        .map(file => `/alina/${folderName}/${file}`);
+
+      return adminFiles;
+    } catch (error) {
+      console.error(`Error reading admin photos from ${dirPath}:`, error);
+      return [];
+    }
+  }
+
+  /**
+   * Select photos for a game with intelligent mixing of user, admin, and original photos
    */
   async selectPhotosForGame(
     count: number,
@@ -80,8 +109,9 @@ export class PhotoSelectionManager {
     }
 
     try {
-      // Get approved user photos
+      // Get approved user photos, admin photos, and original photos
       const userPhotos = await this.getApprovedUserPhotos();
+      const adminPhotos = await this.getAdminPhotos(gameType);
       const originalPhotos = this.getOriginalPhotos(gameType);
 
       // Convert to PhotoInfo format
@@ -92,18 +122,27 @@ export class PhotoSelectionManager {
         photoId: photo.id
       }));
 
+      const adminPhotoInfos: PhotoInfo[] = adminPhotos.map(path => ({
+        path,
+        filename: path.split('/').pop()!,
+        isUserPhoto: false, // Admin photos are treated like original photos
+        photoId: `admin-${path.split('/').pop()!.replace('.jpeg', '')}`
+      }));
+
       const originalPhotoInfos: PhotoInfo[] = originalPhotos.map(path => ({
         path,
         filename: path.split('/').pop()!,
         isUserPhoto: false
       }));
 
-      const totalAvailable = userPhotoInfos.length + originalPhotoInfos.length;
+      // Combine admin photos with original photos for selection strategy
+      const allNonUserPhotos = [...adminPhotoInfos, ...originalPhotoInfos];
+      const totalAvailable = userPhotoInfos.length + allNonUserPhotos.length;
 
-      // Apply selection strategy
+      // Apply selection strategy (admin photos are treated as "original" photos)
       const selectedPhotos = this.applySelectionStrategy(
         userPhotoInfos,
-        originalPhotoInfos,
+        allNonUserPhotos,
         count,
         strategy
       );
