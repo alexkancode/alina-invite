@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
-import cloudflare from '@astrojs/cloudflare';
+import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,5 +10,17 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
 
-  adapter: cloudflare()
+  output: 'server',
+  adapter: node({ mode: 'standalone' }),
+
+  // Disable security restrictions for development/testing
+  security: {
+    checkOrigin: false
+  },
+
+  // Configure server for Railway deployment
+  server: {
+    host: '0.0.0.0',
+    port: 4321
+  }
 });

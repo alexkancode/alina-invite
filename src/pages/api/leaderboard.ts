@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
+// TODO: Convert to PostgreSQL for Railway deployment
+// import { env } from 'cloudflare:workers';
 
 export const prerender = false;
 
@@ -39,13 +40,16 @@ export const POST: APIRoute = async ({ request }) => {
   // Server-side score calculation — never trust the client
   const score = calcScore(moves, timeMs, PAIRS[difficulty]);
 
-  const db = (env as any).DB;
-  await db
-    .prepare(
-      'INSERT INTO leaderboard (player, score, moves, time_ms, difficulty) VALUES (?, ?, ?, ?, ?)'
-    )
-    .bind(player.trim(), score, moves, Math.round(timeMs), difficulty)
-    .run();
+  // TODO: Implement PostgreSQL database connection for Railway
+  // const db = (env as any).DB;
+  // await db
+  //   .prepare(
+  //     'INSERT INTO leaderboard (player, score, moves, time_ms, difficulty) VALUES (?, ?, ?, ?, ?)'
+  //   )
+  //   .bind(player.trim(), score, moves, Math.round(timeMs), difficulty)
+  //   .run();
+
+  console.log('Leaderboard entry (temporarily disabled):', { player: player.trim(), score, moves, timeMs, difficulty });
 
   return new Response(JSON.stringify({ score }), {
     status: 201,
@@ -64,13 +68,17 @@ export const GET: APIRoute = async ({ url }) => {
     });
   }
 
-  const db = (env as any).DB;
-  const { results } = await db
-    .prepare(
-      'SELECT player, score, moves, time_ms, difficulty, created_at FROM leaderboard WHERE difficulty = ? ORDER BY score DESC LIMIT ?'
-    )
-    .bind(difficulty, limit)
-    .all();
+  // TODO: Implement PostgreSQL database connection for Railway
+  // const db = (env as any).DB;
+  // const { results } = await db
+  //   .prepare(
+  //     'SELECT player, score, moves, time_ms, difficulty, created_at FROM leaderboard WHERE difficulty = ? ORDER BY score DESC LIMIT ?'
+  //   )
+  //   .bind(difficulty, limit)
+  //   .all();
+
+  // Temporary: return empty leaderboard
+  const results: any[] = [];
 
   return new Response(JSON.stringify(results), {
     headers: {
