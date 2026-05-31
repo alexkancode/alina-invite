@@ -32,6 +32,7 @@
     "@astrojs/node": "^10.1.1",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.7",
+    "dotenv": "^17.4.2",
     "pg": "^8.21.0",
     "profanease": "^2.0.3",
     "sharp": "^0.34.5",

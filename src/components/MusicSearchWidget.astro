@@ -68,7 +68,7 @@ import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs';
 
       <!-- Search Status -->
       <div class="search-status" id="musicSearchStatus" style="display: none;">
-        <span class="search-indicator">🔍</span>
+        <span class="search-indicator"></span>
         <span class="search-text">Searching...</span>
       </div>
     </div>
@@ -426,6 +426,29 @@ import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs';
     font-style: italic !important;
     text-align: center !important;
     opacity: 0.8 !important;
+  }
+
+  /* Custom song option styling */
+  :global(li.result-item.custom-song) {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,140,0,0.04)) !important;
+    border: 1px dashed rgba(255,215,0,0.3) !important;
+    backdrop-filter: blur(5px) !important;
+  }
+
+  :global(li.result-item.custom-song:hover) {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.08)) !important;
+    border-color: rgba(255,215,0,0.5) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+  }
+
+  :global(li.result-item.custom-song .result-title) {
+    color: #FFD700 !important;
+    font-weight: 600 !important;
+  }
+
+  :global(li.result-item.custom-song .result-artist) {
+    color: rgba(255,215,0,0.8) !important;
+    font-style: italic !important;
   }
 
   /* Remove all borders from input */
@@ -1048,8 +1071,71 @@ import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs';
 
     private showNoResults(): void {
       this.widget.resultsCount.textContent = 'No songs found';
-      this.widget.resultsList.innerHTML = '<li class="result-item no-results"><div class="result-song-info no-results-text">Try a different search term</div></li>';
+
+      // Create custom song option from search text
+      const searchText = this.widget.searchInput.value.trim();
+      const customSong = this.createCustomSong(searchText);
+
+      this.widget.resultsList.innerHTML = `
+        <li class="result-item no-results">
+          <div class="result-song-info no-results-text">No exact matches found</div>
+        </li>
+        <li class="result-item custom-song"
+            tabindex="0"
+            role="option"
+            data-song='${JSON.stringify(customSong)}'>
+          <div class="result-song-info">
+            <div class="result-title">Use: "${searchText}"</div>
+            <div class="result-artist-year">
+              <div class="result-artist">Custom Entry</div>
+            </div>
+          </div>
+        </li>
+      `;
+
+      // Bind click event to custom song option
+      const customSongItem = this.widget.resultsList.querySelector('.custom-song');
+      if (customSongItem) {
+        customSongItem.addEventListener('click', this.handleResultSelect.bind(this));
+      }
+
       this.showResults();
+    }
+
+    private createCustomSong(searchText: string): Song {
+      // Try to parse "artist - title" or "title by artist" format
+      let title = searchText;
+      let artist = 'Unknown Artist';
+
+      // Check for "artist - title" format
+      const dashMatch = searchText.match(/^(.+?)\s*-\s*(.+)$/);
+      if (dashMatch) {
+        artist = dashMatch[1].trim();
+        title = dashMatch[2].trim();
+      } else {
+        // Check for "title by artist" format
+        const byMatch = searchText.match(/^(.+?)\s+by\s+(.+)$/i);
+        if (byMatch) {
+          title = byMatch[1].trim();
+          artist = byMatch[2].trim();
+        }
+      }
+
+      // Generate YouTube search URL
+      const youtubeSearchUrl = this.generateYouTubeSearchUrl(title, artist);
+
+      return {
+        id: `custom-${Date.now()}`,
+        title,
+        artist,
+        source: 'curated',
+        youtubeSearchUrl
+      };
+    }
+
+    private generateYouTubeSearchUrl(title: string, artist: string): string {
+      const query = encodeURIComponent(`${title} ${artist}`);
+      return `https://www.youtube.com/results?search_query=${query}`;
     }
 
     private showError(): void {

@@ -249,11 +249,14 @@ export class DiscoBallManager {
       'balanced'
     );
 
-    // Repeat photos to fill all photo tile slots
+    // Repeat photos to fill all photo tile slots with cache-busting
+    const cacheBuster = Date.now();
     const photoPaths: string[] = [];
     for (let i = 0; i < photoTileCount; i++) {
       const photoIndex = i % photoSelection.photos.length;
-      photoPaths.push(photoSelection.photos[photoIndex].path);
+      const photoPath = photoSelection.photos[photoIndex].path;
+      // Add cache-busting parameter to ensure fresh photo loading
+      photoPaths.push(`${photoPath}?v=${cacheBuster}`);
     }
 
     return {
