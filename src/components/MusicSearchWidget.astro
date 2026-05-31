@@ -1,0 +1,1161 @@
+---
+/**
+ * Progressive Enhancement Music Search Widget
+ *
+ * Replaces static dropdown with dynamic search while maintaining fallback compatibility
+ * Features:
+ * - Real-time search with MusicBrainz API
+ * - Auto-complete suggestions
+ * - Progressive enhancement (graceful degradation)
+ * - Mobile-optimized interface
+ * - YouTube preview links
+ */
+
+import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs';
+---
+
+<div class="music-search-widget">
+  <!-- Progressive Enhancement: Keep original select as fallback -->
+  <select
+    name="favoriteSong"
+    id="favoriteSongSelect"
+    class="music-select-fallback w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+           focus:outline-none transition-colors"
+    style="background: rgba(255,255,255,0.06);
+           border: 2px solid hsl(270, 30%, 40%);"
+    onfocus="this.style.borderColor='#FFB6D9'"
+    onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+  >
+    <option value="">Select a groovy tune...</option>
+    {SEVENTIES_SONGS.map(song => (
+      <option value={JSON.stringify({
+        title: song.title,
+        artist: song.artist,
+        year: song.year,
+        musicbrainz_id: song.musicbrainz_id
+      })}>
+        {formatSongDisplay(song)}
+      </option>
+    ))}
+  </select>
+
+  <!-- Enhanced Search Interface (Hidden initially, shown by JavaScript) -->
+  <div class="music-search-container">
+    <!-- Sunburst background container (overflow contained) -->
+    <div class="music-search-sunburst-container">
+      <div class="sunburst-wrapper">
+        <div class="music-search-background"></div>
+      </div>
+    </div>
+
+    <!-- Search interface container (no overflow restrictions) -->
+    <div class="music-search-wrapper">
+      <div class="music-search-enhanced" style="display: none;">
+    <!-- Search Input -->
+    <div class="search-input-container">
+      <div class="search-input-wrapper">
+        <input
+          type="text"
+          id="musicSearchInput"
+          placeholder="Search for your favorite 70's song..."
+          class="music-search-input w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+                 placeholder-metallic-silver/50 focus:outline-none transition-all duration-200"
+          style="background: rgba(255,255,255,0.06);
+                 border: 2px solid hsl(270, 30%, 40%);"
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Search Status -->
+      <div class="search-status" id="musicSearchStatus" style="display: none;">
+        <span class="search-indicator"></span>
+        <span class="search-text">Searching...</span>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results" id="musicSearchResults" style="display: none;">
+      <div class="results-header">
+        <span class="results-count" id="resultsCount">0 songs found</span>
+        <button type="button" class="clear-search" id="clearSearch">Clear</button>
+      </div>
+      <ul class="results-list" id="resultsList" role="listbox"></ul>
+    </div>
+
+    <!-- Selected Song Display -->
+    <div class="selected-song" id="selectedSongDisplay" style="display: none;">
+      <div class="song-info">
+        <div class="song-title" id="selectedTitle"></div>
+        <div class="song-artist" id="selectedArtist"></div>
+        <div class="song-year" id="selectedYear"></div>
+      </div>
+      <div class="song-actions">
+        <a class="preview-btn" id="previewBtn" target="_blank" rel="noopener">
+          🎵 Preview on YouTube
+        </a>
+        <button type="button" class="change-song-btn" id="changeSongBtn">
+          Change Song
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden input to store the selected song data -->
+  <input type="hidden" name="selectedSongData" id="selectedSongData" />
+</div>
+
+<style>
+  .music-search-widget {
+    position: relative;
+  }
+
+  .music-search-container {
+    position: relative;
+  }
+
+  .music-search-sunburst-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    aspect-ratio: 1;
+    clip-path: inset(0 0 calc(100% - 64px) 0 round 8px);
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .music-search-wrapper {
+    position: relative;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+    padding: 8px 0;
+    z-index: 1;
+  }
+
+  .sunburst-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 !important;
+  }
+
+  .music-search-enhanced {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  .music-search-background {
+    position: absolute;
+    top: calc(-50% + 31px);
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(from 0deg at center,
+      #FFB6D9 0deg,
+      #FFB6D9 30deg,
+      #FFD1DC 30deg,
+      #FFD1DC 60deg,
+      #E54080 60deg,
+      #E54080 90deg,
+      #FF69B4 90deg,
+      #FF69B4 120deg,
+      #FF6EB4 120deg,
+      #FF6EB4 150deg,
+      #FF91A4 150deg,
+      #FF91A4 180deg,
+      #FF4D6D 180deg,
+      #FF4D6D 210deg,
+      #FF5D8F 210deg,
+      #FF5D8F 240deg,
+      #FF1493 240deg,
+      #FF1493 270deg,
+      #E54080 270deg,
+      #E54080 300deg,
+      #FF80C0 300deg,
+      #FF80C0 330deg,
+      #FFB6D9 330deg,
+      #FFB6D9 360deg
+    );
+    border-radius: 8px;
+    animation-fill-mode: none;
+  }
+
+  @keyframes sunburst-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    66.67% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(540deg);
+    }
+  }
+
+  /* Animation state controls */
+  .music-search-wrapper:hover ~ .music-search-sunburst-container .music-search-background,
+  .music-search-wrapper:hover + .music-search-sunburst-container .music-search-background {
+    animation: sunburst-spin 3s ease-in-out alternate-reverse;
+    animation-fill-mode: none;
+  }
+
+  .music-search-container:hover .music-search-background {
+    animation: sunburst-spin 3s ease-in-out alternate-reverse;
+    animation-fill-mode: none;
+  }
+
+  .sunburst-wrapper.searching .music-search-background {
+    animation: sunburst-spin 3s ease-in-out infinite alternate-reverse !important;
+  }
+
+  .sunburst-wrapper.results-showing .music-search-background {
+    animation: none !important;
+  }
+
+  .music-search-enhanced {
+    /* Sizing moved to wrapper */
+  }
+
+  .music-search-enhanced:focus-within {
+    /* Focus styling removed since it's on wrapper now */
+  }
+
+  .search-input-container {
+    position: relative;
+    width: calc(100% - 16px);
+    margin: 0 auto;
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    border-radius: 8px;
+    background: hsl(270, 30%, 40%);
+    padding: 2px;
+  }
+
+
+
+  .music-search-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  .music-search-input:focus {
+    background: rgba(255,255,255,0.08);
+    outline: none;
+  }
+
+  .search-status {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .search-indicator {
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  .search-results {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,182,217,0.2);
+    border-radius: 6px;
+    margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .clear-search {
+    background: none;
+    border: none;
+    color: #FFB6D9;
+    cursor: pointer;
+    font-size: 11px;
+    text-decoration: underline;
+  }
+
+  .results-list {
+    list-style: none;
+    padding: 8px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Ensure dynamic content gets the right colors */
+  .music-search-widget .results-list .result-item {
+    color: #FFB6D9 !important;
+  }
+
+  .music-search-widget .results-list .result-item * {
+    color: inherit !important;
+  }
+
+  .music-search-widget .results-list .result-title {
+    color: #FFB6D9 !important;
+  }
+
+  .music-search-widget .results-list .result-artist {
+    color: rgba(255,255,255,0.7) !important;
+  }
+
+  .music-search-widget .results-list .result-year {
+    color: rgba(255,182,217,0.7) !important;
+  }
+
+  .music-search-widget .results-list .result-source {
+    color: rgba(255,182,217,0.4) !important;
+  }
+
+  /* Target the exact scoped structure */
+  ul.results-list li.result-item div.result-title {
+    color: #FFB6D9 !important;
+  }
+
+  ul.results-list li.result-item div.result-artist {
+    color: rgba(255,255,255,0.7) !important;
+  }
+
+  ul.results-list li.result-item div.result-year {
+    color: rgba(255,182,217,0.7) !important;
+  }
+
+  ul.results-list li.result-item div.result-source {
+    color: rgba(255,182,217,0.4) !important;
+  }
+
+  /* Global scope to override Astro scoping */
+  :global(ul.results-list li.result-item div.result-title) {
+    color: #FFB6D9 !important;
+  }
+
+  :global(ul.results-list li.result-item div.result-artist) {
+    color: rgba(255,255,255,0.7) !important;
+  }
+
+  :global(ul.results-list li.result-item div.result-year) {
+    color: rgba(255,182,217,0.7) !important;
+  }
+
+  :global(ul.results-list li.result-item div.result-source) {
+    color: rgba(255,182,217,0.4) !important;
+  }
+
+  /* Global card styling to override scoping issues */
+  :global(ul.results-list) {
+    padding: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  :global(li.result-item) {
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, rgba(255,182,217,0.08), rgba(139, 47, 201, 0.04)) !important;
+    border: 1px solid rgba(255,182,217,0.15) !important;
+    backdrop-filter: blur(5px) !important;
+    box-shadow: 0 2px 8px rgba(139, 47, 201, 0.1) !important;
+    transition: all 0.2s ease !important;
+  }
+
+  :global(li.result-item:hover) {
+    background: linear-gradient(135deg, rgba(255,182,217,0.2), rgba(139, 47, 201, 0.15)) !important;
+    border-color: rgba(255,182,217,0.4) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 6px 20px rgba(139, 47, 201, 0.2) !important;
+  }
+
+  :global(div.result-song-info) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    flex: 1 !important;
+  }
+
+  :global(div.result-artist-year) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  :global(div.result-source) {
+    display: none !important;
+  }
+
+  /* No results message styling */
+  :global(li.result-item.no-results) {
+    background: rgba(255,182,217,0.05) !important;
+    border-color: rgba(255,182,217,0.1) !important;
+    cursor: default !important;
+    pointer-events: none !important;
+  }
+
+  :global(div.no-results-text) {
+    color: #FFB6D9 !important;
+    font-style: italic !important;
+    text-align: center !important;
+    opacity: 0.8 !important;
+  }
+
+  /* Custom song option styling */
+  :global(li.result-item.custom-song) {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,140,0,0.04)) !important;
+    border: 1px dashed rgba(255,215,0,0.3) !important;
+    backdrop-filter: blur(5px) !important;
+  }
+
+  :global(li.result-item.custom-song:hover) {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.08)) !important;
+    border-color: rgba(255,215,0,0.5) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+  }
+
+  :global(li.result-item.custom-song .result-title) {
+    color: #FFD700 !important;
+    font-weight: 600 !important;
+  }
+
+  :global(li.result-item.custom-song .result-artist) {
+    color: rgba(255,215,0,0.8) !important;
+    font-style: italic !important;
+  }
+
+  /* Remove all borders from input */
+  :global(.music-search-input) {
+    border: none !important;
+  }
+
+  /* Wrapper sizing - global to override scoping */
+  :global(.music-search-wrapper) {
+    position: relative !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 2px solid transparent !important;
+    border-radius: 8px !important;
+    transition: border-color 0.2s ease !important;
+    padding: 8px 0 !important;
+    z-index: 1 !important;
+  }
+
+  /* Ensure search element takes full width and position */
+  :global(.music-search-enhanced) {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+  }
+
+  /* Make search input container 8px smaller on all sides */
+  :global(.search-input-container) {
+    width: calc(100% - 16px) !important;
+    margin: 0 auto !important;
+  }
+
+  /* Sunburst wrapper for proper positioning */
+  :global(.sunburst-wrapper) {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 !important;
+  }
+
+  /* Animation state controls - global */
+  :global(.music-search-container:hover .music-search-background) {
+    animation: sunburst-spin 3s ease-in-out alternate-reverse !important;
+    animation-fill-mode: none !important;
+  }
+
+  :global(.sunburst-wrapper.searching .music-search-background) {
+    animation: sunburst-spin 3s ease-in-out infinite alternate-reverse !important;
+  }
+
+  :global(.sunburst-wrapper.results-showing .music-search-background) {
+    animation: none !important;
+  }
+
+  /* New container styling - global */
+  :global(.music-search-container) {
+    position: relative !important;
+  }
+
+  :global(.music-search-sunburst-container) {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    aspect-ratio: 1 !important;
+    clip-path: inset(0 0 calc(100% - 64px) 0 round 8px) !important;
+    border-radius: 8px !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  /* Pink and purple sunburst background */
+  :global(.music-search-background) {
+    background: conic-gradient(from 0deg at center,
+      #FFB6D9 0deg,
+      #FFB6D9 30deg,
+      #FFD1DC 30deg,
+      #FFD1DC 60deg,
+      #E54080 60deg,
+      #E54080 90deg,
+      #FF69B4 90deg,
+      #FF69B4 120deg,
+      #FF6EB4 120deg,
+      #FF6EB4 150deg,
+      #FF91A4 150deg,
+      #FF91A4 180deg,
+      #FF4D6D 180deg,
+      #FF4D6D 210deg,
+      #FF5D8F 210deg,
+      #FF5D8F 240deg,
+      #FF1493 240deg,
+      #FF1493 270deg,
+      #E54080 270deg,
+      #E54080 300deg,
+      #FF80C0 300deg,
+      #FF80C0 330deg,
+      #FFB6D9 330deg,
+      #FFB6D9 360deg
+    ) !important;
+    position: absolute !important;
+    top: calc(-50% + 31px) !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 8px !important;
+    animation-fill-mode: none !important;
+  }
+
+  .result-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #FFB6D9 !important;
+    background: linear-gradient(135deg, rgba(255,182,217,0.08), rgba(139, 47, 201, 0.04));
+    border: 1px solid rgba(255,182,217,0.15);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(139, 47, 201, 0.1);
+  }
+
+  .result-item:hover,
+  .result-item:focus {
+    background: linear-gradient(135deg, rgba(255,182,217,0.2), rgba(139, 47, 201, 0.15));
+    border-color: rgba(255,182,217,0.4);
+    color: #ffffff;
+    outline: none;
+    transform: translateY(-2px) scale(1.02);
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(139, 47, 201, 0.2);
+  }
+
+
+  .result-song-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .result-title {
+    font-weight: 600;
+    color: #FFB6D9 !important;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .result-artist {
+    color: rgba(255,255,255,0.7) !important;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .result-year {
+    color: rgba(255,182,217,0.7) !important;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .result-item:hover .result-title {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255,182,217,0.5);
+  }
+
+  .result-item:hover .result-artist {
+    color: rgba(255,255,255,0.9);
+  }
+
+  .result-item:hover .result-year {
+    color: rgba(255,255,255,0.8);
+  }
+
+  .result-source {
+    font-size: 9px;
+    color: rgba(255,182,217,0.6);
+    text-transform: uppercase;
+    margin-left: 12px;
+    padding: 4px 8px;
+    border-radius: 10px;
+    background: rgba(255,182,217,0.12);
+    border: 1px solid rgba(255,182,217,0.2);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    align-self: flex-start;
+    backdrop-filter: blur(2px);
+  }
+
+  .result-item:hover .result-source {
+    color: rgba(255,255,255,0.9);
+    background: rgba(139, 47, 201, 0.2);
+    border-color: rgba(255,182,217,0.4);
+  }
+
+  .selected-song {
+    background: linear-gradient(135deg, rgba(255,182,217,0.15), rgba(139, 47, 201, 0.1));
+    border: 1px solid rgba(255,182,217,0.3);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 8px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(139, 47, 201, 0.1);
+  }
+
+  .song-info {
+    margin-bottom: 10px;
+  }
+
+  .song-title {
+    font-weight: 700;
+    color: #FFB6D9;
+    font-size: 15px;
+  }
+
+  .song-artist {
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  .song-year {
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    margin-top: 1px;
+  }
+
+  .song-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .preview-btn {
+    background: linear-gradient(135deg, #FFB6D9, #8B2FC9);
+    color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: transform 0.15s ease;
+  }
+
+  .preview-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .change-song-btn {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .change-song-btn:hover {
+    background: rgba(255,255,255,0.2);
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .search-results {
+      max-height: 150px;
+    }
+
+    .result-item {
+      padding: 8px 10px;
+    }
+
+    .song-actions {
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .preview-btn,
+    .change-song-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  // Progressive Enhancement: Initialize the music search widget
+  import { musicSearchService, type Song, type SearchResult } from '../lib/musicSearchService.js';
+
+  interface MusicSearchWidget {
+    searchInput: HTMLInputElement;
+    searchStatus: HTMLElement;
+    searchResults: HTMLElement;
+    resultsList: HTMLElement;
+    resultsCount: HTMLElement;
+    clearBtn: HTMLElement;
+    selectedDisplay: HTMLElement;
+    changeSongBtn: HTMLElement;
+    previewBtn: HTMLAnchorElement;
+    selectedTitle: HTMLElement;
+    selectedArtist: HTMLElement;
+    selectedYear: HTMLElement;
+    hiddenInput: HTMLInputElement;
+    fallbackSelect: HTMLSelectElement;
+    enhancedContainer: HTMLElement;
+    currentQuery: string;
+    selectedSong: Song | null;
+    searchTimeout: number;
+  }
+
+  class MusicSearch {
+    private widget: MusicSearchWidget;
+
+    constructor() {
+      this.initializeElements();
+      this.bindEvents();
+      this.checkProgressiveEnhancement();
+    }
+
+    private initializeElements(): void {
+      this.widget = {
+        searchInput: document.getElementById('musicSearchInput') as HTMLInputElement,
+        searchStatus: document.getElementById('musicSearchStatus') as HTMLElement,
+        searchResults: document.getElementById('musicSearchResults') as HTMLElement,
+        resultsList: document.getElementById('resultsList') as HTMLElement,
+        resultsCount: document.getElementById('resultsCount') as HTMLElement,
+        clearBtn: document.getElementById('clearSearch') as HTMLElement,
+        selectedDisplay: document.getElementById('selectedSongDisplay') as HTMLElement,
+        changeSongBtn: document.getElementById('changeSongBtn') as HTMLElement,
+        previewBtn: document.getElementById('previewBtn') as HTMLAnchorElement,
+        selectedTitle: document.getElementById('selectedTitle') as HTMLElement,
+        selectedArtist: document.getElementById('selectedArtist') as HTMLElement,
+        selectedYear: document.getElementById('selectedYear') as HTMLElement,
+        hiddenInput: document.getElementById('selectedSongData') as HTMLInputElement,
+        fallbackSelect: document.getElementById('favoriteSongSelect') as HTMLSelectElement,
+        enhancedContainer: document.querySelector('.music-search-enhanced') as HTMLElement,
+        currentQuery: '',
+        selectedSong: null,
+        searchTimeout: 0
+      };
+    }
+
+    private bindEvents(): void {
+      // Search input
+      this.widget.searchInput.addEventListener('input', this.handleSearchInput.bind(this));
+      this.widget.searchInput.addEventListener('focus', this.handleSearchFocus.bind(this));
+
+      // Clear button
+      this.widget.clearBtn.addEventListener('click', this.clearSearch.bind(this));
+
+      // Change song button
+      this.widget.changeSongBtn.addEventListener('click', this.changeSong.bind(this));
+
+      // Keyboard navigation
+      this.widget.searchInput.addEventListener('keydown', this.handleKeydown.bind(this));
+    }
+
+    private checkProgressiveEnhancement(): void {
+      // Test if we can use the enhanced features
+      const canUseEnhanced = this.supportsModernFeatures();
+
+      if (canUseEnhanced) {
+        // Hide fallback, show enhanced
+        this.widget.fallbackSelect.style.display = 'none';
+        this.widget.enhancedContainer.style.display = 'block';
+
+        console.log('🎵 Enhanced music search activated');
+      } else {
+        // Keep fallback visible
+        console.log('🎵 Using fallback music select');
+      }
+    }
+
+    private supportsModernFeatures(): boolean {
+      return !!(
+        window.fetch &&
+        window.Promise &&
+        Array.prototype.filter &&
+        JSON.stringify
+      );
+    }
+
+    private async handleSearchInput(): Promise<void> {
+      const query = this.widget.searchInput.value.trim();
+
+      // Clear previous timeout
+      if (this.widget.searchTimeout) {
+        clearTimeout(this.widget.searchTimeout);
+      }
+
+      // Debounce search
+      this.widget.searchTimeout = setTimeout(async () => {
+        if (query.length < 2) {
+          this.hideResults();
+          return;
+        }
+
+        if (query === this.widget.currentQuery) {
+          return; // Same query, no need to search again
+        }
+
+        this.widget.currentQuery = query;
+        await this.performSearch(query);
+      }, 300) as unknown as number;
+    }
+
+    private async performSearch(query: string): Promise<void> {
+      this.showSearchStatus('Searching...');
+
+      try {
+        // Try MusicBrainz API first, then fallback to curated
+        const result = await musicSearchService.search70sSongs(query, {
+          includeFallback: true,
+          maxResults: 8
+        });
+
+        if (result.success && result.songs.length > 0) {
+          this.displayResults(result);
+        } else {
+          this.showNoResults();
+        }
+      } catch (error) {
+        console.warn('Music search failed:', error);
+        this.showError();
+      } finally {
+        this.hideSearchStatus();
+      }
+    }
+
+    private displayResults(result: SearchResult): void {
+      this.widget.resultsCount.textContent = `${result.songs.length} songs found`;
+
+      this.widget.resultsList.innerHTML = result.songs.map((song, index) => `
+        <li class="result-item"
+            tabindex="0"
+            role="option"
+            data-index="${index}"
+            data-song='${JSON.stringify(song)}'>
+          <div class="result-song-info">
+            <div class="result-title">${this.escapeHtml(song.title)}</div>
+            <div class="result-artist-year">
+              <div class="result-artist">${this.escapeHtml(song.artist)}</div>
+              ${song.year ? `<div class="result-year">(${song.year})</div>` : ''}
+            </div>
+          </div>
+        </li>
+      `).join('');
+
+      // Bind click events to results
+      this.widget.resultsList.querySelectorAll('.result-item').forEach(item => {
+        item.addEventListener('click', this.handleResultSelect.bind(this));
+      });
+
+      this.showResults();
+    }
+
+    private handleResultSelect(event: Event): void {
+      const item = event.currentTarget as HTMLElement;
+      const songData = JSON.parse(item.dataset.song!);
+      this.selectSong(songData);
+    }
+
+    private selectSong(song: Song): void {
+      this.widget.selectedSong = song;
+
+      // Update display
+      this.widget.selectedTitle.textContent = song.title;
+      this.widget.selectedArtist.textContent = song.artist;
+      this.widget.selectedYear.textContent = song.year ? `(${song.year})` : '';
+
+      // Update preview link
+      if (song.youtubeSearchUrl) {
+        this.widget.previewBtn.href = song.youtubeSearchUrl;
+        this.widget.previewBtn.style.display = 'inline-block';
+      } else {
+        this.widget.previewBtn.style.display = 'none';
+      }
+
+      // Update hidden form field
+      this.widget.hiddenInput.value = JSON.stringify({
+        title: song.title,
+        artist: song.artist,
+        year: song.year,
+        source: song.source
+      });
+
+      // Update fallback select for form compatibility
+      this.updateFallbackSelect(song);
+
+      // Show selected song, hide search
+      this.hideResults();
+      this.showSelectedSong();
+    }
+
+    private updateFallbackSelect(song: Song): void {
+      // Try to find matching option in fallback select
+      const options = Array.from(this.widget.fallbackSelect.options);
+      const matchingOption = options.find(option => {
+        if (!option.value) return false;
+        try {
+          const optionData = JSON.parse(option.value);
+          return optionData.title === song.title && optionData.artist === song.artist;
+        } catch {
+          return false;
+        }
+      });
+
+      if (matchingOption) {
+        this.widget.fallbackSelect.value = matchingOption.value;
+      } else {
+        // Create new option for custom song
+        const newOption = document.createElement('option');
+        newOption.value = JSON.stringify({
+          title: song.title,
+          artist: song.artist,
+          year: song.year,
+          source: song.source
+        });
+        newOption.textContent = `${song.title} - ${song.artist}${song.year ? ` (${song.year})` : ''}`;
+        this.widget.fallbackSelect.appendChild(newOption);
+        this.widget.fallbackSelect.value = newOption.value;
+      }
+    }
+
+    private changeSong(): void {
+      this.widget.selectedSong = null;
+      this.widget.hiddenInput.value = '';
+      this.widget.fallbackSelect.value = '';
+      this.widget.currentQuery = '';
+      this.widget.searchInput.value = '';
+
+      this.hideSelectedSong();
+      this.hideResults();
+      this.widget.searchInput.focus();
+    }
+
+    private clearSearch(): void {
+      this.widget.searchInput.value = '';
+      this.widget.currentQuery = '';
+      this.hideResults();
+      this.widget.searchInput.focus();
+    }
+
+    private handleSearchFocus(): void {
+      if (this.widget.currentQuery && this.widget.resultsList.children.length > 0) {
+        this.showResults();
+      }
+    }
+
+    private handleKeydown(event: KeyboardEvent): void {
+      if (event.key === 'Escape') {
+        this.hideResults();
+        this.widget.searchInput.blur();
+      }
+    }
+
+    private showSearchStatus(message: string): void {
+      this.widget.searchStatus.querySelector('.search-text')!.textContent = message;
+      this.widget.searchStatus.style.display = 'flex';
+
+      // Add searching class for animated border and sunburst
+      const wrapper = this.widget.searchInput.closest('.search-input-wrapper') as HTMLElement;
+      if (wrapper) {
+        wrapper.classList.add('searching');
+      }
+
+      // Add searching class to sunburst wrapper
+      const sunburstWrapper = document.querySelector('.sunburst-wrapper') as HTMLElement;
+      if (sunburstWrapper) {
+        sunburstWrapper.classList.add('searching');
+        sunburstWrapper.classList.remove('results-showing');
+      }
+    }
+
+    private hideSearchStatus(): void {
+      this.widget.searchStatus.style.display = 'none';
+
+      // Remove searching class to stop animated border
+      const wrapper = this.widget.searchInput.closest('.search-input-wrapper') as HTMLElement;
+      if (wrapper) {
+        wrapper.classList.remove('searching');
+      }
+
+      // Remove searching class from sunburst wrapper
+      const sunburstWrapper = document.querySelector('.sunburst-wrapper') as HTMLElement;
+      if (sunburstWrapper) {
+        sunburstWrapper.classList.remove('searching');
+      }
+    }
+
+    private showResults(): void {
+      this.widget.searchResults.style.display = 'block';
+
+      // Add results-showing class to stop sunburst animation
+      const sunburstWrapper = document.querySelector('.sunburst-wrapper') as HTMLElement;
+      if (sunburstWrapper) {
+        sunburstWrapper.classList.add('results-showing');
+        sunburstWrapper.classList.remove('searching');
+      }
+    }
+
+    private hideResults(): void {
+      this.widget.searchResults.style.display = 'none';
+
+      // Remove results-showing class to allow sunburst animation again
+      const sunburstWrapper = document.querySelector('.sunburst-wrapper') as HTMLElement;
+      if (sunburstWrapper) {
+        sunburstWrapper.classList.remove('results-showing');
+      }
+    }
+
+    private showSelectedSong(): void {
+      this.widget.selectedDisplay.style.display = 'block';
+    }
+
+    private hideSelectedSong(): void {
+      this.widget.selectedDisplay.style.display = 'none';
+    }
+
+    private showNoResults(): void {
+      this.widget.resultsCount.textContent = 'No songs found';
+
+      // Create custom song option from search text
+      const searchText = this.widget.searchInput.value.trim();
+      const customSong = this.createCustomSong(searchText);
+
+      this.widget.resultsList.innerHTML = `
+        <li class="result-item no-results">
+          <div class="result-song-info no-results-text">No exact matches found</div>
+        </li>
+        <li class="result-item custom-song"
+            tabindex="0"
+            role="option"
+            data-song='${JSON.stringify(customSong)}'>
+          <div class="result-song-info">
+            <div class="result-title">Use: "${searchText}"</div>
+            <div class="result-artist-year">
+              <div class="result-artist">Custom Entry</div>
+            </div>
+          </div>
+        </li>
+      `;
+
+      // Bind click event to custom song option
+      const customSongItem = this.widget.resultsList.querySelector('.custom-song');
+      if (customSongItem) {
+        customSongItem.addEventListener('click', this.handleResultSelect.bind(this));
+      }
+
+      this.showResults();
+    }
+
+    private createCustomSong(searchText: string): Song {
+      // Try to parse "artist - title" or "title by artist" format
+      let title = searchText;
+      let artist = 'Unknown Artist';
+
+      // Check for "artist - title" format
+      const dashMatch = searchText.match(/^(.+?)\s*-\s*(.+)$/);
+      if (dashMatch) {
+        artist = dashMatch[1].trim();
+        title = dashMatch[2].trim();
+      } else {
+        // Check for "title by artist" format
+        const byMatch = searchText.match(/^(.+?)\s+by\s+(.+)$/i);
+        if (byMatch) {
+          title = byMatch[1].trim();
+          artist = byMatch[2].trim();
+        }
+      }
+
+      // Generate YouTube search URL
+      const youtubeSearchUrl = this.generateYouTubeSearchUrl(title, artist);
+
+      return {
+        id: `custom-${Date.now()}`,
+        title,
+        artist,
+        source: 'curated',
+        youtubeSearchUrl
+      };
+    }
+
+    private generateYouTubeSearchUrl(title: string, artist: string): string {
+      const query = encodeURIComponent(`${title} ${artist}`);
+      return `https://www.youtube.com/results?search_query=${query}`;
+    }
+
+    private showError(): void {
+      this.widget.resultsCount.textContent = 'Search error';
+      this.widget.resultsList.innerHTML = '<li class="result-item no-results"><div class="result-song-info no-results-text">Search temporarily unavailable</div></li>';
+      this.showResults();
+    }
+
+    private escapeHtml(unsafe: string): string {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    new MusicSearch();
+  });
+</script>

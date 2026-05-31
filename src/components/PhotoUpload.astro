@@ -1,0 +1,418 @@
+---
+// Mobile-optimized photo upload component
+---
+
+<div id="photo-upload-container" class="photo-upload-widget">
+  <div class="upload-zone">
+    <!-- Hidden file input for camera access -->
+    <input
+      type="file"
+      name="photo"
+      accept="image/*"
+      capture="environment"
+      class="hidden"
+      id="photo-input"
+    />
+
+    <!-- Visual upload button -->
+    <label for="photo-input" class="upload-button">
+      <div class="upload-button-content">
+        <div class="camera-icon">📸</div>
+        <div class="upload-text">
+          <span class="primary-text">Add Your Photo</span>
+          <span class="secondary-text">to the Disco Ball</span>
+        </div>
+      </div>
+    </label>
+
+    <!-- Preview area (hidden initially) -->
+    <div id="upload-preview" class="upload-preview hidden">
+      <div class="preview-image-container">
+        <img id="preview-image" class="preview-image" alt="Photo preview" />
+        <button type="button" id="remove-photo" class="remove-button">✕</button>
+      </div>
+
+      <div class="upload-controls">
+        <button type="button" id="upload-button" class="submit-upload-button">
+          <span id="upload-button-text">Add to Party! ✨</span>
+          <div id="upload-spinner" class="spinner hidden"></div>
+        </button>
+        <p class="upload-note">Photo will be reviewed before appearing in the game</p>
+      </div>
+    </div>
+
+    <!-- Status messages -->
+    <div id="upload-status" class="upload-status hidden"></div>
+  </div>
+</div>
+
+<style>
+.photo-upload-widget {
+  margin: var(--spacing-phi-xl) 0;
+  padding: var(--spacing-phi-lg);
+}
+
+.upload-zone {
+  position: relative;
+  text-align: center;
+}
+
+.upload-button {
+  display: inline-block;
+  cursor: pointer;
+  padding: var(--spacing-phi-lg);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFB6D9, #F5A0C0);
+  border: 3px solid #d06090;
+  box-shadow: 4px 4px 0 #483D8B;
+  transition: all 0.2s ease;
+  min-width: 250px;
+}
+
+.upload-button:hover {
+  box-shadow: var(--glow-dual), 4px 4px 0 #483D8B;
+  transform: translateY(-1px);
+}
+
+.upload-button-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-phi-md);
+  justify-content: center;
+}
+
+.camera-icon {
+  font-size: 2rem;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.primary-text {
+  font-family: 'Righteous', sans-serif;
+  font-size: 1.2rem;
+  color: #483D8B;
+  font-weight: bold;
+}
+
+.secondary-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  color: #483D8B;
+  opacity: 0.8;
+}
+
+.upload-preview {
+  margin-top: var(--spacing-phi-lg);
+}
+
+.preview-image-container {
+  position: relative;
+  display: inline-block;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-elevation-medium);
+}
+
+.preview-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.remove-button:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.upload-controls {
+  margin-top: var(--spacing-phi-md);
+}
+
+.submit-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-phi-sm);
+  padding: var(--spacing-phi-md) var(--spacing-phi-xl);
+  background: linear-gradient(135deg, #FFD700, #E6C200);
+  color: #483D8B;
+  border: 3px solid #B7410E;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 #483D8B;
+  font-family: 'Righteous', sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-upload-button:hover:not(:disabled) {
+  box-shadow: var(--glow-dual), 3px 3px 0 #483D8B;
+  transform: translateY(-1px);
+}
+
+.submit-upload-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.upload-note {
+  margin-top: var(--spacing-phi-sm);
+  font-size: var(--font-size-phi-xs);
+  color: rgba(72, 61, 139, 0.7);
+  font-style: italic;
+}
+
+.upload-status {
+  margin-top: var(--spacing-phi-md);
+  padding: var(--spacing-phi-md);
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.upload-status.success {
+  background: rgba(128, 224, 96, 0.1);
+  border: 2px solid #80E060;
+  color: #2d5016;
+}
+
+.upload-status.error {
+  background: rgba(255, 112, 112, 0.1);
+  border: 2px solid #FF7070;
+  color: #8b2635;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid #483D8B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .upload-button {
+    min-width: calc(100vw - 60px);
+    max-width: 350px;
+  }
+
+  .upload-button-content {
+    flex-direction: column;
+    gap: var(--spacing-phi-sm);
+  }
+
+  .upload-text {
+    text-align: center;
+  }
+
+  .preview-image {
+    width: 150px;
+    height: 150px;
+  }
+}
+</style>
+
+<script>
+class PhotoUploader {
+  private input: HTMLInputElement;
+  private preview: HTMLElement;
+  private previewImage: HTMLImageElement;
+  private uploadButton: HTMLButtonElement;
+  private uploadButtonText: HTMLElement;
+  private uploadSpinner: HTMLElement;
+  private removeButton: HTMLButtonElement;
+  private statusDiv: HTMLElement;
+  private currentFile: File | null = null;
+
+  constructor() {
+    this.input = document.getElementById('photo-input') as HTMLInputElement;
+    this.preview = document.getElementById('upload-preview') as HTMLElement;
+    this.previewImage = document.getElementById('preview-image') as HTMLImageElement;
+    this.uploadButton = document.getElementById('upload-button') as HTMLButtonElement;
+    this.uploadButtonText = document.getElementById('upload-button-text') as HTMLElement;
+    this.uploadSpinner = document.getElementById('upload-spinner') as HTMLElement;
+    this.removeButton = document.getElementById('remove-photo') as HTMLButtonElement;
+    this.statusDiv = document.getElementById('upload-status') as HTMLElement;
+
+    this.bindEvents();
+  }
+
+  private bindEvents() {
+    this.input.addEventListener('change', this.handleFileSelect.bind(this));
+    this.removeButton.addEventListener('click', this.clearSelection.bind(this));
+    this.uploadButton.addEventListener('click', this.uploadPhoto.bind(this));
+  }
+
+  private async handleFileSelect(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+
+    if (!file) return;
+
+    // Basic client-side validation
+    if (file.size > 10 * 1024 * 1024) {
+      this.showError('File is too large (max 10MB)');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.showError('Please select an image file');
+      return;
+    }
+
+    this.currentFile = file;
+
+    try {
+      // Compress image for preview (optional optimization)
+      const compressedFile = await this.compressImage(file, 400, 0.8);
+
+      // Show preview
+      const previewUrl = URL.createObjectURL(compressedFile);
+      this.previewImage.src = previewUrl;
+      this.previewImage.onload = () => URL.revokeObjectURL(previewUrl);
+
+      this.preview.classList.remove('hidden');
+      this.hideStatus();
+
+    } catch (error) {
+      this.showError('Failed to process image preview');
+    }
+  }
+
+  private clearSelection() {
+    this.currentFile = null;
+    this.input.value = '';
+    this.preview.classList.add('hidden');
+    this.hideStatus();
+  }
+
+  private async uploadPhoto() {
+    if (!this.currentFile) return;
+
+    this.setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('photo', this.currentFile);
+
+      const response = await fetch('/api/photo-upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        this.showSuccess('Photo uploaded successfully! It will be reviewed before appearing in the game.');
+        this.clearSelection();
+      } else {
+        this.showError(result.error || 'Upload failed');
+      }
+
+    } catch (error) {
+      this.showError('Network error. Please try again.');
+    } finally {
+      this.setUploading(false);
+    }
+  }
+
+  private setUploading(uploading: boolean) {
+    this.uploadButton.disabled = uploading;
+
+    if (uploading) {
+      this.uploadButtonText.textContent = 'Uploading...';
+      this.uploadSpinner.classList.remove('hidden');
+    } else {
+      this.uploadButtonText.textContent = 'Add to Party! ✨';
+      this.uploadSpinner.classList.add('hidden');
+    }
+  }
+
+  private showSuccess(message: string) {
+    this.statusDiv.textContent = message;
+    this.statusDiv.className = 'upload-status success';
+    this.statusDiv.classList.remove('hidden');
+  }
+
+  private showError(message: string) {
+    this.statusDiv.textContent = message;
+    this.statusDiv.className = 'upload-status error';
+    this.statusDiv.classList.remove('hidden');
+  }
+
+  private hideStatus() {
+    this.statusDiv.classList.add('hidden');
+  }
+
+  // Client-side image compression for better upload performance
+  private compressImage(file: File, maxWidth: number = 1200, quality: number = 0.8): Promise<File> {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const img = new Image();
+
+      img.onload = () => {
+        const { width, height } = img;
+        const ratio = Math.min(maxWidth / width, maxWidth / height);
+
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file); // Fallback to original
+          }
+        }, 'image/jpeg', quality);
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  }
+}
+
+// Initialize uploader when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new PhotoUploader();
+});
+</script>

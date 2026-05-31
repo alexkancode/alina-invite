@@ -253,6 +253,68 @@ Instead of horizontal rules, use a 34px-tall halftone strip:
 
 ---
 
+## CSS & Styling Conventions
+
+### Astro Component Styling Rule
+
+**Always use `:global()` selectors for dynamic content styling** to avoid Astro's CSS scoping issues.
+
+#### The Problem
+Astro automatically scopes component CSS with unique attributes (e.g., `data-astro-cid-csxfwkd7`), which can prevent styles from being applied to dynamically generated HTML content (like search results, JavaScript-rendered lists, etc.).
+
+#### The Solution
+Use `:global()` selectors with `!important` declarations for any styles that need to apply to dynamically generated content:
+
+```css
+/* ❌ BAD: Scoped selector may not work with dynamic content */
+.result-item {
+  background: linear-gradient(135deg, rgba(255,182,217,0.08), rgba(139, 47, 201, 0.04));
+  padding: 12px 16px;
+}
+
+/* ✅ GOOD: Global selector ensures styling applies */
+:global(.result-item) {
+  background: linear-gradient(135deg, rgba(255,182,217,0.08), rgba(139, 47, 201, 0.04)) !important;
+  padding: 12px 16px !important;
+}
+```
+
+#### When to Use Global Selectors
+- Dynamic search results
+- JavaScript-generated content
+- Lists populated by API responses
+- Any content created after initial page render
+- Interactive components with state changes
+
+#### Best Practices
+1. **Use specific selectors**: Target exact elements to avoid style conflicts
+2. **Add `!important`**: Ensure global styles override any conflicting rules
+3. **Document the reason**: Comment why global styling was needed
+4. **Test thoroughly**: Verify styles apply across all dynamic states
+
+Example from the music search widget:
+```css
+/* Global card styling to override scoping issues */
+:global(ul.results-list) {
+  padding: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+:global(li.result-item) {
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, rgba(255,182,217,0.08), rgba(139, 47, 201, 0.04)) !important;
+  border: 1px solid rgba(255,182,217,0.15) !important;
+  transition: all 0.2s ease !important;
+}
+```
+
+This ensures consistent styling across all components while working with Astro's scoping system rather than against it.
+
+---
+
 ## Adding New Elements — Checklist
 
 Before adding any new visual element, verify:
