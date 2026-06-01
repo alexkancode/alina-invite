@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
-import { OverlaySecurityValidator } from '../../../lib/overlay/securityValidator.js';
-import { OverlayImageOptimizer } from '../../../lib/overlay/imageOptimizer.js';
+import { OverlaySecurityValidator } from '../../../lib/overlay/securityValidator.ts';
+import { OverlayImageOptimizer } from '../../../lib/overlay/imageOptimizer.ts';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
-import { getDatabase } from '../../../lib/database.js';
+import pool from '../../../lib/db.js';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -40,38 +40,59 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const overlayDir = path.join(process.cwd(), 'public', 'overlays');
-    await mkdir(overlayDir, { recursive: true });
+
+    try {
+      await mkdir(overlayDir, { recursive: true });
+    } catch (error) {
+      console.error('Failed to create overlay directory:', error);
+      throw new Error('Directory creation failed');
+    }
 
     const originalFilename = `${Date.now()}-${validationResult.securityHash.substring(0, 8)}.jpg`;
     const originalPath = path.join(overlayDir, originalFilename);
 
-    const fileBuffer = await file.arrayBuffer();
-    await writeFile(originalPath, new Uint8Array(fileBuffer));
+    try {
+      const fileBuffer = await file.arrayBuffer();
+      await writeFile(originalPath, new Uint8Array(fileBuffer));
+    } catch (error) {
+      console.error('Failed to write overlay file:', error);
+      throw new Error('File write failed');
+    }
 
+    // Create processing pipeline for future use (currently just returns metadata)
     const optimizer = new OverlayImageOptimizer();
     const pipeline = await optimizer.createProcessingPipeline(originalPath, overlayDir);
 
-    const db = getDatabase();
-    const result = await db.query(`
-      INSERT INTO overlay_assets (
-        original_name,
-        storage_path,
-        file_size,
-        content_type,
-        security_hash,
-        jpeg_path,
-        active
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, original_name, jpeg_path, blend_mode, opacity, active
-    `, [
-      file.name,
-      `/overlays/${originalFilename}`,
-      file.size,
-      validationResult.contentType,
-      validationResult.securityHash,
-      `/overlays/${originalFilename}`,
-      false
-    ]);
+    let result;
+    try {
+      result = await pool.query(`
+        INSERT INTO overlay_assets (
+          original_name,
+          storage_path,
+          file_size,
+          content_type,
+          security_hash,
+          jpeg_path,
+          blend_mode,
+          opacity,
+          active
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING id, original_name, jpeg_path, blend_mode, opacity, active
+      `, [
+        file.name,
+        `/overlays/${originalFilename}`,
+        file.size,
+        validationResult.contentType,
+        validationResult.securityHash,
+        `/overlays/${originalFilename}`,
+        'overlay',                     // blend_mode default
+        0.8,                          // opacity default
+        false                         // active
+      ]);
+    } catch (error) {
+      console.error('Database insert failed:', error);
+      throw new Error('Database operation failed');
+    }
 
     const overlayAsset = result.rows[0];
 
@@ -92,8 +113,21 @@ export const POST: APIRoute = async ({ request }) => {
 
   } catch (error) {
     console.error('Upload overlay error:', error);
+
+    // Provide more specific error messages for debugging
+    let errorMessage = 'Internal server error during upload';
+    if (error instanceof Error) {
+      console.error('Error details:', error.message);
+      console.error('Stack trace:', error.stack);
+
+      // Include specific error type in development
+      if (process.env.NODE_ENV === 'development') {
+        errorMessage = `${errorMessage}: ${error.message}`;
+      }
+    }
+
     return new Response(JSON.stringify({
-      error: 'Internal server error during upload'
+      error: errorMessage
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

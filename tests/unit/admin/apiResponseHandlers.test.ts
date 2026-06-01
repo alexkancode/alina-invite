@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 describe('API Response Handlers', () => {
   describe('parsePhotosResponse', () => {
-    test('handles flat array format correctly', () => {
+    test('handles component format flat array correctly', () => {
       const flatArray = [
         { id: 'photo-1', name: 'photo1.jpg', path: '/uploads/photo1.jpg' },
         { id: 'photo-2', name: 'photo2.jpg', path: '/uploads/photo2.jpg' }
@@ -25,22 +25,55 @@ describe('API Response Handlers', () => {
       });
     });
 
-    test('handles nested object format (current API)', () => {
-      const nestedObject = {
+    test('handles actual API response format', () => {
+      const actualApiResponse = {
         success: true,
         photos: [
-          { id: 'photo-1', name: 'photo1.jpg', path: '/uploads/photo1.jpg' }
+          {
+            id: 'photo-123',
+            upload_date: '2026-06-01T10:00:00.000Z',
+            is_approved: false,
+            original_filename: 'test-photo.jpg',
+            file_size: 1024,
+            upload_ip: '127.0.0.1',
+            is_hidden: false,
+            moderation_notes: null
+          }
         ],
         count: 1
       };
 
-      const result = parsePhotosResponse(nestedObject);
+      const result = parsePhotosResponse(actualApiResponse);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        id: 'photo-1',
-        name: 'photo1.jpg',
-        path: '/uploads/photo1.jpg'
+        id: 'photo-123',
+        name: 'test-photo.jpg',
+        path: '/alina/thumbs/test-photo.jpg'
+      });
+    });
+
+    test('handles flat array of actual API format', () => {
+      const actualApiArray = [
+        {
+          id: 'photo-456',
+          upload_date: '2026-06-01T11:00:00.000Z',
+          is_approved: true,
+          original_filename: 'another-photo.png',
+          file_size: 2048,
+          upload_ip: '127.0.0.1',
+          is_hidden: false,
+          moderation_notes: 'Approved'
+        }
+      ];
+
+      const result = parsePhotosResponse(actualApiArray);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        id: 'photo-456',
+        name: 'another-photo.png',
+        path: '/alina/thumbs/another-photo.png'
       });
     });
 
@@ -66,7 +99,7 @@ describe('API Response Handlers', () => {
   });
 
   describe('parseOverlaysResponse', () => {
-    test('handles flat array format correctly', () => {
+    test('handles component format flat array correctly', () => {
       const flatArray = [
         {
           id: 'overlay-1',
@@ -89,32 +122,36 @@ describe('API Response Handlers', () => {
       });
     });
 
-    test('handles nested object format (current API)', () => {
-      const nestedObject = {
+    test('handles actual API response format', () => {
+      const actualApiResponse = {
         overlays: [
           {
-            id: 'overlay-1',
-            name: 'overlay1.png',
-            path: '/overlays/overlay1.png',
-            blendMode: 'multiply',
-            opacity: 0.6
+            id: 'overlay-123',
+            filename: 'sparkles.png',
+            display_name: 'Sparkle Effect',
+            file_size: 512,
+            is_active: true,
+            opacity: 0.8,
+            blend_mode: 'overlay',
+            created_by: 'admin',
+            description: 'Adds sparkle effects'
           }
         ],
         settings: {
-          maxUploads: 10,
-          allowedFormats: ['png', 'jpg']
+          overlay_probability: 0.7,
+          overlay_on_photos: true
         }
       };
 
-      const result = parseOverlaysResponse(nestedObject);
+      const result = parseOverlaysResponse(actualApiResponse);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        id: 'overlay-1',
-        name: 'overlay1.png',
-        path: '/overlays/overlay1.png',
-        blendMode: 'multiply',
-        opacity: 0.6
+        id: 'overlay-123',
+        name: 'Sparkle Effect',
+        path: '/overlays/sparkles.png',
+        blendMode: 'overlay',
+        opacity: 0.8
       });
     });
 
@@ -128,20 +165,56 @@ describe('API Response Handlers', () => {
   });
 
   describe('parseDashboardStats', () => {
-    test('calculates stats from both responses', () => {
+    test('calculates stats from actual API responses', () => {
       const photosResponse = {
         success: true,
         photos: [
-          { id: 'photo-1', name: 'photo1.jpg', path: '/uploads/photo1.jpg' },
-          { id: 'photo-2', name: 'photo2.jpg', path: '/uploads/photo2.jpg' }
+          {
+            id: 'photo-1',
+            upload_date: '2026-06-01T10:00:00.000Z',
+            is_approved: false,
+            original_filename: 'photo1.jpg',
+            file_size: 1024,
+            upload_ip: '127.0.0.1',
+            is_hidden: false,
+            moderation_notes: null
+          },
+          {
+            id: 'photo-2',
+            upload_date: '2026-06-01T11:00:00.000Z',
+            is_approved: true,
+            original_filename: 'photo2.jpg',
+            file_size: 2048,
+            upload_ip: '127.0.0.1',
+            is_hidden: false,
+            moderation_notes: 'Approved'
+          }
         ],
         count: 2
       };
 
       const overlaysResponse = {
         overlays: [
-          { id: 'overlay-1', name: 'overlay1.png', path: '/overlays/overlay1.png', blendMode: 'overlay', opacity: 0.8 },
-          { id: 'overlay-2', name: 'overlay2.png', path: '/overlays/overlay2.png', blendMode: 'multiply', opacity: 0.0 }
+          {
+            id: 'overlay-1',
+            filename: 'effect1.png',
+            display_name: 'Effect One',
+            file_size: 512,
+            is_active: true,
+            opacity: 0.8,
+            blend_mode: 'overlay',
+            created_by: 'admin'
+          },
+          {
+            id: 'overlay-2',
+            filename: 'effect2.png',
+            display_name: 'Effect Two',
+            file_size: 256,
+            is_active: false,
+            opacity: 0.0,
+            blend_mode: 'multiply',
+            created_by: 'user'
+          }
         ],
         settings: {}
       };
@@ -169,15 +242,42 @@ describe('API Response Handlers', () => {
       const photosResponse = {
         success: true,
         photos: [
-          { id: 'photo-1', name: 'photo1.jpg', path: '/uploads/photo1.jpg' }
+          {
+            id: 'photo-1',
+            upload_date: '2026-06-01T10:00:00.000Z',
+            is_approved: false,
+            original_filename: 'photo1.jpg',
+            file_size: 1024,
+            upload_ip: '127.0.0.1',
+            is_hidden: false,
+            moderation_notes: null
+          }
         ],
         count: 1
       };
 
       const overlaysResponse = {
         overlays: [
-          { id: 'overlay-1', name: 'overlay1.png', path: '/overlays/overlay1.png', blendMode: 'overlay', opacity: 0.8 },
-          { id: 'overlay-2', name: 'overlay2.png', path: '/overlays/overlay2.png', blendMode: 'multiply', opacity: 0.6 }
+          {
+            id: 'overlay-1',
+            filename: 'effect1.png',
+            display_name: 'Effect One',
+            file_size: 512,
+            is_active: true,
+            opacity: 0.8,
+            blend_mode: 'overlay',
+            created_by: 'admin'
+          },
+          {
+            id: 'overlay-2',
+            filename: 'effect2.png',
+            display_name: 'Effect Two',
+            file_size: 256,
+            is_active: false,
+            opacity: 0.6,
+            blend_mode: 'multiply',
+            created_by: 'user'
+          }
         ],
         settings: {}
       };
