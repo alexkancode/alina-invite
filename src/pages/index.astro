@@ -731,7 +731,7 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
         }
 
         /* Reduce stripe content spacer height on mobile to save vertical space */
-        .stripe-content-spacer {
+        :global(.stripe-content-spacer) {
           height: 1rem !important;
         }
 
@@ -819,10 +819,6 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
           margin: 13px;
         }
 
-        /* Smaller spacer on mobile */
-        .stripe-content-spacer {
-          height: 100px !important;
-        }
 
         /* Reduce sunburst size */
         .sunburst-bg svg {
