@@ -1,0 +1,33 @@
+{
+  "name": "eslint-plugin-error-prevention",
+  "version": "1.0.0",
+  "description": "ESLint rules to prevent common backend error patterns",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha tests/**/*.test.js",
+    "test:watch": "mocha tests/**/*.test.js --watch",
+    "test:coverage": "nyc mocha tests/**/*.test.js"
+  },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "typescript",
+    "imports",
+    "error-prevention",
+    "static-analysis"
+  ],
+  "author": "Error Prevention Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "eslint": ">=7.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "mocha": "^10.0.0",
+    "nyc": "^15.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
