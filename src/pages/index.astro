@@ -727,7 +727,12 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
           display: block !important;
           font-size: clamp(24px, 8vw, 48px) !important;
           padding: 0 13px !important;
-          margin-bottom: 21px !important;
+          margin: 2rem 13px !important;
+        }
+
+        /* Reduce stripe content spacer height on mobile to save vertical space */
+        .stripe-content-spacer {
+          height: 1rem !important;
         }
 
         /* RSVP guest list: horizontal layout on mobile */
