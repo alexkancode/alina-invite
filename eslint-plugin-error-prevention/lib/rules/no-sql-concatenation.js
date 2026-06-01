@@ -1,6 +1,6 @@
-const { matchSQLPattern } = require('../utils/pattern-matchers');
+import { matchSQLPattern } from '../utils/pattern-matchers.js';
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

@@ -176,7 +176,7 @@ function hasCorrelationIdUsage(body) {
   return body.body.some(checkNode);
 }
 
-module.exports = {
+export {
   matchImportPattern,
   matchSQLPattern,
   matchErrorPattern,

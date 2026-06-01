@@ -1,7 +1,7 @@
-const { getSourceValue } = require('../utils/ast-helpers');
-const { matchImportPattern } = require('../utils/pattern-matchers');
+import { getSourceValue } from '../utils/ast-helpers.js';
+import { matchImportPattern } from '../utils/pattern-matchers.js';
 
-module.exports = {
+export default {
   meta: {
     type: 'suggestion',
     docs: {

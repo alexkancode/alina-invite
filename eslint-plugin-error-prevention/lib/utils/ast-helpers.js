@@ -95,7 +95,7 @@ function hasContextInError(node) {
   return false;
 }
 
-module.exports = {
+export {
   getSourceValue,
   hasTypeScriptExtension,
   removeExtension,

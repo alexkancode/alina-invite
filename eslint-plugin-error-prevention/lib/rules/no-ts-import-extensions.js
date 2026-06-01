@@ -1,6 +1,6 @@
-const { getSourceValue, removeExtension, hasTypeScriptExtension } = require('../utils/ast-helpers');
+import { getSourceValue, removeExtension, hasTypeScriptExtension } from '../utils/ast-helpers.js';
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

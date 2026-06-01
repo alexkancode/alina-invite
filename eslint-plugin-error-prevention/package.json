@@ -1,6 +1,7 @@
 {
   "name": "eslint-plugin-error-prevention",
   "version": "1.0.0",
+  "type": "module",
   "description": "ESLint rules to prevent common backend error patterns",
   "main": "lib/index.js",
   "scripts": {

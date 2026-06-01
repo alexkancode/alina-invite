@@ -1,12 +1,14 @@
-const noTsImportExtensions = require('./rules/no-ts-import-extensions');
-const consistentImportPatterns = require('./rules/consistent-import-patterns');
-const noSqlConcatenation = require('./rules/no-sql-concatenation');
+import noTsImportExtensions from './rules/no-ts-import-extensions.js';
+import consistentImportPatterns from './rules/consistent-import-patterns.js';
+import noSqlConcatenation from './rules/no-sql-concatenation.js';
+import validateTsconfigConsistency from './rules/validate-tsconfig-consistency.js';
 
-module.exports = {
+export default {
   rules: {
     'no-ts-import-extensions': noTsImportExtensions,
     'consistent-import-patterns': consistentImportPatterns,
-    'no-sql-concatenation': noSqlConcatenation
+    'no-sql-concatenation': noSqlConcatenation,
+    'validate-tsconfig-consistency': validateTsconfigConsistency
   },
   configs: {
     recommended: {
@@ -14,7 +16,8 @@ module.exports = {
       rules: {
         'error-prevention/no-ts-import-extensions': 'error',
         'error-prevention/consistent-import-patterns': 'warn',
-        'error-prevention/no-sql-concatenation': 'error'
+        'error-prevention/no-sql-concatenation': 'error',
+        'error-prevention/validate-tsconfig-consistency': 'error'
       }
     },
     'phase-1': {
@@ -23,6 +26,12 @@ module.exports = {
         'error-prevention/no-ts-import-extensions': 'error',
         'error-prevention/consistent-import-patterns': 'warn',
         'error-prevention/no-sql-concatenation': 'error'
+      }
+    },
+    'config-drift-prevention': {
+      plugins: ['error-prevention'],
+      rules: {
+        'error-prevention/validate-tsconfig-consistency': 'error'
       }
     }
   }
