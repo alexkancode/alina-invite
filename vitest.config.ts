@@ -27,7 +27,9 @@ export default defineConfig({
       'tests/integration/admin-components-fixed.test.ts',
       'tests/integration/overlay-upload-api.test.ts',
       // ESLint integration tests
-      'tests/integration/eslint-integration.test.js'
+      'tests/integration/eslint-integration.test.js',
+      // ESLint plugin framework tests
+      'eslint-plugin-error-prevention/tests/**/*.test.js'
     ],
     // Set timeout for image processing tests
     testTimeout: 10000,
