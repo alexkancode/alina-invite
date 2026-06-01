@@ -1,35 +1,15 @@
 import { z } from 'zod';
 import type { PhotoAsset, OverlayAsset } from './tabState';
-
-// Zod schemas for API response validation
-const PhotoAssetSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  path: z.string()
-});
-
-const OverlayAssetSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  path: z.string(),
-  blendMode: z.string(),
-  opacity: z.number()
-});
-
-// API Response schemas
-const PhotosApiResponseSchema = z.object({
-  success: z.boolean(),
-  photos: z.array(PhotoAssetSchema),
-  count: z.number()
-});
-
-const OverlaysApiResponseSchema = z.object({
-  overlays: z.array(OverlayAssetSchema),
-  settings: z.object({
-    maxUploads: z.number().optional(),
-    allowedFormats: z.array(z.string()).optional()
-  }).optional()
-});
+import {
+  ActualPhotosApiResponseSchema,
+  ActualOverlaysApiResponseSchema,
+  ActualPhotoSchema,
+  ActualOverlaySchema
+} from '../../schemas/actualApiResponses';
+import {
+  mapApiPhotosToComponents,
+  mapApiOverlaysToComponents
+} from './fieldMappers';
 
 // Generic response validation utility
 export function validateApiResponse<T>(data: unknown, schema: z.ZodSchema<T>): T | null {
@@ -43,34 +23,66 @@ export function validateApiResponse<T>(data: unknown, schema: z.ZodSchema<T>): T
 
 // Type-safe response parsing functions
 export function parsePhotosResponse(response: unknown): PhotoAsset[] {
-  // Handle flat array (expected format)
+  // Handle flat array formats
   if (Array.isArray(response)) {
-    const flatArraySchema = z.array(PhotoAssetSchema);
-    const validatedArray = validateApiResponse(response, flatArraySchema);
-    return validatedArray || [];
+    // Try component format first (future-proof)
+    const componentArraySchema = z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      path: z.string()
+    }));
+    const validatedComponentArray = validateApiResponse(response, componentArraySchema);
+    if (validatedComponentArray) {
+      return validatedComponentArray;
+    }
+
+    // Try actual API format array
+    const validatedApiArray = validateApiResponse(response, z.array(ActualPhotoSchema));
+    if (validatedApiArray) {
+      return mapApiPhotosToComponents(validatedApiArray);
+    }
+
+    return [];
   }
 
-  // Handle nested object (current API format)
-  const validatedResponse = validateApiResponse(response, PhotosApiResponseSchema);
+  // Handle actual API response format (nested object)
+  const validatedResponse = validateApiResponse(response, ActualPhotosApiResponseSchema);
   if (validatedResponse && validatedResponse.success) {
-    return validatedResponse.photos;
+    return mapApiPhotosToComponents(validatedResponse.photos);
   }
 
   return [];
 }
 
 export function parseOverlaysResponse(response: unknown): OverlayAsset[] {
-  // Handle flat array (expected format)
+  // Handle flat array formats
   if (Array.isArray(response)) {
-    const flatArraySchema = z.array(OverlayAssetSchema);
-    const validatedArray = validateApiResponse(response, flatArraySchema);
-    return validatedArray || [];
+    // Try component format first (future-proof)
+    const componentArraySchema = z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      path: z.string(),
+      blendMode: z.string(),
+      opacity: z.number()
+    }));
+    const validatedComponentArray = validateApiResponse(response, componentArraySchema);
+    if (validatedComponentArray) {
+      return validatedComponentArray;
+    }
+
+    // Try actual API format array
+    const validatedApiArray = validateApiResponse(response, z.array(ActualOverlaySchema));
+    if (validatedApiArray) {
+      return mapApiOverlaysToComponents(validatedApiArray);
+    }
+
+    return [];
   }
 
-  // Handle nested object (current API format)
-  const validatedResponse = validateApiResponse(response, OverlaysApiResponseSchema);
+  // Handle actual API response format (nested object)
+  const validatedResponse = validateApiResponse(response, ActualOverlaysApiResponseSchema);
   if (validatedResponse && validatedResponse.overlays) {
-    return validatedResponse.overlays;
+    return mapApiOverlaysToComponents(validatedResponse.overlays);
   }
 
   return [];
@@ -91,7 +103,7 @@ export function parseDashboardStats(
   const overlays = parseOverlaysResponse(overlaysResponse);
 
   const activeOverlays = overlays.filter(overlay =>
-    // Assume overlay is active if opacity > 0
+    // Overlay is active if opacity > 0
     overlay.opacity > 0
   );
 
