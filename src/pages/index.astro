@@ -339,6 +339,20 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
       <!-- Spacer between stripes and content -->
       <div class="stripe-content-spacer" style="height: 300px;"></div>
 
+      <!-- ═══ Mobile Arc Text (plain text version) ═══ -->
+      <div class="mobile-arc-text text-center"
+           style="font-family: 'Chicle', sans-serif;
+                  font-size: 132px;
+                  font-weight: 500;
+                  letter-spacing: 0.05em;
+                  color: #483D8B;
+                  line-height: 0.9;
+                  margin-bottom: 34px;
+                  opacity: 0;
+                  animation: reveal-up 0.8s ease-out 5s forwards;">
+        Let's celebrate Alina's first year of life!
+      </div>
+
       <!-- ═══ 62/38 Golden Ratio Layout ═══ -->
       <div class="grid gap-phi-xl content-reveal justify-center" style="grid-template-columns: auto auto;
            opacity: 0; animation: reveal-up 0.8s ease-out 5s forwards;">
@@ -640,6 +654,11 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
 
     <!-- ═══ Responsive ═══ -->
     <style>
+      /* Mobile arc text: hidden on desktop, visible on mobile */
+      .mobile-arc-text {
+        display: none;
+      }
+
       /* Game modal: full-screen on mobile, stack columns */
       @media (max-width: 768px) {
         .game-modal-inner {
@@ -701,6 +720,14 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
           font-size: 50px !important;
           line-height: 1 !important;
           margin-top: 50px !important;
+        }
+
+        /* Mobile arc text: show and adjust size for mobile */
+        .mobile-arc-text {
+          display: block !important;
+          font-size: clamp(24px, 8vw, 48px) !important;
+          padding: 0 13px !important;
+          margin-bottom: 21px !important;
         }
 
         /* Arc text: behind content, centered, pushed down, fades out after reveal */
