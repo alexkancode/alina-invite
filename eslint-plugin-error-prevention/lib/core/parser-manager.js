@@ -1,4 +1,4 @@
-import { TypeScriptConfigParser, PackageJsonParser, BuildToolParser } from './config-parsers.js';
+import { TypeScriptConfigParser, PackageJsonParser, BuildToolParser, EnvironmentConfigParser, DockerConfigParser } from './config-parsers.js';
 
 class ParserManager {
   static parserClasses = new Map();
@@ -69,7 +69,9 @@ class ParserManager {
     const defaultParsers = [
       ['typescript', TypeScriptConfigParser],
       ['package', PackageJsonParser],
-      ['buildTool', BuildToolParser]
+      ['buildTool', BuildToolParser],
+      ['environment', EnvironmentConfigParser],
+      ['docker', DockerConfigParser]
     ];
 
     for (const [name, ParserClass] of defaultParsers) {

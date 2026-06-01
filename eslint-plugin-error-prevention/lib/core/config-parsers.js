@@ -241,3 +241,198 @@ export class BuildToolParser {
     };
   }
 }
+
+export class EnvironmentConfigParser {
+  static name = 'environment';
+
+  static parse(projectRoot) {
+    const envFiles = [
+      '.env',
+      '.env.local',
+      '.env.development',
+      '.env.production'
+    ];
+
+    const configs = {};
+
+    for (const file of envFiles) {
+      const envPath = path.join(projectRoot, file);
+      if (fs.existsSync(envPath)) {
+        try {
+          configs[file] = this.parseEnvFile(envPath);
+        } catch (error) {
+          // Skip files that can't be parsed
+        }
+      }
+    }
+
+    return {
+      files: configs,
+      database: this.extractDatabaseConfig(configs),
+      path: projectRoot,
+      type: 'environment'
+    };
+  }
+
+  static parseEnvFile(filePath) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const config = {};
+
+    const lines = content.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      // Skip comments and empty lines
+      if (trimmed === '' || trimmed.startsWith('#')) {
+        continue;
+      }
+
+      const match = trimmed.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        const [, key, value] = match;
+        config[key.trim()] = value.trim().replace(/^["']|["']$/g, '');
+      }
+    }
+
+    return config;
+  }
+
+  static extractDatabaseConfig(configs) {
+    const dbConfig = {};
+
+    // Extract from all env files, later values override earlier ones
+    Object.values(configs).forEach(config => {
+      if (config.DB_HOST) dbConfig.host = config.DB_HOST;
+      if (config.DB_PORT) dbConfig.port = parseInt(config.DB_PORT);
+      if (config.DB_NAME) dbConfig.database = config.DB_NAME;
+      if (config.DB_USER) dbConfig.user = config.DB_USER;
+      if (config.DATABASE_URL) dbConfig.url = config.DATABASE_URL;
+    });
+
+    return dbConfig;
+  }
+
+  static validate(config) {
+    if (!config || config.error) {
+      return false;
+    }
+    return Object.keys(config.files).length > 0;
+  }
+}
+
+export class DockerConfigParser {
+  static name = 'docker';
+
+  static parse(projectRoot) {
+    const dockerFiles = [
+      'docker-compose.yml',
+      'docker-compose.yaml',
+      'docker-compose.prod.yml',
+      'docker-compose.dev.yml'
+    ];
+
+    const configs = {};
+
+    for (const file of dockerFiles) {
+      const dockerPath = path.join(projectRoot, file);
+      if (fs.existsSync(dockerPath)) {
+        try {
+          configs[file] = this.parseDockerFile(dockerPath);
+        } catch (error) {
+          // Skip files that can't be parsed
+        }
+      }
+    }
+
+    return {
+      files: configs,
+      database: this.extractDatabaseServices(configs),
+      path: projectRoot,
+      type: 'docker'
+    };
+  }
+
+  static parseDockerFile(filePath) {
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    // Simple YAML-like parsing for docker-compose structure
+    const config = { services: {} };
+    const lines = content.split('\n');
+
+    let currentService = null;
+    let inServices = false;
+    let inPorts = false;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      // Detect services section
+      if (trimmed === 'services:') {
+        inServices = true;
+        continue;
+      }
+
+      // Service name (2-space indent under services)
+      if (inServices && line.match(/^  [a-zA-Z0-9_-]+:/)) {
+        currentService = trimmed.replace(':', '');
+        config.services[currentService] = {};
+        inPorts = false;
+        continue;
+      }
+
+      // Ports section (4-space indent under service)
+      if (currentService && line.match(/^    ports:/)) {
+        config.services[currentService].ports = [];
+        inPorts = true;
+        continue;
+      }
+
+      // Port entries (6-space indent under ports)
+      if (currentService && inPorts && line.match(/^      - /)) {
+        const ports = config.services[currentService].ports || [];
+        const portMapping = trimmed.replace(/^- "?|"?$/g, '');
+        ports.push(portMapping);
+        config.services[currentService].ports = ports;
+        continue;
+      }
+
+      // Reset ports flag when encountering other properties
+      if (currentService && line.match(/^    [a-zA-Z_]+:/) && !line.match(/^    ports:/)) {
+        inPorts = false;
+      }
+    }
+
+    return config;
+  }
+
+  static extractDatabaseServices(configs) {
+    const dbServices = {};
+
+    Object.entries(configs).forEach(([file, config]) => {
+      Object.entries(config.services || {}).forEach(([name, service]) => {
+        // Identify database services by name patterns
+        const dbPatterns = ['db', 'database', 'postgres', 'mysql', 'mongo', 'redis'];
+        const isDbService = dbPatterns.some(pattern =>
+          name.toLowerCase().includes(pattern)
+        );
+
+        if (isDbService) {
+          dbServices[name] = {
+            file,
+            ports: service.ports || [],
+            ...service
+          };
+        }
+      });
+    });
+
+    return dbServices;
+  }
+
+  static validate(config) {
+    if (!config || config.error) {
+      return false;
+    }
+    return Object.keys(config.files).length > 0;
+  }
+}
