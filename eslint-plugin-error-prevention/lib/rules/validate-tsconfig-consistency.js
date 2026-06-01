@@ -54,7 +54,7 @@ function create(context) {
   function loadConfigurations() {
     if (configsLoaded) return;
 
-    const filename = context.getFilename();
+    const filename = context.getFilename ? context.getFilename() : context.filename;
     projectRoot = ConfigurationParser.findProjectRoot(path.dirname(filename));
 
     tsConfig = ConfigurationParser.parseTsConfig(projectRoot);

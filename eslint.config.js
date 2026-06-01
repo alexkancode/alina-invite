@@ -60,7 +60,12 @@ export default [
         aliasPrefix: '@/',
         allowMixed: false
       }],
-      'error-prevention/no-sql-concatenation': 'error'
+      'error-prevention/no-sql-concatenation': 'error',
+      'error-prevention/validate-tsconfig-consistency': ['error', {
+        checkNodeVersion: true,
+        checkModuleResolution: true,
+        checkPathMapping: true
+      }]
     }
   },
   {
