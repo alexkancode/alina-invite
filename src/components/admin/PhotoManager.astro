@@ -1,0 +1,441 @@
+---
+// PhotoManager: Wrapper for existing photo functionality with contextual help
+---
+
+<div class="photo-manager">
+  <div class="manager-header">
+    <h3>Photo Gallery Management</h3>
+    <p class="manager-description">
+      Upload photos that will appear in the party gallery and as disco ball tile content.
+      These photos become the base imagery for the disco ball effect.
+    </p>
+  </div>
+
+  <div class="upload-section">
+    <div class="upload-zone" id="photo-upload-zone">
+      <input
+        type="file"
+        id="photo-file-input"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        hidden
+      />
+      <label for="photo-file-input" class="upload-label">
+        <div class="upload-icon">📷</div>
+        <p class="upload-title">Upload Party Photos</p>
+        <p class="upload-hint">JPEG, PNG, WebP • Max 10MB each • Multiple files supported</p>
+      </label>
+    </div>
+
+    <div class="upload-progress" id="photo-upload-progress" hidden>
+      <div class="progress-bar">
+        <div class="progress-fill" id="photo-progress-fill"></div>
+      </div>
+      <p class="progress-text" id="photo-progress-text">Processing...</p>
+    </div>
+  </div>
+
+  <div class="photo-gallery" id="photo-gallery">
+    <h4>Current Photos</h4>
+    <div class="gallery-grid" id="photo-gallery-grid">
+      <!-- Dynamic photo previews will be inserted here -->
+    </div>
+  </div>
+
+  <div class="help-section">
+    <details>
+      <summary>Photo Upload Guidelines</summary>
+      <ul>
+        <li>High-quality images work best for disco ball tiles</li>
+        <li>Photos with good contrast show well with overlay effects</li>
+        <li>Square aspect ratios optimize disco ball tile display</li>
+        <li>Avoid images that are too dark or too light</li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<script>
+  interface PhotoAsset {
+    id: string;
+    name: string;
+    path: string;
+    thumbnailPath?: string;
+  }
+
+  class PhotoManagerController {
+    private uploadZone: HTMLElement;
+    private fileInput: HTMLInputElement;
+    private progressSection: HTMLElement;
+    private progressFill: HTMLElement;
+    private progressText: HTMLElement;
+    private galleryGrid: HTMLElement;
+
+    constructor() {
+      this.initializeElements();
+      this.setupEventListeners();
+      this.loadExistingPhotos();
+    }
+
+    private initializeElements(): void {
+      this.uploadZone = document.getElementById('photo-upload-zone')!;
+      this.fileInput = document.getElementById('photo-file-input') as HTMLInputElement;
+      this.progressSection = document.getElementById('photo-upload-progress')!;
+      this.progressFill = document.getElementById('photo-progress-fill')!;
+      this.progressText = document.getElementById('photo-progress-text')!;
+      this.galleryGrid = document.getElementById('photo-gallery-grid')!;
+    }
+
+    private setupEventListeners(): void {
+      this.uploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+      this.uploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+      this.uploadZone.addEventListener('drop', this.handleDrop.bind(this));
+      this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+    }
+
+    private handleDragOver(e: DragEvent): void {
+      e.preventDefault();
+      this.uploadZone.classList.add('drag-over');
+    }
+
+    private handleDragLeave(): void {
+      this.uploadZone.classList.remove('drag-over');
+    }
+
+    private handleDrop(e: DragEvent): void {
+      e.preventDefault();
+      this.uploadZone.classList.remove('drag-over');
+      const files = e.dataTransfer?.files;
+      if (files) {
+        this.handleFiles(Array.from(files));
+      }
+    }
+
+    private handleFileSelect(): void {
+      const files = this.fileInput.files;
+      if (files) {
+        this.handleFiles(Array.from(files));
+      }
+    }
+
+    private async handleFiles(files: File[]): Promise<void> {
+      this.showProgress();
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.updateProgress((i / files.length) * 100, `Uploading ${file.name}...`);
+
+        try {
+          const photo = await this.uploadPhoto(file);
+          this.addPhotoToGallery(photo);
+          this.notifyPhotoUpdate();
+        } catch (error) {
+          this.showError(`Failed to upload ${file.name}: ${error}`);
+        }
+      }
+
+      this.hideProgress();
+    }
+
+    private async uploadPhoto(file: File): Promise<PhotoAsset> {
+      const formData = new FormData();
+      formData.append('photo', file);
+
+      const response = await fetch('/api/admin/upload-photo', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Upload failed');
+      }
+
+      const result = await response.json();
+      return {
+        id: result.id,
+        name: result.filename,
+        path: result.path,
+        thumbnailPath: result.thumbnailPath
+      };
+    }
+
+    private addPhotoToGallery(photo: PhotoAsset): void {
+      const photoCard = document.createElement('div');
+      photoCard.className = 'photo-card';
+      photoCard.dataset.photoId = photo.id;
+
+      photoCard.innerHTML = `
+        <div class="photo-preview">
+          <img
+            src="${photo.thumbnailPath || photo.path}"
+            alt="${photo.name}"
+            loading="lazy"
+          />
+          <div class="photo-controls">
+            <button class="btn-delete" data-action="delete">Delete</button>
+          </div>
+        </div>
+        <div class="photo-info">
+          <p class="photo-name">${photo.name}</p>
+        </div>
+      `;
+
+      this.setupPhotoCardListeners(photoCard);
+      this.galleryGrid.appendChild(photoCard);
+    }
+
+    private setupPhotoCardListeners(card: HTMLElement): void {
+      card.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const action = target.dataset.action;
+        const photoId = card.dataset.photoId!;
+
+        if (action === 'delete') {
+          this.deletePhoto(photoId, card);
+        }
+      });
+    }
+
+    private async deletePhoto(photoId: string, card: HTMLElement): Promise<void> {
+      if (confirm('Delete this photo?')) {
+        try {
+          const response = await fetch(`/api/admin/photo/${photoId}`, {
+            method: 'DELETE'
+          });
+
+          if (response.ok) {
+            card.remove();
+            this.notifyPhotoUpdate();
+          }
+        } catch (error) {
+          this.showError('Failed to delete photo');
+        }
+      }
+    }
+
+    private showProgress(): void {
+      this.progressSection.hidden = false;
+    }
+
+    private hideProgress(): void {
+      this.progressSection.hidden = true;
+    }
+
+    private updateProgress(percent: number, text: string): void {
+      this.progressFill.style.width = `${percent}%`;
+      this.progressText.textContent = text;
+    }
+
+    private showError(message: string): void {
+      console.error('Photo Manager Error:', message);
+      alert(message);
+    }
+
+    private notifyPhotoUpdate(): void {
+      const photoCards = this.galleryGrid.querySelectorAll('.photo-card');
+      const photos = Array.from(photoCards).map(card => ({
+        id: card.dataset.photoId!,
+        name: card.querySelector('.photo-name')?.textContent || '',
+        path: card.querySelector('img')?.src || ''
+      }));
+
+      document.dispatchEvent(new CustomEvent('photosUpdated', {
+        detail: { photos }
+      }));
+    }
+
+    private async loadExistingPhotos(): Promise<void> {
+      try {
+        const response = await fetch('/api/admin/photos');
+        const photos = await response.json();
+
+        photos.forEach((photo: PhotoAsset) => {
+          this.addPhotoToGallery(photo);
+        });
+
+        this.notifyPhotoUpdate();
+      } catch (error) {
+        console.error('Failed to load existing photos:', error);
+      }
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    new PhotoManagerController();
+  }
+</script>
+
+<style>
+  .photo-manager {
+    padding: var(--spacing-phi-md);
+  }
+
+  .manager-header h3 {
+    color: var(--color-ink);
+    margin-bottom: var(--spacing-phi-sm);
+    font-size: var(--font-size-phi-md);
+  }
+
+  .manager-description {
+    color: var(--color-muted);
+    margin-bottom: var(--spacing-phi-lg);
+    line-height: 1.6;
+  }
+
+  .upload-zone {
+    min-height: 180px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: var(--spacing-phi-md);
+    background: var(--color-paper);
+  }
+
+  .upload-zone:hover,
+  .upload-zone.drag-over {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 8%, var(--color-paper));
+  }
+
+  .upload-label {
+    text-align: center;
+    cursor: pointer;
+    padding: var(--spacing-phi-lg);
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-phi-md);
+  }
+
+  .upload-title {
+    font-size: var(--font-size-phi-md);
+    font-weight: 600;
+    color: var(--color-ink);
+    margin-bottom: var(--spacing-phi-sm);
+  }
+
+  .upload-hint {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .upload-progress {
+    background: var(--color-paper);
+    padding: var(--spacing-phi-md);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-phi-md);
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: color-mix(in srgb, var(--color-muted) 30%, transparent);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-phi-sm);
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--color-accent);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-phi-md);
+    margin-bottom: var(--spacing-phi-lg);
+  }
+
+  .photo-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-elevation-low);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .photo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevation-medium);
+  }
+
+  .photo-preview {
+    position: relative;
+  }
+
+  .photo-preview img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .photo-controls {
+    position: absolute;
+    top: var(--spacing-phi-sm);
+    right: var(--spacing-phi-sm);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .photo-card:hover .photo-controls {
+    opacity: 1;
+  }
+
+  .photo-controls button {
+    background: var(--color-pop-red);
+    color: var(--color-paper);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .photo-info {
+    padding: var(--spacing-phi-sm);
+  }
+
+  .photo-name {
+    font-size: 0.875rem;
+    color: var(--color-ink);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .help-section {
+    margin-top: var(--spacing-phi-lg);
+    padding-top: var(--spacing-phi-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .help-section details {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .help-section summary {
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-ink);
+    margin-bottom: var(--spacing-phi-sm);
+  }
+
+  .help-section ul {
+    margin: var(--spacing-phi-sm) 0 0 var(--spacing-phi-lg);
+    line-height: 1.6;
+  }
+</style>

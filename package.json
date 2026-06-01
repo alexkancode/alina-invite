@@ -44,6 +44,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@types/pg": "^8.20.0",
+    "jsdom": "^29.1.1",
     "tsx": "^4.22.3",
     "vitest": "^3.2.4"
   }

@@ -1,0 +1,400 @@
+---
+// CombinedPreview: Real-time preview showing photos + overlay effects
+---
+
+<div class="combined-preview">
+  <div class="preview-header">
+    <h4>Live Preview</h4>
+    <p class="preview-description">
+      See how photos and overlay effects combine on the disco ball
+    </p>
+  </div>
+
+  <div class="preview-container">
+    <div class="preview-disco-ball" id="preview-disco-ball">
+      <div class="disco-ball-mini" id="disco-ball-mini">
+        <!-- Mini disco ball tiles will be generated here -->
+      </div>
+    </div>
+
+    <div class="preview-controls">
+      <label class="preview-control">
+        Animation Speed:
+        <input
+          type="range"
+          id="animation-speed"
+          min="0.1"
+          max="2"
+          step="0.1"
+          value="1"
+        />
+        <span id="speed-value">1x</span>
+      </label>
+
+      <label class="preview-control">
+        <input type="checkbox" id="show-overlays" checked />
+        Show Overlay Effects
+      </label>
+
+      <button class="refresh-btn" id="refresh-preview">
+        Refresh Preview
+      </button>
+    </div>
+  </div>
+
+  <div class="preview-stats" id="preview-stats">
+    <div class="stat">
+      <span class="stat-label">Photos:</span>
+      <span class="stat-value" id="photo-count">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Overlays:</span>
+      <span class="stat-value" id="overlay-count">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Active Tiles:</span>
+      <span class="stat-value" id="tile-count">0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface PhotoAsset {
+    id: string;
+    name: string;
+    path: string;
+  }
+
+  interface OverlayAsset {
+    id: string;
+    name: string;
+    path: string;
+    blendMode: string;
+    opacity: number;
+  }
+
+  class CombinedPreviewController {
+    private discoBall: HTMLElement;
+    private animationSpeedSlider: HTMLInputElement;
+    private speedValue: HTMLElement;
+    private showOverlaysCheckbox: HTMLInputElement;
+    private refreshButton: HTMLButtonElement;
+    private photoCount: HTMLElement;
+    private overlayCount: HTMLElement;
+    private tileCount: HTMLElement;
+
+    private photos: PhotoAsset[] = [];
+    private overlays: OverlayAsset[] = [];
+    private tiles: HTMLElement[] = [];
+
+    constructor() {
+      this.initializeElements();
+      this.setupEventListeners();
+      this.generateMiniDiscoBall();
+    }
+
+    private initializeElements(): void {
+      this.discoBall = document.getElementById('disco-ball-mini')!;
+      this.animationSpeedSlider = document.getElementById('animation-speed') as HTMLInputElement;
+      this.speedValue = document.getElementById('speed-value')!;
+      this.showOverlaysCheckbox = document.getElementById('show-overlays') as HTMLInputElement;
+      this.refreshButton = document.getElementById('refresh-preview') as HTMLButtonElement;
+      this.photoCount = document.getElementById('photo-count')!;
+      this.overlayCount = document.getElementById('overlay-count')!;
+      this.tileCount = document.getElementById('tile-count')!;
+    }
+
+    private setupEventListeners(): void {
+      document.addEventListener('photosUpdated', this.handlePhotosUpdated.bind(this));
+      document.addEventListener('overlaysUpdated', this.handleOverlaysUpdated.bind(this));
+
+      this.animationSpeedSlider.addEventListener('input', this.updateAnimationSpeed.bind(this));
+      this.showOverlaysCheckbox.addEventListener('change', this.toggleOverlays.bind(this));
+      this.refreshButton.addEventListener('click', this.refreshPreview.bind(this));
+    }
+
+    private handlePhotosUpdated(event: CustomEvent): void {
+      this.photos = event.detail.photos || [];
+      this.updateStats();
+      this.updateTiles();
+    }
+
+    private handleOverlaysUpdated(event: CustomEvent): void {
+      this.overlays = event.detail.overlays || [];
+      this.updateStats();
+      this.updateOverlayEffects();
+    }
+
+    private generateMiniDiscoBall(): void {
+      const tileCount = 36; // Smaller grid for preview
+      this.discoBall.innerHTML = '';
+
+      for (let i = 0; i < tileCount; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'disco-tile';
+        tile.dataset.tileIndex = i.toString();
+
+        const angle = (i / tileCount) * 360;
+        const row = Math.floor(i / 6);
+        const col = i % 6;
+
+        tile.style.transform = `
+          rotateY(${col * 60}deg)
+          rotateX(${(row - 3) * 30}deg)
+          translateZ(60px)
+        `;
+
+        this.discoBall.appendChild(tile);
+        this.tiles.push(tile);
+      }
+
+      this.updateStats();
+    }
+
+    private updateTiles(): void {
+      if (this.photos.length === 0) {
+        this.tiles.forEach(tile => {
+          tile.style.backgroundImage = '';
+          tile.classList.add('empty');
+        });
+        return;
+      }
+
+      this.tiles.forEach((tile, index) => {
+        const photo = this.photos[index % this.photos.length];
+        if (photo) {
+          tile.style.backgroundImage = `url(${photo.path})`;
+          tile.classList.remove('empty');
+        }
+      });
+    }
+
+    private updateOverlayEffects(): void {
+      if (!this.showOverlaysCheckbox.checked || this.overlays.length === 0) {
+        this.tiles.forEach(tile => {
+          tile.style.position = 'relative';
+          const existingOverlay = tile.querySelector('.tile-overlay');
+          if (existingOverlay) {
+            existingOverlay.remove();
+          }
+        });
+        return;
+      }
+
+      this.tiles.forEach((tile, index) => {
+        const overlay = this.overlays[index % this.overlays.length];
+        if (overlay) {
+          this.applyOverlayToTile(tile, overlay);
+        }
+      });
+    }
+
+    private applyOverlayToTile(tile: HTMLElement, overlay: OverlayAsset): void {
+      let overlayElement = tile.querySelector('.tile-overlay') as HTMLElement;
+
+      if (!overlayElement) {
+        overlayElement = document.createElement('div');
+        overlayElement.className = 'tile-overlay';
+        tile.style.position = 'relative';
+        tile.appendChild(overlayElement);
+      }
+
+      overlayElement.style.cssText = `
+        position: absolute;
+        inset: 0;
+        background-image: url(${overlay.path});
+        background-size: cover;
+        background-position: center;
+        mix-blend-mode: ${overlay.blendMode};
+        opacity: ${overlay.opacity};
+        pointer-events: none;
+      `;
+    }
+
+    private updateAnimationSpeed(): void {
+      const speed = parseFloat(this.animationSpeedSlider.value);
+      this.speedValue.textContent = `${speed}x`;
+
+      this.discoBall.style.animationDuration = `${20 / speed}s`;
+    }
+
+    private toggleOverlays(): void {
+      this.updateOverlayEffects();
+    }
+
+    private refreshPreview(): void {
+      this.updateTiles();
+      this.updateOverlayEffects();
+      this.updateStats();
+    }
+
+    private updateStats(): void {
+      this.photoCount.textContent = this.photos.length.toString();
+      this.overlayCount.textContent = this.overlays.length.toString();
+      this.tileCount.textContent = this.tiles.length.toString();
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    new CombinedPreviewController();
+  }
+</script>
+
+<style>
+  .combined-preview {
+    padding: var(--spacing-phi-md);
+    background: var(--color-paper);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-phi-lg);
+  }
+
+  .preview-header h4 {
+    color: var(--color-ink);
+    margin-bottom: var(--spacing-phi-xs);
+    font-size: var(--font-size-phi-md);
+  }
+
+  .preview-description {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-phi-lg);
+  }
+
+  .preview-container {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing-phi-lg);
+    align-items: center;
+    margin-bottom: var(--spacing-phi-lg);
+  }
+
+  .preview-disco-ball {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-pop-blue), var(--color-pop-pink));
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    perspective: 400px;
+  }
+
+  .disco-ball-mini {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: disco-spin 20s linear infinite;
+  }
+
+  @keyframes disco-spin {
+    from { transform: rotateY(0deg) rotateX(0deg); }
+    to { transform: rotateY(360deg) rotateX(0deg); }
+  }
+
+  .disco-tile {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: var(--color-metallic-silver);
+    background-size: cover;
+    background-position: center;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 20%, transparent);
+    border-radius: 2px;
+    backface-visibility: hidden;
+  }
+
+  .disco-tile.empty {
+    background: linear-gradient(
+      135deg,
+      var(--color-metallic-silver),
+      color-mix(in srgb, var(--color-metallic-silver) 80%, var(--color-paper))
+    );
+  }
+
+  .tile-overlay {
+    border-radius: inherit;
+  }
+
+  .preview-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-phi-md);
+    min-width: 200px;
+  }
+
+  .preview-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-phi-xs);
+    font-size: 0.875rem;
+    color: var(--color-ink);
+  }
+
+  .preview-control input[type="range"] {
+    width: 100%;
+  }
+
+  .preview-control input[type="checkbox"] {
+    width: auto;
+    margin-right: var(--spacing-phi-xs);
+  }
+
+  .refresh-btn {
+    background: var(--color-accent);
+    color: var(--color-paper);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-phi-sm) var(--spacing-phi-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .refresh-btn:hover {
+    background: color-mix(in srgb, var(--color-accent) 90%, var(--color-ink));
+  }
+
+  .preview-stats {
+    display: flex;
+    gap: var(--spacing-phi-lg);
+    padding-top: var(--spacing-phi-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-phi-xs);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-size: var(--font-size-phi-md);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  @media (max-width: 768px) {
+    .preview-container {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-phi-md);
+    }
+
+    .preview-controls {
+      min-width: auto;
+    }
+
+    .preview-stats {
+      justify-content: space-around;
+    }
+  }
+</style>

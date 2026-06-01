@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    environment: 'jsdom',
     include: [
       'tests/api.test.ts',
       'tests/api.leaderboard.test.ts',
@@ -19,7 +20,9 @@ export default defineConfig({
       'tests/unit/music-search.test.ts',
       // Overlay system tests
       'tests/unit/overlay/**/*.test.ts',
-      'tests/integration/tile-overlay-system.test.ts'
+      'tests/integration/tile-overlay-system.test.ts',
+      // Admin integration tests
+      'tests/unit/admin/**/*.test.ts'
     ],
     // Set timeout for image processing tests
     testTimeout: 10000,

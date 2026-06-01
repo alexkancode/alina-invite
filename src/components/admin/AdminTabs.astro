@@ -1,0 +1,251 @@
+---
+interface Tab {
+  id: string;
+  label: string;
+  icon?: string;
+}
+
+interface Props {
+  tabs: Tab[];
+  defaultTab?: string;
+}
+
+const { tabs, defaultTab = 'photos' } = Astro.props;
+---
+
+<div class="admin-tabs">
+  <nav class="tab-nav" role="tablist">
+    {tabs.map((tab, index) => (
+      <button
+        class={`tab-button ${tab.id === defaultTab ? 'active' : ''}`}
+        data-tab={tab.id}
+        role="tab"
+        aria-controls={`panel-${index}`}
+        id={`tab-${index}`}
+        tabindex={tab.id === defaultTab ? '0' : '-1'}
+      >
+        {tab.icon && <span class="tab-icon">{tab.icon}</span>}
+        {tab.label}
+      </button>
+    ))}
+  </nav>
+
+  <div class="tab-content">
+    {tabs.map((tab, index) => (
+      <div
+        class={`tab-panel ${tab.id === defaultTab ? 'active' : 'hidden'}`}
+        data-panel={tab.id}
+        role="tabpanel"
+        aria-labelledby={`tab-${index}`}
+        id={`panel-${index}`}
+      >
+        <slot name={tab.id} />
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  class AdminTabsController {
+    private container: HTMLElement;
+    private tabButtons: NodeListOf<HTMLButtonElement>;
+    private tabPanels: NodeListOf<HTMLElement>;
+
+    constructor() {
+      this.container = document.querySelector('.admin-tabs')!;
+      this.tabButtons = this.container.querySelectorAll('.tab-button');
+      this.tabPanels = this.container.querySelectorAll('.tab-panel');
+
+      this.setupEventListeners();
+      this.setupKeyboardNavigation();
+    }
+
+    private setupEventListeners(): void {
+      this.container.addEventListener('click', this.handleClick.bind(this));
+    }
+
+    private setupKeyboardNavigation(): void {
+      this.tabButtons.forEach(button => {
+        button.addEventListener('keydown', this.handleKeydown.bind(this));
+      });
+    }
+
+    private handleClick(event: Event): void {
+      const target = event.target as HTMLElement;
+      const tabButton = target.closest('.tab-button') as HTMLButtonElement;
+
+      if (tabButton && tabButton.dataset.tab) {
+        event.preventDefault();
+        this.activateTab(tabButton.dataset.tab);
+      }
+    }
+
+    private handleKeydown(event: KeyboardEvent): void {
+      const target = event.target as HTMLButtonElement;
+      const currentIndex = Array.from(this.tabButtons).indexOf(target);
+
+      switch (event.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+          event.preventDefault();
+          this.focusNextTab(currentIndex);
+          break;
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          event.preventDefault();
+          this.focusPreviousTab(currentIndex);
+          break;
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+          if (target.dataset.tab) {
+            this.activateTab(target.dataset.tab);
+          }
+          break;
+        case 'Home':
+          event.preventDefault();
+          this.focusTab(0);
+          break;
+        case 'End':
+          event.preventDefault();
+          this.focusTab(this.tabButtons.length - 1);
+          break;
+      }
+    }
+
+    private focusNextTab(currentIndex: number): void {
+      const nextIndex = (currentIndex + 1) % this.tabButtons.length;
+      this.focusTab(nextIndex);
+    }
+
+    private focusPreviousTab(currentIndex: number): void {
+      const prevIndex = currentIndex === 0 ? this.tabButtons.length - 1 : currentIndex - 1;
+      this.focusTab(prevIndex);
+    }
+
+    private focusTab(index: number): void {
+      this.tabButtons[index].focus();
+    }
+
+    private activateTab(tabId: string): void {
+      const previousActiveButton = this.container.querySelector('.tab-button.active');
+      const previousTab = previousActiveButton?.getAttribute('data-tab');
+
+      this.tabButtons.forEach(button => {
+        const isActive = button.dataset.tab === tabId;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+
+      this.tabPanels.forEach(panel => {
+        const isActive = panel.dataset.panel === tabId;
+        panel.classList.toggle('active', isActive);
+        panel.classList.toggle('hidden', !isActive);
+      });
+
+      this.container.dispatchEvent(new CustomEvent('tabChanged', {
+        detail: { activeTab: tabId, previousTab }
+      }));
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    new AdminTabsController();
+  }
+</script>
+
+<style>
+  .admin-tabs {
+    background: var(--color-paper);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-elevation-medium);
+  }
+
+  .tab-nav {
+    display: flex;
+    background: var(--color-ink);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .tab-button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    padding: var(--spacing-phi-md) var(--spacing-phi-lg);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-phi-xs);
+    position: relative;
+  }
+
+  .tab-button:hover {
+    background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+    color: var(--color-paper);
+  }
+
+  .tab-button:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .tab-button.active {
+    background: var(--color-accent);
+    color: var(--color-paper);
+  }
+
+  .tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-paper);
+  }
+
+  .tab-icon {
+    font-size: 1.2em;
+  }
+
+  .tab-content {
+    padding: var(--spacing-phi-lg);
+    min-height: 400px;
+  }
+
+  .tab-panel {
+    transition: opacity 0.2s ease;
+  }
+
+  .tab-panel.hidden {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .tab-nav {
+      flex-direction: column;
+    }
+
+    .tab-button {
+      text-align: left;
+      padding: var(--spacing-phi-sm) var(--spacing-phi-md);
+    }
+
+    .tab-content {
+      padding: var(--spacing-phi-md);
+    }
+  }
+</style>
