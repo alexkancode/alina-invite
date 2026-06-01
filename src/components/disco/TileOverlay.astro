@@ -1,0 +1,92 @@
+---
+interface Props {
+  overlayAsset?: {
+    avifPath?: string;
+    webpPath?: string;
+    jpegPath: string;
+    blendMode: string;
+    opacity: number;
+  };
+  tileIndex: number;
+  className?: string;
+}
+
+const { overlayAsset, tileIndex, className = '' } = Astro.props;
+---
+
+{overlayAsset && (
+  <div
+    class={`tile-overlay ${className}`}
+    style={{
+      '--blend-mode': overlayAsset.blendMode,
+      '--opacity': overlayAsset.opacity,
+      '--tile-index': tileIndex
+    }}
+    data-tile={tileIndex}
+  >
+    <picture>
+      {overlayAsset.avifPath && (
+        <source srcset={overlayAsset.avifPath} type="image/avif">
+      )}
+      {overlayAsset.webpPath && (
+        <source srcset={overlayAsset.webpPath} type="image/webp">
+      )}
+      <img
+        src={overlayAsset.jpegPath}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        width="100"
+        height="100"
+      />
+    </picture>
+  </div>
+)}
+
+<style>
+  .tile-overlay {
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: var(--blend-mode);
+    opacity: var(--opacity);
+    isolation: isolate;
+    pointer-events: none;
+    z-index: 2;
+    border-radius: inherit;
+    overflow: hidden;
+  }
+
+  .tile-overlay picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .tile-overlay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tile-overlay {
+      mix-blend-mode: normal;
+      opacity: calc(var(--opacity) * 0.6);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .tile-overlay {
+      opacity: calc(var(--opacity) * 0.8);
+    }
+  }
+
+  @supports not (mix-blend-mode: var(--blend-mode)) {
+    .tile-overlay {
+      mix-blend-mode: multiply;
+      opacity: calc(var(--opacity) * 0.7);
+    }
+  }
+</style>

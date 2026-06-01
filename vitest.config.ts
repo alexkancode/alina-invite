@@ -16,7 +16,10 @@ export default defineConfig({
       'tests/unit/**/*.test.ts',
       'tests/photo-integration.test.ts',
       // Music search tests
-      'tests/unit/music-search.test.ts'
+      'tests/unit/music-search.test.ts',
+      // Overlay system tests
+      'tests/unit/overlay/**/*.test.ts',
+      'tests/integration/tile-overlay-system.test.ts'
     ],
     // Set timeout for image processing tests
     testTimeout: 10000,

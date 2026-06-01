@@ -1,0 +1,501 @@
+---
+// Admin overlay manager component
+---
+
+<div class="overlay-manager">
+  <div class="manager-header">
+    <h2>Tile Overlay Manager</h2>
+    <p class="manager-description">Upload and manage overlay images for disco ball tiles</p>
+  </div>
+
+  <div class="upload-section">
+    <div class="upload-zone" id="upload-zone">
+      <input
+        type="file"
+        id="overlay-file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        multiple
+        hidden
+      />
+      <label for="overlay-file" class="upload-label">
+        <div class="upload-icon">📁</div>
+        <p>Drop overlay images here or click to browse</p>
+        <p class="upload-hint">JPEG, PNG, WebP, AVIF • Max 5MB each</p>
+      </label>
+    </div>
+
+    <div class="upload-progress" id="upload-progress" hidden>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <p class="progress-text" id="progress-text">Processing...</p>
+    </div>
+  </div>
+
+  <div class="overlay-gallery" id="overlay-gallery">
+    <h3>Uploaded Overlays</h3>
+    <div class="gallery-grid" id="gallery-grid">
+      <!-- Dynamic overlay previews -->
+    </div>
+  </div>
+
+  <div class="disco-preview">
+    <h3>Disco Ball Preview</h3>
+    <div class="preview-disco-ball" id="preview-disco-ball">
+      <!-- Preview tiles with overlays -->
+    </div>
+  </div>
+</div>
+
+<script>
+  interface UploadedOverlay {
+    id: string;
+    originalName: string;
+    previewPath: string;
+    blendMode: string;
+    opacity: number;
+    active: boolean;
+  }
+
+  class OverlayManager {
+    private uploadZone: HTMLElement;
+    private fileInput: HTMLInputElement;
+    private progressSection: HTMLElement;
+    private progressFill: HTMLElement;
+    private progressText: HTMLElement;
+    private galleryGrid: HTMLElement;
+    private previewBall: HTMLElement;
+
+    constructor() {
+      this.initializeElements();
+      this.setupEventListeners();
+      this.loadExistingOverlays();
+    }
+
+    private initializeElements(): void {
+      this.uploadZone = document.getElementById('upload-zone')!;
+      this.fileInput = document.getElementById('overlay-file') as HTMLInputElement;
+      this.progressSection = document.getElementById('upload-progress')!;
+      this.progressFill = document.getElementById('progress-fill')!;
+      this.progressText = document.getElementById('progress-text')!;
+      this.galleryGrid = document.getElementById('gallery-grid')!;
+      this.previewBall = document.getElementById('preview-disco-ball')!;
+    }
+
+    private setupEventListeners(): void {
+      this.uploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+      this.uploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+      this.uploadZone.addEventListener('drop', this.handleDrop.bind(this));
+      this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+    }
+
+    private handleDragOver(e: DragEvent): void {
+      e.preventDefault();
+      this.uploadZone.classList.add('drag-over');
+    }
+
+    private handleDragLeave(): void {
+      this.uploadZone.classList.remove('drag-over');
+    }
+
+    private handleDrop(e: DragEvent): void {
+      e.preventDefault();
+      this.uploadZone.classList.remove('drag-over');
+      const files = e.dataTransfer?.files;
+      if (files) {
+        this.handleFiles(Array.from(files));
+      }
+    }
+
+    private handleFileSelect(): void {
+      const files = this.fileInput.files;
+      if (files) {
+        this.handleFiles(Array.from(files));
+      }
+    }
+
+    private async handleFiles(files: File[]): Promise<void> {
+      this.showProgress();
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.updateProgress((i / files.length) * 100, `Uploading ${file.name}...`);
+
+        try {
+          const overlay = await this.uploadFile(file);
+          this.addOverlayToGallery(overlay);
+        } catch (error) {
+          this.showError(`Failed to upload ${file.name}: ${error}`);
+        }
+      }
+
+      this.hideProgress();
+    }
+
+    private async uploadFile(file: File): Promise<UploadedOverlay> {
+      const formData = new FormData();
+      formData.append('overlay', file);
+
+      const response = await fetch('/api/admin/upload-overlay', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details ? error.details.join(', ') : error.error);
+      }
+
+      const result = await response.json();
+      return result.overlay;
+    }
+
+    private addOverlayToGallery(overlay: UploadedOverlay): void {
+      const overlayCard = document.createElement('div');
+      overlayCard.className = 'overlay-card';
+      overlayCard.dataset.overlayId = overlay.id;
+
+      overlayCard.innerHTML = `
+        <div class="overlay-preview">
+          <img src="${overlay.previewPath}" alt="${overlay.originalName}" loading="lazy" />
+          <div class="overlay-controls">
+            <button class="btn-toggle ${overlay.active ? 'active' : ''}" data-action="toggle">
+              ${overlay.active ? 'Active' : 'Inactive'}
+            </button>
+            <button class="btn-delete" data-action="delete">Delete</button>
+          </div>
+        </div>
+        <div class="overlay-info">
+          <p class="overlay-name">${overlay.originalName}</p>
+          <div class="overlay-settings">
+            <label>
+              Blend Mode:
+              <select data-setting="blendMode">
+                <option value="multiply" ${overlay.blendMode === 'multiply' ? 'selected' : ''}>Multiply</option>
+                <option value="overlay" ${overlay.blendMode === 'overlay' ? 'selected' : ''}>Overlay</option>
+                <option value="soft-light" ${overlay.blendMode === 'soft-light' ? 'selected' : ''}>Soft Light</option>
+                <option value="screen" ${overlay.blendMode === 'screen' ? 'selected' : ''}>Screen</option>
+              </select>
+            </label>
+            <label>
+              Opacity:
+              <input type="range" min="0" max="1" step="0.1" value="${overlay.opacity}" data-setting="opacity" />
+              <span class="opacity-value">${Math.round(overlay.opacity * 100)}%</span>
+            </label>
+          </div>
+        </div>
+      `;
+
+      this.setupOverlayCardListeners(overlayCard);
+      this.galleryGrid.appendChild(overlayCard);
+    }
+
+    private setupOverlayCardListeners(card: HTMLElement): void {
+      card.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const action = target.dataset.action;
+        const overlayId = card.dataset.overlayId!;
+
+        if (action === 'toggle') {
+          this.toggleOverlay(overlayId, target);
+        } else if (action === 'delete') {
+          this.deleteOverlay(overlayId, card);
+        }
+      });
+
+      card.addEventListener('change', (e) => {
+        const target = e.target as HTMLElement;
+        const setting = target.dataset.setting;
+        const overlayId = card.dataset.overlayId!;
+
+        if (setting) {
+          this.updateOverlaySetting(overlayId, setting, target);
+        }
+      });
+    }
+
+    private async toggleOverlay(overlayId: string, button: HTMLElement): Promise<void> {
+      try {
+        const response = await fetch(`/api/admin/overlay/${overlayId}/toggle`, {
+          method: 'POST'
+        });
+
+        if (response.ok) {
+          const isActive = button.classList.toggle('active');
+          button.textContent = isActive ? 'Active' : 'Inactive';
+          this.updatePreview();
+        }
+      } catch (error) {
+        this.showError('Failed to toggle overlay');
+      }
+    }
+
+    private async deleteOverlay(overlayId: string, card: HTMLElement): Promise<void> {
+      if (confirm('Delete this overlay?')) {
+        try {
+          const response = await fetch(`/api/admin/overlay/${overlayId}`, {
+            method: 'DELETE'
+          });
+
+          if (response.ok) {
+            card.remove();
+            this.updatePreview();
+          }
+        } catch (error) {
+          this.showError('Failed to delete overlay');
+        }
+      }
+    }
+
+    private async updateOverlaySetting(overlayId: string, setting: string, element: HTMLElement): Promise<void> {
+      const value = (element as HTMLInputElement).value;
+
+      try {
+        await fetch(`/api/admin/overlay/${overlayId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ [setting]: value })
+        });
+
+        if (setting === 'opacity') {
+          const valueSpan = element.parentElement?.querySelector('.opacity-value');
+          if (valueSpan) {
+            valueSpan.textContent = `${Math.round(parseFloat(value) * 100)}%`;
+          }
+        }
+
+        this.updatePreview();
+      } catch (error) {
+        this.showError(`Failed to update ${setting}`);
+      }
+    }
+
+    private showProgress(): void {
+      this.progressSection.hidden = false;
+    }
+
+    private hideProgress(): void {
+      this.progressSection.hidden = true;
+    }
+
+    private updateProgress(percent: number, text: string): void {
+      this.progressFill.style.width = `${percent}%`;
+      this.progressText.textContent = text;
+    }
+
+    private showError(message: string): void {
+      console.error('Overlay Manager Error:', message);
+      // TODO: Implement proper error notification system
+      alert(message);
+    }
+
+    private updatePreview(): void {
+      // TODO: Update disco ball preview with current overlays
+      console.log('Updating disco ball preview...');
+    }
+
+    private async loadExistingOverlays(): Promise<void> {
+      try {
+        const response = await fetch('/api/admin/overlays');
+        const overlays = await response.json();
+
+        overlays.forEach((overlay: UploadedOverlay) => {
+          this.addOverlayToGallery(overlay);
+        });
+      } catch (error) {
+        console.error('Failed to load existing overlays:', error);
+      }
+    }
+  }
+
+  new OverlayManager();
+</script>
+
+<style>
+  .overlay-manager {
+    background: var(--color-paper);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-phi-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .manager-header h2 {
+    color: var(--color-ink);
+    margin-bottom: var(--spacing-phi-sm);
+  }
+
+  .manager-description {
+    color: var(--color-muted);
+    margin-bottom: var(--spacing-phi-lg);
+  }
+
+  .upload-section {
+    margin-bottom: var(--spacing-phi-xl);
+  }
+
+  .upload-zone {
+    min-height: 200px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: var(--spacing-phi-md);
+  }
+
+  .upload-zone:hover,
+  .upload-zone.drag-over {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  }
+
+  .upload-label {
+    text-align: center;
+    cursor: pointer;
+    padding: var(--spacing-phi-lg);
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-phi-md);
+  }
+
+  .upload-hint {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    margin-top: var(--spacing-phi-sm);
+  }
+
+  .upload-progress {
+    background: var(--color-paper);
+    padding: var(--spacing-phi-md);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--color-muted);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-phi-sm);
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--color-accent);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .overlay-gallery h3 {
+    color: var(--color-ink);
+    margin-bottom: var(--spacing-phi-md);
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-phi-lg);
+    margin-bottom: var(--spacing-phi-xl);
+  }
+
+  .overlay-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-elevation-low);
+  }
+
+  .overlay-preview {
+    position: relative;
+  }
+
+  .overlay-preview img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .overlay-controls {
+    position: absolute;
+    top: var(--spacing-phi-sm);
+    right: var(--spacing-phi-sm);
+    display: flex;
+    gap: var(--spacing-phi-xs);
+  }
+
+  .overlay-controls button {
+    background: color-mix(in srgb, var(--color-ink) 80%, transparent);
+    color: var(--color-paper);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .btn-toggle.active {
+    background: var(--color-accent);
+  }
+
+  .btn-delete {
+    background: var(--color-pop-red);
+  }
+
+  .overlay-info {
+    padding: var(--spacing-phi-md);
+  }
+
+  .overlay-name {
+    font-weight: 600;
+    margin-bottom: var(--spacing-phi-sm);
+    color: var(--color-ink);
+  }
+
+  .overlay-settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-phi-sm);
+  }
+
+  .overlay-settings label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-phi-sm);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .overlay-settings select,
+  .overlay-settings input[type="range"] {
+    flex: 1;
+  }
+
+  .disco-preview h3 {
+    color: var(--color-ink);
+    margin-bottom: var(--spacing-phi-md);
+  }
+
+  .preview-disco-ball {
+    height: 300px;
+    background: linear-gradient(135deg, var(--color-pop-blue), var(--color-pop-pink));
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-paper);
+    font-style: italic;
+  }
+
+  .opacity-value {
+    min-width: 3ch;
+    text-align: right;
+  }
+</style>
