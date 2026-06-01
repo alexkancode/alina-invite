@@ -349,7 +349,7 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
                   line-height: 0.9;
                   margin-bottom: 34px;
                   opacity: 0;
-                  animation: reveal-up 0.8s ease-out 5s forwards;">
+                  animation: reveal-up 0.8s ease-out 4s forwards;">
         Let's celebrate Alina's first year of life!
       </div>
 
@@ -730,6 +730,51 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
           margin-bottom: 21px !important;
         }
 
+        /* RSVP guest list: horizontal layout on mobile */
+        :global(#rsvp-guests) {
+          gap: 8px !important;
+          justify-content: flex-start !important;
+          padding: 0 13px !important;
+          max-height: 140px !important;
+          overflow-y: auto !important;
+        }
+
+        /* RSVP guest entries: 25% width max, compact layout */
+        :global(#rsvp-guests > div) {
+          flex: 0 0 calc(25% - 6px) !important;
+          min-width: 0 !important;
+          max-width: calc(25% - 6px) !important;
+          padding: 8px 4px !important;
+          font-size: 12px !important;
+          line-height: 1.2 !important;
+        }
+
+        /* Adjust text sizes in RSVP entries with ellipsis overflow */
+        :global(#rsvp-guests .text-phi-sm) {
+          font-size: 11px !important;
+          max-width: 100% !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+
+        :global(#rsvp-guests .text-phi-xs) {
+          font-size: 10px !important;
+          max-width: 100% !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+
+        /* Song info ellipsis */
+        :global(#rsvp-guests span[style*="font-style: italic"]) {
+          max-width: 100% !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          display: block !important;
+        }
+
         /* Arc text: behind content, centered, pushed down, fades out after reveal */
         .arc-disco-unit, .arc-text-svg, .disco-ball-scene {
           display: none !important;
@@ -1078,7 +1123,7 @@ import MusicSearchWidget from '../components/MusicSearchWidget.astro'
               : '';
 
             return `
-            <div class="flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg" style="min-width: 80px; background: rgba(72, 61, 139, 0.06);">
+            <div class="flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg" style="background: rgba(72, 61, 139, 0.06);">
               <span class="font-medium text-phi-sm" style="color: #483D8B;">${r.name}</span>
               <span class="text-phi-xs" style="color: ${r.attending === 'yes' ? '#8B2FC9' : 'rgba(72, 61, 139, 0.4)'};">${r.attending === 'yes' ? 'Going ✓' : 'Not going'}</span>
               ${songInfo}
