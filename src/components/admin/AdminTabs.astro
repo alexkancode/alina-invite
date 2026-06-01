@@ -31,17 +31,24 @@ const { tabs, defaultTab = 'photos' } = Astro.props;
   </nav>
 
   <div class="tab-content">
-    {tabs.map((tab, index) => (
-      <div
-        class={`tab-panel ${tab.id === defaultTab ? 'active' : 'hidden'}`}
-        data-panel={tab.id}
-        role="tabpanel"
-        aria-labelledby={`tab-${index}`}
-        id={`panel-${index}`}
-      >
-        <slot name={tab.id} />
-      </div>
-    ))}
+    <div
+      class={`tab-panel ${defaultTab === 'photos' ? 'active' : 'hidden'}`}
+      data-panel="photos"
+      role="tabpanel"
+      aria-labelledby="tab-0"
+      id="panel-0"
+    >
+      <slot name="photos" />
+    </div>
+    <div
+      class={`tab-panel ${defaultTab === 'overlays' ? 'active' : 'hidden'}`}
+      data-panel="overlays"
+      role="tabpanel"
+      aria-labelledby="tab-1"
+      id="panel-1"
+    >
+      <slot name="overlays" />
+    </div>
   </div>
 </div>
 

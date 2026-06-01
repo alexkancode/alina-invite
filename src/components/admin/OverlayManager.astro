@@ -296,14 +296,30 @@
 
     private async loadExistingOverlays(): Promise<void> {
       try {
-        const response = await fetch('/api/admin/overlays');
-        const overlays = await response.json();
+        // Import the admin API client dynamically
+        const { adminApiClient } = await import('../../lib/admin/adminApiClient');
+        const overlays = await adminApiClient.fetchOverlays();
 
         overlays.forEach((overlay: UploadedOverlay) => {
           this.addOverlayToGallery(overlay);
         });
       } catch (error) {
         console.error('Failed to load existing overlays:', error);
+        this.showErrorState('Unable to load overlays. Please try refreshing the page.');
+      }
+    }
+
+    private showErrorState(message: string): void {
+      const gallery = this.container.querySelector('.overlay-gallery');
+      if (gallery) {
+        gallery.innerHTML = `
+          <div class="error-state" style="padding: var(--spacing-phi-lg); text-align: center; color: var(--color-error, #dc2626);">
+            <p>${message}</p>
+            <button onclick="location.reload()" style="margin-top: var(--spacing-phi-md); padding: var(--spacing-phi-sm) var(--spacing-phi-md); background: var(--color-accent); color: var(--color-paper); border: none; border-radius: var(--radius-lg); cursor: pointer;">
+              Retry
+            </button>
+          </div>
+        `;
       }
     }
   }

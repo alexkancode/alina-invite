@@ -227,24 +227,19 @@ const tabs = [
 
       private async updateStats(): Promise<void> {
         try {
-          const [photosResponse, overlaysResponse] = await Promise.all([
-            fetch('/api/admin/photos'),
-            fetch('/api/admin/overlays')
-          ]);
+          // Import the admin API client dynamically
+          const { adminApiClient } = await import('../../lib/admin/adminApiClient');
+          const stats = await adminApiClient.fetchDashboardStats();
 
-          if (photosResponse.ok) {
-            const photos = await photosResponse.json();
-            this.photoCount.textContent = photos.length.toString();
-          }
-
-          if (overlaysResponse.ok) {
-            const overlays = await overlaysResponse.json();
-            const activeOverlays = overlays.filter((overlay: any) => overlay.active);
-            this.overlayCount.textContent = overlays.length.toString();
-            this.activeEffects.textContent = activeOverlays.length.toString();
-          }
+          this.photoCount.textContent = stats.photoCount.toString();
+          this.overlayCount.textContent = stats.overlayCount.toString();
+          this.activeEffects.textContent = stats.activeEffects.toString();
         } catch (error) {
           console.error('Failed to load initial stats:', error);
+          // Set fallback values
+          this.photoCount.textContent = '0';
+          this.overlayCount.textContent = '0';
+          this.activeEffects.textContent = '0';
         }
       }
     }

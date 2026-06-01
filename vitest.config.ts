@@ -22,7 +22,9 @@ export default defineConfig({
       'tests/unit/overlay/**/*.test.ts',
       'tests/integration/tile-overlay-system.test.ts',
       // Admin integration tests
-      'tests/unit/admin/**/*.test.ts'
+      'tests/unit/admin/**/*.test.ts',
+      'tests/integration/admin-api-response-errors.test.ts',
+      'tests/integration/admin-components-fixed.test.ts'
     ],
     // Set timeout for image processing tests
     testTimeout: 10000,
