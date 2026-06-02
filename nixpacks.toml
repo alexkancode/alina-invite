@@ -1,0 +1,12 @@
+[providers]
+static = "caddy"
+
+[variables]
+BUILD_CMD = "npm run build"
+START_CMD = "caddy run --config Caddyfile --adapter caddyfile"
+
+[build]
+cmd = "$BUILD_CMD"
+
+[start]
+cmd = "$START_CMD"

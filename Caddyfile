@@ -1,0 +1,16 @@
+:{$PORT} {
+	root * ./dist
+
+	# Serve /alina paths from public/alina directory
+	handle_path /alina/* {
+		root * ./public/alina
+		file_server
+		header Content-Type image/jpeg
+	}
+
+	# Default static file serving for Astro build output
+	file_server
+
+	# Fallback for SPA routing
+	try_files {path} /index.html
+}
