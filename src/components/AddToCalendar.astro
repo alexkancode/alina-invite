@@ -1,0 +1,158 @@
+---
+import { getDefaultPartyDetails } from '../lib/calendarGenerator.ts';
+
+export interface Props {
+  guestName?: string;
+  rsvpId?: string;
+  buttonText?: string;
+  className?: string;
+}
+
+const {
+  guestName,
+  rsvpId,
+  buttonText = 'Add to Calendar',
+  className = ''
+} = Astro.props;
+
+const partyDetails = getDefaultPartyDetails();
+
+const eventData = {
+  title: partyDetails.title,
+  description: partyDetails.description,
+  startTime: partyDetails.startDate,
+  endTime: partyDetails.endDate,
+  location: partyDetails.location,
+  guestName
+};
+
+const uniqueId = `calendar-btn-${Math.random().toString(36).slice(2)}`;
+const statusId = `calendar-status-${Math.random().toString(36).slice(2)}`;
+---
+
+<div class={`add-to-calendar-widget ${className}`}>
+  <button
+    id={uniqueId}
+    class="calendar-button"
+    type="button"
+  >
+    {buttonText}
+  </button>
+
+  <div
+    id={statusId}
+    class="calendar-status hidden"
+    aria-live="polite"
+    role="status"
+  ></div>
+</div>
+
+<script define:vars={{ eventData, uniqueId, statusId }}>
+  import { initializeCalendarButton } from '../lib/calendarButtonHandler.ts';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeCalendarButton(eventData, `#${uniqueId}`, `#${statusId}`);
+  });
+</script>
+
+<style>
+.add-to-calendar-widget {
+  display: inline-block;
+  position: relative;
+}
+
+.calendar-button {
+  cursor: pointer;
+  border: none;
+  padding: 12px 24px;
+  background-color: #4285f4;
+  color: white;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+  min-width: 160px;
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.calendar-button:hover {
+  background-color: #3367d6;
+}
+
+.calendar-button:active {
+  background-color: #2c5aa0;
+}
+
+.calendar-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #9aa0a6;
+}
+
+.calendar-button:focus {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
+
+.calendar-status {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 20px;
+}
+
+.calendar-status.success {
+  background-color: #e8f5e8;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+
+.calendar-status.error {
+  background-color: #ffeaa7;
+  border: 1px solid #fdcb6e;
+  color: #2d3436;
+}
+
+.calendar-status.hidden {
+  display: none;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+  .calendar-button {
+    transform: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-button {
+    font-size: 14px;
+    padding: 10px 20px;
+    min-width: 140px;
+    min-height: 44px;
+  }
+
+  .add-to-calendar-widget {
+    width: 100%;
+  }
+
+  .calendar-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-button {
+    transition: none;
+  }
+}
+</style>
