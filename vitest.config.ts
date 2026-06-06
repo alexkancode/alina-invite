@@ -29,7 +29,12 @@ export default defineConfig({
       // ESLint integration tests
       'tests/integration/eslint-integration.test.js',
       // ESLint plugin framework tests
-      'eslint-plugin-error-prevention/tests/**/*.test.js'
+      'eslint-plugin-error-prevention/tests/**/*.test.js',
+      // Advanced testing patterns
+      'tests/canary/**/*.canary.ts',
+      'tests/contracts/**/*.contract.ts',
+      'tests/property/**/*.test.ts',
+      'tests/integration/**/*.test.ts'
     ],
     // Set timeout for image processing tests
     testTimeout: 10000,
