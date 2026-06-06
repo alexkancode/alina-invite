@@ -304,4 +304,293 @@ describe('MusicSearchService', () => {
 
   });
 
+  // NEW: Spotify Integration Tests
+  describe('MusicSearchService - Spotify Integration', () => {
+    beforeEach(() => {
+      // Set up environment variables for testing
+      process.env.SPOTIFY_CLIENT_ID = 'test-client-id';
+      process.env.SPOTIFY_CLIENT_SECRET = 'test-client-secret';
+    });
+
+    afterEach(() => {
+      delete process.env.SPOTIFY_CLIENT_ID;
+      delete process.env.SPOTIFY_CLIENT_SECRET;
+    });
+
+    describe('search70sSongs with Spotify', () => {
+      it('should include Spotify results when includeSpotify is true', async () => {
+        // Mock Spotify auth first (since spotifyPrimary is true)
+        vi.mocked(fetch)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+              access_token: 'test-token',
+              expires_in: 3600
+            })
+          } as Response)
+          // Mock Spotify search
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+              tracks: {
+                items: [{
+                  id: 'spotify-123',
+                  name: 'Dancing Queen',
+                  artists: [{ name: 'ABBA' }],
+                  album: {
+                    name: 'Arrival',
+                    release_date: '1976-10-11',
+                    images: [{ url: 'http://example.com/image.jpg' }]
+                  },
+                  preview_url: 'http://example.com/preview.mp3',
+                  popularity: 85,
+                  explicit: false
+                }]
+              }
+            })
+          } as Response);
+
+        const results = await musicService.search70sSongs('dancing', {
+          includeSpotify: true,
+          spotifyPrimary: true,
+          includeFallback: false
+        });
+
+        expect(results.success).toBe(true);
+        expect(results.songs).toHaveLength(1);
+        expect(results.songs[0].source).toBe('spotify');
+        expect(results.songs[0]).toMatchObject({
+          title: 'Dancing Queen',
+          artist: 'ABBA',
+          year: 1976,
+          spotifyId: 'spotify-123',
+          previewUrl: 'http://example.com/preview.mp3'
+        });
+        expect(results.sourcesUsed).toContain('spotify');
+        expect(results.searchStrategy).toBe('spotify-primary');
+      });
+
+      it('should use Spotify as primary when spotifyPrimary is true', async () => {
+        // Mock Spotify auth and search
+        vi.mocked(fetch)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({ access_token: 'token', expires_in: 3600 })
+          } as Response)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+              tracks: {
+                items: [{
+                  id: 'spotify-track',
+                  name: 'Test Song',
+                  artists: [{ name: 'Test Artist' }],
+                  album: { name: 'Test Album', release_date: '1975-01-01', images: [] },
+                  preview_url: null,
+                  popularity: 70,
+                  explicit: false
+                }]
+              }
+            })
+          } as Response);
+
+        const results = await musicService.search70sSongs('test', {
+          includeSpotify: true,
+          spotifyPrimary: true
+        });
+
+        expect(results.searchStrategy).toBe('spotify-primary');
+        expect(results.sourcesUsed).toContain('spotify');
+      });
+
+      it('should fall back to MusicBrainz when Spotify fails', async () => {
+        // Mock Spotify failure then MusicBrainz success
+        vi.mocked(fetch)
+          .mockRejectedValueOnce(new Error('Spotify auth failed'))
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+              recordings: [{
+                id: 'mb-123',
+                title: 'Fallback Song',
+                'artist-credit': [{ artist: { name: 'Fallback Artist' } }],
+                'first-release-date': '1975-01-01'
+              }]
+            })
+          } as Response);
+
+        const results = await musicService.search70sSongs('test', {
+          includeSpotify: true,
+          spotifyPrimary: true,
+          includeFallback: false
+        });
+
+        expect(results.success).toBe(true);
+        expect(results.songs[0].source).toBe('musicbrainz');
+        expect(results.sourcesUsed).toContain('musicbrainz');
+      });
+
+      it('should merge results from multiple sources', async () => {
+        // Mock MusicBrainz success
+        vi.mocked(fetch).mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({
+            recordings: [{
+              id: 'mb-123',
+              title: 'MB Song',
+              'artist-credit': [{ artist: { name: 'MB Artist' } }],
+              'first-release-date': '1975-01-01'
+            }]
+          })
+        } as Response);
+
+        // Mock Spotify auth and search
+        vi.mocked(fetch)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({ access_token: 'token', expires_in: 3600 })
+          } as Response)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+              tracks: {
+                items: [{
+                  id: 'spotify-123',
+                  name: 'Spotify Song',
+                  artists: [{ name: 'Spotify Artist' }],
+                  album: { name: 'Album', release_date: '1976-01-01', images: [] },
+                  preview_url: null,
+                  popularity: 60,
+                  explicit: false
+                }]
+              }
+            })
+          } as Response);
+
+        const results = await musicService.search70sSongs('test', {
+          includeSpotify: true,
+          spotifyPrimary: false // Use mixed strategy
+        });
+
+        expect(results.success).toBe(true);
+        expect(results.songs.length).toBeGreaterThanOrEqual(1);
+        expect(results.source).toBe('mixed');
+        expect(results.sourcesUsed).toContain('musicbrainz');
+        expect(results.sourcesUsed).toContain('spotify');
+      });
+
+      it('should preserve enhanced metadata from Spotify', async () => {
+        // Mock Spotify with rich metadata
+        vi.mocked(fetch)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({ access_token: 'token', expires_in: 3600 })
+          } as Response)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+              tracks: {
+                items: [{
+                  id: 'rich-track',
+                  name: 'Rich Metadata Song',
+                  artists: [{ name: 'Rich Artist' }],
+                  album: {
+                    name: 'Rich Album',
+                    release_date: '1977-01-01',
+                    images: [{ url: 'http://example.com/high-quality.jpg' }]
+                  },
+                  preview_url: 'http://example.com/preview.mp3',
+                  popularity: 95,
+                  explicit: true
+                }]
+              }
+            })
+          } as Response);
+
+        const results = await musicService.search70sSongs('test', {
+          includeSpotify: true,
+          spotifyPrimary: true,
+          includeEnhancedMetadata: true
+        });
+
+        expect(results.songs[0]).toMatchObject({
+          spotifyId: 'rich-track',
+          previewUrl: 'http://example.com/preview.mp3',
+          popularity: 95,
+          albumArtUrl: 'http://example.com/high-quality.jpg',
+          explicit: true
+        });
+      });
+    });
+
+    describe('Spotify error handling', () => {
+      it('should gracefully handle missing Spotify credentials', async () => {
+        delete process.env.SPOTIFY_CLIENT_ID;
+        delete process.env.SPOTIFY_CLIENT_SECRET;
+
+        // Should still work with MusicBrainz
+        vi.mocked(fetch).mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({
+            recordings: [{
+              id: 'mb-fallback',
+              title: 'Fallback Song',
+              'artist-credit': [{ artist: { name: 'Fallback Artist' } }],
+              'first-release-date': '1975-01-01'
+            }]
+          })
+        } as Response);
+
+        const results = await musicService.search70sSongs('test', {
+          includeSpotify: true
+        });
+
+        expect(results.success).toBe(true);
+        expect(results.songs[0].source).toBe('musicbrainz');
+        expect(results.sourcesUsed).not.toContain('spotify');
+      });
+
+      it('should continue with MusicBrainz when Spotify fails', async () => {
+        // Mock Spotify failure
+        vi.mocked(fetch)
+          .mockRejectedValueOnce(new Error('Spotify API error'))
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+              recordings: [{
+                id: 'mb-backup',
+                title: 'Backup Song',
+                'artist-credit': [{ artist: { name: 'Backup Artist' } }],
+                'first-release-date': '1975-01-01'
+              }]
+            })
+          } as Response);
+
+        const results = await musicService.search70sSongs('test', {
+          includeSpotify: true,
+          spotifyPrimary: true
+        });
+
+        expect(results.success).toBe(true);
+        expect(results.songs[0].source).toBe('musicbrainz');
+      });
+
+      it('should not crash on Spotify API errors', async () => {
+        // Mock complete failure of both APIs
+        vi.mocked(fetch).mockRejectedValue(new Error('Complete API failure'));
+
+        const results = await musicService.search70sSongs('bohemian', {
+          includeSpotify: true,
+          spotifyPrimary: true,
+          includeFallback: true
+        });
+
+        // Should fall back to curated songs
+        expect(results.success).toBe(true);
+        expect(results.source).toBe('fallback');
+        expect(results.songs.some(song => song.source === 'curated')).toBe(true);
+      });
+    });
+  });
+
 });

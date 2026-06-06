@@ -3,34 +3,53 @@
  *
  * Features:
  * - MusicBrainz API integration for comprehensive 70's music database
+ * - Spotify Web API integration for enhanced metadata
  * - Rate limiting to respect API limits (1 request/second)
  * - Intelligent caching to reduce API calls
  * - Progressive enhancement with curated fallback
  * - YouTube preview URL generation
  */
 
+import { SpotifyClient } from './spotify/client.js';
+
 export interface Song {
   id: string;
   title: string;
   artist: string;
   year?: number;
-  source: 'musicbrainz' | 'curated';
+  source: 'musicbrainz' | 'curated' | 'spotify';  // ENHANCED: Add spotify source
   youtubeSearchUrl?: string;
   musicbrainzId?: string;
+
+  // ENHANCED: New Spotify-enhanced fields (optional for backwards compatibility)
+  spotifyId?: string;
+  previewUrl?: string | null;
+  popularity?: number;
+  albumArtUrl?: string | null;
+  explicit?: boolean;
 }
 
 export interface SearchResult {
   success: boolean;
   songs: Song[];
   error?: string;
-  source: 'api' | 'cache' | 'fallback';
+  source: 'api' | 'cache' | 'fallback' | 'spotify' | 'mixed';  // ENHANCED: Add spotify/mixed sources
   totalFound?: number;
+
+  // ENHANCED: New metadata for enhanced results
+  sourcesUsed?: Array<'musicbrainz' | 'spotify' | 'curated'>;
+  searchStrategy?: 'spotify-primary' | 'musicbrainz-primary' | 'fallback-only';
 }
 
 export interface SearchOptions {
   includeFallback?: boolean;
   maxResults?: number;
   cacheTimeout?: number;
+
+  // ENHANCED: New Spotify-specific options
+  includeSpotify?: boolean;
+  spotifyPrimary?: boolean;
+  includeEnhancedMetadata?: boolean;
 }
 
 interface CacheEntry {
@@ -58,57 +77,80 @@ export class MusicSearchService {
   private readonly CACHE_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
   private readonly DEFAULT_MAX_RESULTS = 15;
 
+  // ENHANCED: Add Spotify client (lazy initialization)
+  private spotifyClient: SpotifyClient | null = null;
+
+  private getSpotifyClient(): SpotifyClient {
+    if (!this.spotifyClient) {
+      // Lazy initialization to pick up environment variables set in tests
+      this.spotifyClient = new SpotifyClient(
+        process.env.SPOTIFY_CLIENT_ID,
+        process.env.SPOTIFY_CLIENT_SECRET
+      );
+    }
+    return this.spotifyClient;
+  }
+
   /**
-   * Search for 70's songs using MusicBrainz API with fallback to curated list
+   * ENHANCED: Search for 70's songs using MusicBrainz API and/or Spotify with fallback to curated list
    */
   async search70sSongs(query: string, options: SearchOptions = {}): Promise<SearchResult> {
     const {
       includeFallback = false,
       maxResults = this.DEFAULT_MAX_RESULTS,
-      cacheTimeout = this.CACHE_TIMEOUT_MS
+      cacheTimeout = this.CACHE_TIMEOUT_MS,
+      includeSpotify = false,       // NEW: Disable Spotify by default for backwards compatibility
+      spotifyPrimary = false,       // NEW: Use Spotify as primary source
+      includeEnhancedMetadata = true // NEW: Include rich metadata
     } = options;
 
-    // Check cache first
-    const cacheKey = `${query}_${maxResults}`;
+    // Check cache first (include options in cache key)
+    const cacheKey = `${query}_${maxResults}_${includeSpotify}_${spotifyPrimary}`;
     const cached = this.getFromCache(cacheKey, cacheTimeout);
     if (cached) {
       return { ...cached, source: 'cache' };
     }
 
     try {
-      // Rate limiting for MusicBrainz API
-      await this.waitForRateLimit();
+      let result: SearchResult;
 
-      // Search MusicBrainz API
-      const apiResult = await this.searchMusicBrainzAPI(query, maxResults);
+      if (spotifyPrimary && includeSpotify) {
+        // Spotify-first strategy
+        result = await this.searchSpotifyFirst(query, maxResults, options);
+      } else if (includeSpotify) {
+        // Mixed strategy (MusicBrainz + Spotify)
+        result = await this.searchMixed(query, maxResults, options);
+      } else {
+        // Original MusicBrainz-only strategy
+        result = await this.searchMusicBrainzOnly(query, maxResults, options);
+      }
 
       // Cache successful results
-      this.setCache(cacheKey, apiResult);
+      if (result.success) {
+        this.setCache(cacheKey, result);
+      }
 
-      return apiResult;
+      return result;
 
     } catch (error) {
-      console.warn('MusicBrainz API search failed:', error);
+      console.warn('Music search failed:', error);
 
       if (includeFallback) {
-        // Fallback to curated songs
-        const fallbackSongs = this.searchCuratedSongs(query)
-          .slice(0, maxResults);
-
-        const fallbackResult: SearchResult = {
+        const fallbackSongs = this.searchCuratedSongs(query).slice(0, maxResults);
+        return {
           success: true,
           songs: fallbackSongs,
           source: 'fallback',
-          totalFound: fallbackSongs.length
+          totalFound: fallbackSongs.length,
+          sourcesUsed: ['curated'],
+          searchStrategy: 'fallback-only'
         };
-
-        return fallbackResult;
       }
 
       return {
         success: false,
         songs: [],
-        error: 'Failed to search MusicBrainz API',
+        error: 'All search methods failed',
         source: 'api'
       };
     }
@@ -146,6 +188,198 @@ export class MusicSearchService {
       source: 'api',
       totalFound: data.recordings.length
     };
+  }
+
+  // NEW: Spotify-first search strategy
+  private async searchSpotifyFirst(query: string, maxResults: number, options: SearchOptions): Promise<SearchResult> {
+    const sourcesUsed: Array<'musicbrainz' | 'spotify' | 'curated'> = [];
+    let allSongs: Song[] = [];
+
+    try {
+      // Try Spotify first
+      const spotifyResults = await this.searchSpotifyAPI(query, maxResults);
+      if (spotifyResults.length > 0) {
+        allSongs = spotifyResults;
+        sourcesUsed.push('spotify');
+
+        // If we have enough results from Spotify, return them
+        if (allSongs.length >= maxResults) {
+          return {
+            success: true,
+            songs: allSongs.slice(0, maxResults),
+            source: 'spotify',
+            totalFound: allSongs.length,
+            sourcesUsed,
+            searchStrategy: 'spotify-primary'
+          };
+        }
+      }
+    } catch (error) {
+      console.warn('Spotify search failed, falling back to MusicBrainz:', error);
+    }
+
+    // Fill in with MusicBrainz if needed
+    try {
+      const remaining = maxResults - allSongs.length;
+      if (remaining > 0) {
+        await this.waitForRateLimit();
+        const mbResult = await this.searchMusicBrainzAPI(query, remaining);
+        if (mbResult.success && mbResult.songs.length > 0) {
+          allSongs = [...allSongs, ...mbResult.songs];
+          sourcesUsed.push('musicbrainz');
+        }
+      }
+    } catch (error) {
+      console.warn('MusicBrainz search also failed:', error);
+    }
+
+    // Fallback to curated if still not enough
+    let isFallback = false;
+    if (allSongs.length === 0 && options.includeFallback) {
+      const curatedSongs = this.searchCuratedSongs(query).slice(0, maxResults);
+      allSongs = curatedSongs;
+      sourcesUsed.push('curated');
+      isFallback = true;
+    }
+
+    // Determine source type
+    let sourceType: string;
+    if (isFallback) {
+      sourceType = 'fallback';
+    } else if (sourcesUsed.length > 1) {
+      sourceType = 'mixed';
+    } else {
+      sourceType = sourcesUsed[0] || 'api';
+    }
+
+    return {
+      success: allSongs.length > 0,
+      songs: allSongs.slice(0, maxResults),
+      source: sourceType as any,
+      totalFound: allSongs.length,
+      sourcesUsed,
+      searchStrategy: 'spotify-primary'
+    };
+  }
+
+  // NEW: Mixed search strategy (MusicBrainz + Spotify)
+  private async searchMixed(query: string, maxResults: number, options: SearchOptions): Promise<SearchResult> {
+    const sourcesUsed: Array<'musicbrainz' | 'spotify' | 'curated'> = [];
+    let allSongs: Song[] = [];
+
+    // Start with MusicBrainz (original behavior)
+    try {
+      await this.waitForRateLimit();
+      const mbResult = await this.searchMusicBrainzAPI(query, Math.ceil(maxResults / 2));
+      if (mbResult.success) {
+        allSongs = mbResult.songs;
+        sourcesUsed.push('musicbrainz');
+      }
+    } catch (error) {
+      console.warn('MusicBrainz search failed:', error);
+    }
+
+    // Enhance with Spotify results
+    try {
+      const remaining = maxResults - allSongs.length;
+      const spotifyResults = await this.searchSpotifyAPI(query, Math.max(remaining, Math.ceil(maxResults / 2)));
+
+      // Add Spotify results that aren't duplicates
+      const uniqueSpotifyResults = spotifyResults.filter(spotifyTrack =>
+        !allSongs.some(existingTrack =>
+          this.areTracksEquivalent(existingTrack, spotifyTrack)
+        )
+      );
+
+      if (uniqueSpotifyResults.length > 0) {
+        allSongs = [...allSongs, ...uniqueSpotifyResults];
+        sourcesUsed.push('spotify');
+      }
+    } catch (error) {
+      console.warn('Spotify enhancement failed:', error);
+    }
+
+    // Final fallback if needed
+    let isFallback = false;
+    if (allSongs.length === 0 && options.includeFallback) {
+      const curatedSongs = this.searchCuratedSongs(query).slice(0, maxResults);
+      allSongs = curatedSongs;
+      sourcesUsed.push('curated');
+      isFallback = true;
+    }
+
+    // Determine source type
+    let sourceType: string;
+    if (isFallback) {
+      sourceType = 'fallback';
+    } else if (sourcesUsed.length > 1) {
+      sourceType = 'mixed';
+    } else {
+      sourceType = sourcesUsed[0] || 'api';
+    }
+
+    return {
+      success: allSongs.length > 0,
+      songs: allSongs.slice(0, maxResults),
+      source: sourceType as any,
+      totalFound: allSongs.length,
+      sourcesUsed,
+      searchStrategy: 'musicbrainz-primary'
+    };
+  }
+
+  // NEW: Original MusicBrainz-only search (for backwards compatibility)
+  private async searchMusicBrainzOnly(query: string, maxResults: number, options: SearchOptions): Promise<SearchResult> {
+    try {
+      await this.waitForRateLimit();
+      const result = await this.searchMusicBrainzAPI(query, maxResults);
+      return {
+        ...result,
+        sourcesUsed: ['musicbrainz'],
+        searchStrategy: 'musicbrainz-primary'
+      };
+    } catch (error) {
+      if (options.includeFallback) {
+        const fallbackSongs = this.searchCuratedSongs(query).slice(0, maxResults);
+        return {
+          success: true,
+          songs: fallbackSongs,
+          source: 'fallback',
+          totalFound: fallbackSongs.length,
+          sourcesUsed: ['curated'],
+          searchStrategy: 'fallback-only'
+        };
+      }
+
+      return {
+        success: false,
+        songs: [],
+        error: 'Failed to search MusicBrainz API', // Keep original error message for backwards compatibility
+        source: 'api'
+      };
+    }
+  }
+
+  // NEW: Search Spotify API for 70's music
+  private async searchSpotifyAPI(query: string, maxResults: number): Promise<Song[]> {
+    // Add 70's decade filter to query
+    const decade70sQuery = `${query} year:1970-1979`;
+    const allResults = await this.getSpotifyClient().searchTracks(decade70sQuery, maxResults * 2);
+
+    // Additional filtering to ensure 70's only
+    const filtered70s = allResults.filter(track =>
+      track.year && track.year >= 1970 && track.year <= 1979
+    );
+
+    return filtered70s.slice(0, maxResults);
+  }
+
+  // NEW: Check if two tracks are equivalent (for deduplication)
+  private areTracksEquivalent(track1: Song, track2: Song): boolean {
+    const normalize = (str: string) => str.toLowerCase().trim().replace(/[^\w\s]/g, '');
+
+    return normalize(track1.title) === normalize(track2.title) &&
+           normalize(track1.artist) === normalize(track2.artist);
   }
 
   /**
