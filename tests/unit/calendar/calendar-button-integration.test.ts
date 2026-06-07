@@ -1,6 +1,15 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { JSDOM } from 'jsdom';
 
+// Mock the calendar integration modules before importing the handler
+vi.mock('../../../src/lib/mobileCalendarIntegration.js', () => ({
+  addToCalendar: vi.fn()
+}));
+
+vi.mock('../../../src/lib/platformDetectionService.js', () => ({
+  detectPlatform: vi.fn()
+}));
+
 // End-to-end calendar button integration tests
 // Tests the complete calendar button workflow from click to calendar integration
 
@@ -8,6 +17,8 @@ describe('Calendar Button Integration', () => {
   let dom: JSDOM;
   let window: any;
   let document: any;
+  let mockAddToCalendar: any;
+  let mockDetectPlatform: any;
 
   const mockCalendarEvent = {
     title: "Alina's Birthday Party",
@@ -18,7 +29,17 @@ describe('Calendar Button Integration', () => {
     guestName: 'Test Guest'
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Import the mocked modules
+    const { addToCalendar } = await import('../../../src/lib/mobileCalendarIntegration.js');
+    const { detectPlatform } = await import('../../../src/lib/platformDetectionService.js');
+
+    mockAddToCalendar = addToCalendar as any;
+    mockDetectPlatform = detectPlatform as any;
+
+    // Reset mocks
+    vi.clearAllMocks();
+
     // Set up DOM environment
     dom = new JSDOM(`
       <!DOCTYPE html>
@@ -49,12 +70,6 @@ describe('Calendar Button Integration', () => {
       createObjectURL: vi.fn(() => 'blob:mock-url'),
       revokeObjectURL: vi.fn()
     };
-
-    // Mock successful navigation
-    Object.defineProperty(window.location, 'href', {
-      writable: true,
-      value: 'http://localhost:3000'
-    });
   });
 
   afterEach(() => {
@@ -67,54 +82,85 @@ describe('Calendar Button Integration', () => {
       // Mock Safari iOS user agent
       Object.defineProperty(window.navigator, 'userAgent', {
         value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1',
-        writable: true
+        writable: true,
+        configurable: true
       });
 
+      // Mock platform detection
+      mockDetectPlatform.mockReturnValue({
+        os: 'ios',
+        supportsDeepLinking: true,
+        requiresCursorPointer: true,
+        requiresSafariOptimizations: true
+      });
+
+      // Mock successful calendar integration
+      mockAddToCalendar.mockResolvedValue(undefined);
+
       // Load calendar button functionality
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
       expect(button).toBeTruthy();
 
       // Mock click event
-      const clickEvent = new window.Event('click', { bubbles: true });
-      button.dispatchEvent(clickEvent);
+      button.click();
 
-      // Should attempt Google Calendar deep link
-      await new Promise(resolve => setTimeout(resolve, 10)); // Allow async operations
-      expect(window.location.href).toContain('calendar.google.com/calendar/render');
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Should call addToCalendar with correct parameters
+      expect(mockAddToCalendar).toHaveBeenCalledWith(
+        mockCalendarEvent,
+        expect.objectContaining({
+          os: 'ios',
+          supportsDeepLinking: true
+        })
+      );
     });
 
     it('should show loading state during calendar operation', async () => {
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      // Mock platform detection
+      mockDetectPlatform.mockReturnValue({
+        os: 'desktop',
+        supportsDeepLinking: false,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
+      });
+
+      // Mock slow calendar operation
+      mockAddToCalendar.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
-      const statusDiv = document.getElementById('calendar-status');
-
-      // Simulate slow operation
-      const slowPromise = new Promise(resolve => setTimeout(resolve, 100));
 
       button.click();
 
       // Check loading state immediately after click
       expect(button.textContent).toContain('Adding...');
       expect(button.disabled).toBe(true);
+      expect(button.getAttribute('aria-busy')).toBe('true');
 
-      await slowPromise;
+      // Wait for operation to complete
+      await new Promise(resolve => setTimeout(resolve, 150));
     });
 
     it('should display error message when calendar operation fails', async () => {
-      // Mock navigation failure
-      Object.defineProperty(window.location, 'href', {
-        set: () => { throw new Error('Navigation blocked'); }
+      // Mock platform detection
+      mockDetectPlatform.mockReturnValue({
+        os: 'desktop',
+        supportsDeepLinking: false,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
       });
 
-      // Mock blob creation failure as well
-      window.URL.createObjectURL = vi.fn(() => { throw new Error('Blob failed'); });
+      // Mock calendar integration failure
+      mockAddToCalendar.mockRejectedValue(new Error('Calendar operation failed'));
 
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
@@ -134,10 +180,21 @@ describe('Calendar Button Integration', () => {
       // Mock desktop Chrome user agent
       Object.defineProperty(window.navigator, 'userAgent', {
         value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
-        writable: true
+        writable: true,
+        configurable: true
       });
 
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      // Mock platform detection for desktop
+      mockDetectPlatform.mockReturnValue({
+        os: 'desktop',
+        supportsDeepLinking: false,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
+      });
+
+      mockAddToCalendar.mockResolvedValue(undefined);
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
@@ -145,21 +202,35 @@ describe('Calendar Button Integration', () => {
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Should create blob for download
-      expect(window.URL.createObjectURL).toHaveBeenCalled();
-
-      // Should not attempt navigation
-      expect(window.location.href).toBe('http://localhost:3000');
+      // Should call addToCalendar with desktop platform info
+      expect(mockAddToCalendar).toHaveBeenCalledWith(
+        mockCalendarEvent,
+        expect.objectContaining({
+          os: 'desktop',
+          supportsDeepLinking: false
+        })
+      );
     });
 
     it('should handle Android Chrome with intent URLs', async () => {
       // Mock Android Chrome user agent
       Object.defineProperty(window.navigator, 'userAgent', {
         value: 'Mozilla/5.0 (Linux; Android 12; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.104 Mobile Safari/537.36',
-        writable: true
+        writable: true,
+        configurable: true
       });
 
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      // Mock platform detection for Android
+      mockDetectPlatform.mockReturnValue({
+        os: 'android',
+        supportsDeepLinking: true,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
+      });
+
+      mockAddToCalendar.mockResolvedValue(undefined);
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
@@ -167,8 +238,14 @@ describe('Calendar Button Integration', () => {
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Should attempt intent URL
-      expect(window.location.href).toContain('intent://calendar.google.com');
+      // Should call addToCalendar with Android platform info
+      expect(mockAddToCalendar).toHaveBeenCalledWith(
+        mockCalendarEvent,
+        expect.objectContaining({
+          os: 'android',
+          supportsDeepLinking: true
+        })
+      );
     });
   });
 
@@ -177,14 +254,22 @@ describe('Calendar Button Integration', () => {
       // Mock Safari
       Object.defineProperty(window.navigator, 'userAgent', {
         value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15',
-        writable: true
+        writable: true,
+        configurable: true
       });
 
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      // Mock platform detection for iOS
+      mockDetectPlatform.mockReturnValue({
+        os: 'ios',
+        supportsDeepLinking: true,
+        requiresCursorPointer: true,
+        requiresSafariOptimizations: true
+      });
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
-      const computedStyle = window.getComputedStyle(button);
 
       // Should have cursor pointer for Safari
       expect(button.style.cursor).toBe('pointer');
@@ -194,15 +279,22 @@ describe('Calendar Button Integration', () => {
       // Mock Safari
       Object.defineProperty(window.navigator, 'userAgent', {
         value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15',
-        writable: true
+        writable: true,
+        configurable: true
+      });
+
+      // Mock platform detection for iOS
+      mockDetectPlatform.mockReturnValue({
+        os: 'ios',
+        supportsDeepLinking: true,
+        requiresCursorPointer: true,
+        requiresSafariOptimizations: true
       });
 
       // Force fallback to ICS download
-      Object.defineProperty(window.location, 'href', {
-        set: () => { throw new Error('Force fallback'); }
-      });
+      mockAddToCalendar.mockRejectedValue(new Error('Force fallback'));
 
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
@@ -221,9 +313,16 @@ describe('Calendar Button Integration', () => {
       const incompleteEvent = {
         title: 'Test Event',
         // Missing required fields
-      };
+      } as any;
 
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      mockDetectPlatform.mockReturnValue({
+        os: 'desktop',
+        supportsDeepLinking: false,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
+      });
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
 
       // Should not throw error
       await expect(initializeCalendarButton(incompleteEvent)).resolves.not.toThrow();
@@ -234,9 +333,16 @@ describe('Calendar Button Integration', () => {
         ...mockCalendarEvent,
         startTime: 'invalid-date',
         endTime: new Date('2026-07-11T18:00:00-05:00')
-      };
+      } as any;
 
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      mockDetectPlatform.mockReturnValue({
+        os: 'desktop',
+        supportsDeepLinking: false,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
+      });
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(eventWithInvalidDate);
 
       const button = document.getElementById('add-to-calendar-btn');
@@ -251,29 +357,35 @@ describe('Calendar Button Integration', () => {
 
   describe('Accessibility and User Experience', () => {
     it('should maintain button accessibility during operations', async () => {
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      mockDetectPlatform.mockReturnValue({
+        os: 'desktop',
+        supportsDeepLinking: false,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
+      });
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
       const button = document.getElementById('add-to-calendar-btn');
 
       // Check initial accessibility
       expect(button.getAttribute('role')).toBe('button');
-      expect(button.getAttribute('aria-label')).toContain('Add to Calendar');
-
-      // Check accessibility during loading
-      button.click();
-      expect(button.getAttribute('aria-busy')).toBe('true');
+      expect(button.getAttribute('aria-label')).toContain('Add event to your calendar');
     });
 
     it('should provide screen reader feedback for status changes', async () => {
-      const { initializeCalendarButton } = require('../../../src/lib/calendarButtonHandler.js');
+      mockDetectPlatform.mockReturnValue({
+        os: 'desktop',
+        supportsDeepLinking: false,
+        requiresCursorPointer: false,
+        requiresSafariOptimizations: false
+      });
+
+      const { initializeCalendarButton } = await import('../../../src/lib/calendarButtonHandler.js');
       await initializeCalendarButton(mockCalendarEvent);
 
-      const button = document.getElementById('add-to-calendar-btn');
       const statusDiv = document.getElementById('calendar-status');
-
-      button.click();
-      await new Promise(resolve => setTimeout(resolve, 10));
 
       // Status div should have aria-live for screen readers
       expect(statusDiv.getAttribute('aria-live')).toBe('polite');

@@ -1,29 +1,35 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import { AdminTabsController } from '../../../src/lib/admin/AdminTabsController';
 
 describe('AdminTabs UI Component', () => {
-  let mockDocument: Document;
   let mockContainer: HTMLElement;
+  let tabsController: AdminTabsController;
 
   beforeEach(() => {
     // Create mock DOM elements for testing
     mockContainer = document.createElement('div');
+    mockContainer.className = 'admin-tabs';
     mockContainer.innerHTML = `
-      <div class="admin-tabs">
-        <nav class="tab-nav">
-          <button class="tab-button active" data-tab="photos">Photo Gallery</button>
-          <button class="tab-button" data-tab="overlays">Overlay Effects</button>
-        </nav>
-        <div class="tab-content">
-          <div class="tab-panel active" data-panel="photos">Photo content</div>
-          <div class="tab-panel hidden" data-panel="overlays">Overlay content</div>
-        </div>
+      <nav class="tab-nav" role="tablist">
+        <button class="tab-button active" data-tab="photos" role="tab" aria-controls="panel-0" id="tab-0" tabindex="0">Photo Gallery</button>
+        <button class="tab-button" data-tab="overlays" role="tab" aria-controls="panel-1" id="tab-1" tabindex="-1">Overlay Effects</button>
+      </nav>
+      <div class="tab-content">
+        <div class="tab-panel active" data-panel="photos" role="tabpanel" aria-labelledby="tab-0" id="panel-0">Photo content</div>
+        <div class="tab-panel hidden" data-panel="overlays" role="tabpanel" aria-labelledby="tab-1" id="panel-1">Overlay content</div>
       </div>
     `;
 
     document.body.appendChild(mockContainer);
+
+    // Initialize the controller with the mock container
+    tabsController = new AdminTabsController({ container: mockContainer });
   });
 
   afterEach(() => {
+    if (tabsController) {
+      tabsController.destroy();
+    }
     document.body.removeChild(mockContainer);
   });
 
@@ -71,7 +77,7 @@ describe('AdminTabs UI Component', () => {
 
       photoButton.focus();
 
-      const arrowRightEvent = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+      const arrowRightEvent = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true });
       photoButton.dispatchEvent(arrowRightEvent);
 
       expect(document.activeElement).toBe(overlayButton);
@@ -82,7 +88,7 @@ describe('AdminTabs UI Component', () => {
 
       overlayButton.focus();
 
-      const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+      const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
       overlayButton.dispatchEvent(enterEvent);
 
       expect(overlayButton.classList.contains('active')).toBe(true);
