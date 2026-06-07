@@ -10,6 +10,7 @@
  * - YouTube preview URL generation
  */
 
+import 'dotenv/config';
 import { SpotifyClient } from './spotify/client.js';
 
 export interface Song {
@@ -82,6 +83,12 @@ export class MusicSearchService {
 
   private getSpotifyClient(): SpotifyClient {
     if (!this.spotifyClient) {
+      // Debug: Log environment variable status
+      console.log('Environment check:', {
+        SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID ? 'Set' : 'Not set',
+        SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET ? 'Set' : 'Not set'
+      });
+
       // Lazy initialization to pick up environment variables set in tests
       this.spotifyClient = new SpotifyClient(
         process.env.SPOTIFY_CLIENT_ID,

@@ -9,10 +9,17 @@
  * - Progressive enhancement (graceful degradation)
  * - Mobile-optimized interface
  * - YouTube preview links
+ * - Feature flag controlled visibility
  */
 
 import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs';
+import { isFeatureEnabled } from '../lib/feature-flags/astro-helper';
+
+// Check if music search feature is enabled
+const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 ---
+
+{isMusicSearchEnabled ? (
 
 <div class="music-search-widget">
   <!-- Progressive Enhancement: Keep original select as fallback -->
@@ -1539,3 +1546,4 @@ import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs';
     new MusicSearch();
   });
 </script>
+) : null}

@@ -1,7 +1,22 @@
 import type { NextApiRequest, NextApiResponse } from 'astro';
 import { musicSearchService, type SearchResult } from '../../lib/musicSearchService.js';
+import { FeatureFlagService } from '../../lib/feature-flags/service.js';
 
 export async function GET(request: Request): Promise<Response> {
+  // Check if music search feature is enabled
+  const featureFlagService = FeatureFlagService.getInstance();
+  const isMusicSearchEnabled = await featureFlagService.isEnabled('musicSearch');
+
+  if (!isMusicSearchEnabled) {
+    return new Response(JSON.stringify({
+      error: 'Music search feature is disabled',
+      code: 'FEATURE_DISABLED'
+    }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const url = new URL(request.url);
   const query = url.searchParams.get('q');
   const includeSpotify = url.searchParams.get('includeSpotify') !== 'false';
