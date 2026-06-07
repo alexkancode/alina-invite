@@ -1541,9 +1541,13 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
     (window as any).SpotifyPreview = new SpotifyPreview();
   }
 
-  // Initialize when DOM is ready
+  // Initialize when DOM is ready - only if feature is enabled
   document.addEventListener('DOMContentLoaded', () => {
-    new MusicSearch();
+    const musicSearchWidget = document.querySelector('.music-search-widget');
+    if (musicSearchWidget) {
+      new MusicSearch();
+    }
   });
 </script>
+
 ) : null}
