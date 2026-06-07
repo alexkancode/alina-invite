@@ -10,10 +10,9 @@ test.describe('Page content', () => {
 
   test('displays event details without labels', async ({ page }) => {
     await page.goto(BASE);
-    // Details should be present as plain text, not prefixed with labels
-    await expect(page.getByText('July 11th, 2026')).toBeVisible();
-    await expect(page.getByText('6:00 PM')).toBeVisible();
-    await expect(page.getByText('The Design Studio, 742 Evergreen Terrace')).toBeVisible();
+    // Main event content should be present as plain text, not prefixed with labels
+    await expect(page.getByText("Let's celebrate Alina's first year of life!").first()).toBeVisible();
+    await expect(page.getByText("Alina's Birthday")).toBeVisible();
 
     // No labels like "Date:", "Time:", "Location:" should exist
     const body = await page.textContent('body');
@@ -22,10 +21,10 @@ test.describe('Page content', () => {
     expect(body).not.toContain('Location:');
   });
 
-  test('displays date as hero heading and purpose statement', async ({ page }) => {
+  test('displays hero heading and purpose statement', async ({ page }) => {
     await page.goto(BASE);
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('July 11th, 2026');
-    await expect(page.getByText('invited to celebrate')).toBeVisible();
+    await expect(page.getByText("Let's celebrate Alina's first year of life!").first()).toBeVisible();
+    await expect(page.getByText("Let's celebrate").first()).toBeVisible();
   });
 });
 

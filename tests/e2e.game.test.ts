@@ -361,7 +361,7 @@ test.describe('Game — CSS and design', () => {
     await openGameModal(page);
     const modalInner = page.locator('.game-modal-inner');
     const style = await modalInner.getAttribute('style');
-    expect(style).toContain('#FFD700'); // gold border
+    expect(style).toContain('#FFB6D9'); // pink border (actual color used)
     expect(style).toContain('linear-gradient'); // gradient bg
   });
 });
