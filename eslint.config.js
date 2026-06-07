@@ -65,7 +65,8 @@ export default [
         checkNodeVersion: true,
         checkModuleResolution: true,
         checkPathMapping: true
-      }]
+      }],
+      'error-prevention/database-config-consistency': 'error'
     }
   },
   {

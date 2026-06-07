@@ -2,13 +2,15 @@ import noTsImportExtensions from './rules/no-ts-import-extensions.js';
 import consistentImportPatterns from './rules/consistent-import-patterns.js';
 import noSqlConcatenation from './rules/no-sql-concatenation.js';
 import validateTsconfigConsistency from './rules/validate-tsconfig-consistency.js';
+import databaseConfigConsistency from './rules/simplified/database-config-consistency.js';
 
 export default {
   rules: {
     'no-ts-import-extensions': noTsImportExtensions,
     'consistent-import-patterns': consistentImportPatterns,
     'no-sql-concatenation': noSqlConcatenation,
-    'validate-tsconfig-consistency': validateTsconfigConsistency
+    'validate-tsconfig-consistency': validateTsconfigConsistency,
+    'database-config-consistency': databaseConfigConsistency
   },
   configs: {
     recommended: {
