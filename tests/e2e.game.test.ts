@@ -1,28 +1,39 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 const BASE = 'http://localhost:4321';
+
+// Helper function to open game modal reliably
+async function openGameModal(page: Page) {
+  const discoBallClick = page.locator('#disco-ball-click');
+  await discoBallClick.scrollIntoViewIfNeeded();
+  await discoBallClick.click();
+  await expect(page.locator('#game-modal')).toBeVisible();
+}
 
 test.describe('Game modal — opening and closing', () => {
   test('disco ball click opens game modal', async ({ page }) => {
     await page.goto(BASE);
     const modal = page.locator('#game-modal');
     await expect(modal).toBeHidden();
-    await page.click('#disco-ball-click', { force: true });
-    await expect(modal).toBeVisible();
+
+    // Use helper to open modal
+    await openGameModal(page);
   });
 
   test('close button closes game modal', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
-    await expect(page.locator('#game-modal')).toBeVisible();
-    await page.click('#game-close', { force: true });
+    await openGameModal(page);
+
+    // Close modal
+    await page.click('#game-close');
     await expect(page.locator('#game-modal')).toBeHidden();
   });
 
   test('clicking backdrop closes game modal', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
-    await expect(page.locator('#game-modal')).toBeVisible();
+    await openGameModal(page);
+
+    // Click backdrop to close
     await page.locator('#game-modal').click({ position: { x: 10, y: 10 } });
     await expect(page.locator('#game-modal')).toBeHidden();
   });
@@ -31,7 +42,7 @@ test.describe('Game modal — opening and closing', () => {
 test.describe('Game board — initial state', () => {
   test('game board renders 16 tiles for medium difficulty', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const tiles = page.locator('.game-tile');
     await expect(tiles.first()).toBeVisible();
     expect(await tiles.count()).toBe(16);
@@ -39,14 +50,14 @@ test.describe('Game board — initial state', () => {
 
   test('all tiles start face-down (not flipped)', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const flipped = page.locator('.game-tile.flipped');
     expect(await flipped.count()).toBe(0);
   });
 
   test('HUD shows initial state', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     await expect(page.locator('#game-moves')).toHaveText('Moves: 0');
     await expect(page.locator('#game-timer')).toHaveText('0:00');
     await expect(page.locator('#game-score-display')).toHaveText('Score: —');
@@ -54,13 +65,13 @@ test.describe('Game board — initial state', () => {
 
   test('game over panel is hidden initially', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     await expect(page.locator('#game-over')).toBeHidden();
   });
 
   test('medium difficulty button is active by default', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const medBtn = page.locator('.game-diff-btn[data-diff="medium"]');
     const borderColor = await medBtn.evaluate(el => el.style.borderColor);
     expect(borderColor).toContain('ffd700');
@@ -70,7 +81,7 @@ test.describe('Game board — initial state', () => {
 test.describe('Game board — difficulty switching', () => {
   test('easy mode renders 12 tiles (3 columns)', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     await page.click('.game-diff-btn[data-diff="easy"]');
     const tiles = page.locator('.game-tile');
     expect(await tiles.count()).toBe(12);
@@ -78,7 +89,7 @@ test.describe('Game board — difficulty switching', () => {
 
   test('hard mode renders 24 tiles', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     await page.click('.game-diff-btn[data-diff="hard"]');
     const tiles = page.locator('.game-tile');
     expect(await tiles.count()).toBe(24);
@@ -86,7 +97,7 @@ test.describe('Game board — difficulty switching', () => {
 
   test('switching difficulty resets HUD', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
 
     // Flip a tile to start timer / increment state
     await page.locator('.game-tile').first().click();
@@ -100,7 +111,7 @@ test.describe('Game board — difficulty switching', () => {
 
   test('switching difficulty highlights the selected button', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     await page.click('.game-diff-btn[data-diff="hard"]');
 
     const hardBtn = page.locator('.game-diff-btn[data-diff="hard"]');
@@ -117,7 +128,7 @@ test.describe('Game board — difficulty switching', () => {
 test.describe('Game — tile interactions', () => {
   test('clicking a tile flips it', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const firstTile = page.locator('.game-tile').first();
     await firstTile.click();
     await expect(firstTile).toHaveClass(/flipped/);
@@ -125,7 +136,7 @@ test.describe('Game — tile interactions', () => {
 
   test('clicking the same tile twice does not unflip it', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const firstTile = page.locator('.game-tile').first();
     await firstTile.click();
     await firstTile.click();
@@ -134,7 +145,7 @@ test.describe('Game — tile interactions', () => {
 
   test('clicking two non-matching tiles flips them back', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
 
     // Find two tiles with different emojis
     const tiles = page.locator('.game-tile');
@@ -156,7 +167,7 @@ test.describe('Game — tile interactions', () => {
 
   test('move counter increments on second tile click', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
 
     const tiles = page.locator('.game-tile');
     await tiles.nth(0).click();
@@ -168,7 +179,7 @@ test.describe('Game — tile interactions', () => {
 
   test('timer starts on first tile click', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     await expect(page.locator('#game-timer')).toHaveText('0:00');
 
     await page.locator('.game-tile').first().click();
@@ -182,7 +193,7 @@ test.describe('Game — tile interactions', () => {
 test.describe('Game — complete game flow', () => {
   test('matching all pairs shows game over panel with score', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
 
     // Use easy mode (6 pairs = 12 tiles) for a faster test
     await page.click('.game-diff-btn[data-diff="easy"]');
@@ -257,7 +268,7 @@ test.describe('Game — complete game flow', () => {
 
   test('play again button resets the board', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
 
     // Flip a couple tiles
     const tiles = page.locator('.game-tile');
@@ -278,7 +289,7 @@ test.describe('Game — name input for leaderboard', () => {
     await page.goto(BASE);
     // Clear any RSVP data
     await page.evaluate(() => localStorage.removeItem('rsvp'));
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
 
     // We need to complete a game to see the name input
     // For this test, just verify the input element exists in the DOM
@@ -288,14 +299,14 @@ test.describe('Game — name input for leaderboard', () => {
 
   test('name input has max length of 30', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const maxLength = await page.locator('#game-player-name').getAttribute('maxlength');
     expect(maxLength).toBe('30');
   });
 
   test('submit button exists in game over panel', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const submitBtn = page.locator('#game-submit-score');
     await expect(submitBtn).toBeAttached();
     await expect(submitBtn).toHaveText('Submit Score');
@@ -305,14 +316,14 @@ test.describe('Game — name input for leaderboard', () => {
 test.describe('Game — leaderboard display', () => {
   test('leaderboard section is present in modal', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     await expect(page.locator('#game-leaderboard')).toBeVisible();
     await expect(page.getByText('Leaderboard')).toBeVisible();
   });
 
   test('leaderboard loads content on modal open', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     // Wait for fetch to complete
     await page.waitForTimeout(1000);
     const listContent = await page.locator('#game-leaderboard-list').textContent();
@@ -324,7 +335,7 @@ test.describe('Game — leaderboard display', () => {
 test.describe('Game — CSS and design', () => {
   test('game tiles have 3D flip animation CSS', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const inner = page.locator('.game-tile-inner').first();
     const transformStyle = await inner.evaluate(el => getComputedStyle(el).transformStyle);
     expect(transformStyle).toBe('preserve-3d');
@@ -332,7 +343,7 @@ test.describe('Game — CSS and design', () => {
 
   test('tile backs have backface-visibility hidden', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const front = page.locator('.game-tile-front').first();
     const bfv = await front.evaluate(el => getComputedStyle(el).backfaceVisibility);
     expect(bfv).toBe('hidden');
@@ -340,14 +351,14 @@ test.describe('Game — CSS and design', () => {
 
   test('game board uses CSS grid layout', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const display = await page.locator('#game-board').evaluate(el => getComputedStyle(el).display);
     expect(display).toBe('grid');
   });
 
   test('game modal has disco-themed styling', async ({ page }) => {
     await page.goto(BASE);
-    await page.click('#disco-ball-click', { force: true });
+    await openGameModal(page);
     const modalInner = page.locator('.game-modal-inner');
     const style = await modalInner.getAttribute('style');
     expect(style).toContain('#FFD700'); // gold border
