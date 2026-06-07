@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'astro';
 import { musicSearchService, type SearchResult } from '../../lib/musicSearchService.js';
-import { FeatureFlagService } from '../../lib/feature-flags/service.js';
+import { createProductionService } from '../../lib/feature-flags/factory.js';
 
 export async function GET(request: Request): Promise<Response> {
   // Check if music search feature is enabled
-  const featureFlagService = FeatureFlagService.getInstance();
+  const featureFlagService = createProductionService();
   const isMusicSearchEnabled = await featureFlagService.isEnabled('musicSearch');
 
   if (!isMusicSearchEnabled) {

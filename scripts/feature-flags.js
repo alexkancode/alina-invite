@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { promises as fs } from 'fs';
-import path from 'path';
 
 // Valid feature flags (must match TypeScript interface)
 const VALID_FLAGS = ['musicSearch'];
