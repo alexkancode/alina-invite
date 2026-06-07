@@ -1,7 +1,8 @@
-import { getApprovedPhotos } from './photoDatabase.js';
 import { readdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import type { IPhotoDatabaseAdapter } from './photo-database/interfaces/IPhotoDatabaseAdapter.js';
+import { ProductionPhotoDatabaseAdapter } from './photo-database/adapters/ProductionPhotoDatabaseAdapter.js';
 
 export type GameType = 'disco-ball' | 'minigame';
 export type SelectionStrategy = 'balanced' | 'prefer-user' | 'original-only' | 'random';
@@ -26,8 +27,10 @@ export interface PhotoSet {
 
 export class PhotoSelectionManager {
   private originalPhotos: { disco: string[]; minigame: string[] };
+  private photoDatabaseAdapter: IPhotoDatabaseAdapter;
 
-  constructor() {
+  constructor(photoDatabaseAdapter?: IPhotoDatabaseAdapter) {
+    this.photoDatabaseAdapter = photoDatabaseAdapter || new ProductionPhotoDatabaseAdapter();
     // Original Alina photos from the existing codebase
     this.originalPhotos = {
       disco: [
@@ -188,10 +191,10 @@ export class PhotoSelectionManager {
   }
 
   /**
-   * Get approved user photos from database (stub for dependency injection)
+   * Get approved user photos from database via injected adapter
    */
   async getApprovedUserPhotos() {
-    return await getApprovedPhotos();
+    return await this.photoDatabaseAdapter.getApprovedPhotos();
   }
 
   /**
