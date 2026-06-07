@@ -1,23 +1,39 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { PhotoSelectionManager, SelectionStrategy, PhotoSet } from '../src/lib/photoSelectionManager.js';
-import { PhotoTestContext, createPhotoTestContext } from './helpers/databaseTransaction.js';
+import { MockPhotoDatabaseAdapter } from '../src/lib/photo-database/adapters/MockPhotoDatabaseAdapter.js';
+import type { PhotoRecord } from '../src/lib/photo-database/interfaces/IPhotoDatabaseAdapter.js';
 
 // Tests for intelligent photo selection for games
-// Uses database transaction rollback for perfect test isolation
+// Uses mock database adapter for perfect test isolation
 describe('Photo Selection Manager', () => {
   let photoManager: PhotoSelectionManager;
-  let dbContext: PhotoTestContext;
+  let mockAdapter: MockPhotoDatabaseAdapter;
 
   beforeEach(async () => {
-    photoManager = new PhotoSelectionManager();
-    // Create isolated database transaction for this test
-    dbContext = await createPhotoTestContext();
+    mockAdapter = new MockPhotoDatabaseAdapter();
+    photoManager = new PhotoSelectionManager(mockAdapter);
   });
 
   afterEach(async () => {
-    // Automatically rollback all database changes
-    await dbContext.cleanup();
+    // Clean up mock data
+    mockAdapter.removeAllPhotos();
+    mockAdapter.resetCallCounts();
   });
+
+  function createTestPhoto(isApproved: boolean = true): PhotoRecord {
+    const id = `test-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const photo: PhotoRecord = {
+      id,
+      upload_date: new Date(),
+      is_approved: isApproved,
+      is_hidden: false,
+      original_filename: `test-${id}.jpeg`,
+      file_size: 1000,
+      upload_ip: '192.168.1.1'
+    };
+    mockAdapter.addTestPhoto(photo);
+    return photo;
+  }
 
   describe('Basic Selection', () => {
     it('should return original photos when no user photos exist', async () => {
@@ -37,9 +53,9 @@ describe('Photo Selection Manager', () => {
 
     it('should mix user and original photos when both exist', async () => {
       // Create some approved user photos
-      await dbContext.createTestPhoto(true);
-      await dbContext.createTestPhoto(true);
-      await dbContext.createTestPhoto(true);
+      createTestPhoto(true);
+      createTestPhoto(true);
+      createTestPhoto(true);
 
       const selection = await photoManager.selectPhotosForGame(8, 'disco-ball');
 
@@ -59,7 +75,7 @@ describe('Photo Selection Manager', () => {
     it('should prioritize user photos when available', async () => {
       // Create many user photos (more than needed)
       for (let i = 0; i < 12; i++) {
-        await dbContext.createTestPhoto(true);
+        createTestPhoto(true);
       }
 
       const selection = await photoManager.selectPhotosForGame(8, 'disco-ball', 'prefer-user');
@@ -73,9 +89,9 @@ describe('Photo Selection Manager', () => {
 
     it('should exclude pending photos from selection', async () => {
       // Create approved and pending photos
-      await dbContext.createTestPhoto(true);  // Approved
-      await dbContext.createTestPhoto(false); // Pending
-      await dbContext.createTestPhoto(true);  // Approved
+      createTestPhoto(true);  // Approved
+      createTestPhoto(false); // Pending
+      createTestPhoto(true);  // Approved
 
       const selection = await photoManager.selectPhotosForGame(10, 'disco-ball');
 
@@ -92,7 +108,7 @@ describe('Photo Selection Manager', () => {
     it('should randomize selection between calls', async () => {
       // Create enough photos for variation
       for (let i = 0; i < 5; i++) {
-        await dbContext.createTestPhoto(true);
+        createTestPhoto(true);
       }
 
       const selection1 = await photoManager.selectPhotosForGame(8, 'disco-ball');
@@ -111,7 +127,7 @@ describe('Photo Selection Manager', () => {
     it('should handle balanced strategy correctly', async () => {
       // Create equal numbers of user and original photos available
       for (let i = 0; i < 5; i++) {
-        await dbContext.createTestPhoto(true);
+        createTestPhoto(true);
       }
 
       const selection = await photoManager.selectPhotosForGame(10, 'disco-ball', 'balanced');
@@ -131,8 +147,8 @@ describe('Photo Selection Manager', () => {
 
     it('should handle original-only strategy', async () => {
       // Create user photos but request original-only
-      await dbContext.createTestPhoto(true);
-      await dbContext.createTestPhoto(true);
+      createTestPhoto(true);
+      createTestPhoto(true);
 
       const selection = await photoManager.selectPhotosForGame(8, 'disco-ball', 'original-only');
 
@@ -147,7 +163,7 @@ describe('Photo Selection Manager', () => {
 
   describe('Game Type Specific Selection', () => {
     it('should provide disco ball sized photos for disco ball', async () => {
-      await dbContext.createTestPhoto(true);
+      createTestPhoto(true);
 
       const selection = await photoManager.selectPhotosForGame(8, 'disco-ball');
 
@@ -161,7 +177,7 @@ describe('Photo Selection Manager', () => {
     });
 
     it('should provide minigame sized photos for tile game', async () => {
-      await dbContext.createTestPhoto(true);
+      createTestPhoto(true);
 
       const selection = await photoManager.selectPhotosForGame(8, 'minigame');
 
@@ -232,7 +248,7 @@ describe('Photo Selection Manager', () => {
     it('should select photos within reasonable time', async () => {
       // Create many photos to test performance
       for (let i = 0; i < 50; i++) {
-        await dbContext.createTestPhoto(true);
+        createTestPhoto(true);
       }
 
       const startTime = Date.now();
@@ -246,7 +262,7 @@ describe('Photo Selection Manager', () => {
     it('should handle concurrent selection requests', async () => {
       // Create photos for concurrent testing
       for (let i = 0; i < 10; i++) {
-        await dbContext.createTestPhoto(true);
+        createTestPhoto(true);
       }
 
       // Make multiple concurrent requests
