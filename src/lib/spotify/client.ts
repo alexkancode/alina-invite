@@ -75,28 +75,81 @@ export class SpotifyClient {
   }
 
   private async refreshToken(): Promise<string> {
-    const credentials = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
+    // Enhanced logging for production debugging
+    console.log('🔍 [SPOTIFY_DEBUG] Starting token refresh...');
+    console.log('🔍 [SPOTIFY_DEBUG] Client ID present:', !!this.clientId);
+    console.log('🔍 [SPOTIFY_DEBUG] Client Secret present:', !!this.clientSecret);
+    console.log('🔍 [SPOTIFY_DEBUG] Client ID length:', this.clientId ? this.clientId.length : 0);
+    console.log('🔍 [SPOTIFY_DEBUG] Client Secret length:', this.clientSecret ? this.clientSecret.length : 0);
 
-    const response = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'grant_type=client_credentials',
-    });
-
-    if (!response.ok) {
-      throw new SpotifyError('Authentication failed', 'AUTH_FAILED', false);
+    if (this.clientId) {
+      console.log('🔍 [SPOTIFY_DEBUG] Client ID prefix:', this.clientId.substring(0, 8) + '...');
     }
 
-    const tokens = await response.json();
-    this.tokenCache = {
-      token: tokens.access_token,
-      expires: new Date(Date.now() + (tokens.expires_in - 60) * 1000), // 1 min buffer
-    };
+    const credentials = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
+    console.log('🔍 [SPOTIFY_DEBUG] Credentials encoded length:', credentials.length);
 
-    return tokens.access_token;
+    const requestBody = 'grant_type=client_credentials';
+    const requestUrl = 'https://accounts.spotify.com/api/token';
+
+    console.log('🔍 [SPOTIFY_DEBUG] Request URL:', requestUrl);
+    console.log('🔍 [SPOTIFY_DEBUG] Request body:', requestBody);
+
+    try {
+      const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${credentials}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: requestBody,
+      });
+
+      console.log('🔍 [SPOTIFY_DEBUG] Response status:', response.status);
+      console.log('🔍 [SPOTIFY_DEBUG] Response ok:', response.ok);
+      console.log('🔍 [SPOTIFY_DEBUG] Response headers:', {
+        contentType: response.headers.get('content-type'),
+        cacheControl: response.headers.get('cache-control')
+      });
+
+      if (!response.ok) {
+        let errorBody: string;
+        try {
+          errorBody = await response.text();
+          console.log('🔍 [SPOTIFY_DEBUG] Error response body:', errorBody);
+        } catch (e) {
+          errorBody = 'Could not read error response';
+          console.log('🔍 [SPOTIFY_DEBUG] Could not read error response');
+        }
+
+        throw new SpotifyError(`Authentication failed: ${response.status} - ${errorBody}`, 'AUTH_FAILED', false);
+      }
+
+      const tokens = await response.json();
+      console.log('🔍 [SPOTIFY_DEBUG] Token response received:', {
+        hasAccessToken: !!tokens.access_token,
+        tokenType: tokens.token_type,
+        expiresIn: tokens.expires_in,
+        tokenLength: tokens.access_token ? tokens.access_token.length : 0
+      });
+
+      if (!tokens.access_token) {
+        console.log('❌ [SPOTIFY_DEBUG] No access token in response!');
+        throw new SpotifyError('No access token in response', 'INVALID_TOKEN_RESPONSE', false);
+      }
+
+      this.tokenCache = {
+        token: tokens.access_token,
+        expires: new Date(Date.now() + (tokens.expires_in - 60) * 1000), // 1 min buffer
+      };
+
+      console.log('✅ [SPOTIFY_DEBUG] Token refresh successful, expires at:', this.tokenCache.expires.toISOString());
+      return tokens.access_token;
+
+    } catch (error) {
+      console.log('❌ [SPOTIFY_DEBUG] Token refresh failed:', error);
+      throw error;
+    }
   }
 
   private async makeSearchRequest(query: string, token: string, limit: number): Promise<Response> {

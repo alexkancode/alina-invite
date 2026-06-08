@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { EnhancedSpotifyClient as SpotifyClient, type Song } from './spotify/enhanced-client.js';
+import { SpotifyClient, type Song } from './spotify/client.js';
 
 export interface SearchResult {
   success: boolean;

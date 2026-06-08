@@ -1,18 +1,18 @@
 {
-  "timestamp": "2026-06-08T14:34:08-05:00",
+  "timestamp": "2026-06-08T14:48:29-05:00",
   "tests": [
     {
       "query": "dancing queen",
       "maxResults": 1,
       "responseTime": "",
-      "response": {"success":true,"songs":[],"source":"spotify","totalFound":0,"cached":true},
+      "response": {"success":true,"songs":[],"source":"spotify","totalFound":0,"cached":false},
       "songCount": 0
     },
     {
       "query": "queen",
       "maxResults": 3,
       "responseTime": "",
-      "response": {"success":true,"songs":[],"source":"spotify","totalFound":0,"cached":true},
+      "response": {"success":true,"songs":[],"source":"spotify","totalFound":0,"cached":false},
       "songCount": 0
     }
   ]
