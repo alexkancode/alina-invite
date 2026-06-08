@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'astro';
-import { musicSearchService, type SearchResult } from '../../lib/musicSearchService.js';
+import { spotifyMusicService, type SearchResult } from '../../lib/spotifyMusicService.js';
 import { createProductionService } from '../../lib/feature-flags/factory.js';
 
 export async function GET(request: Request): Promise<Response> {
@@ -19,8 +19,6 @@ export async function GET(request: Request): Promise<Response> {
 
   const url = new URL(request.url);
   const query = url.searchParams.get('q');
-  const includeSpotify = url.searchParams.get('includeSpotify') !== 'false';
-  const spotifyPrimary = url.searchParams.get('spotifyPrimary') === 'true';
   const maxResults = parseInt(url.searchParams.get('maxResults') || '15');
 
   if (!query || query.trim() === '') {
@@ -31,12 +29,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    const result = await musicSearchService.search70sSongs(query.trim(), {
-      includeFallback: true,
-      includeSpotify,
-      spotifyPrimary,
-      maxResults
-    });
+    const result = await spotifyMusicService.searchMusic(query.trim(), maxResults);
 
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -49,7 +42,7 @@ export async function GET(request: Request): Promise<Response> {
       success: false,
       songs: [],
       error: 'Search service temporarily unavailable',
-      source: 'api'
+      source: 'error'
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
