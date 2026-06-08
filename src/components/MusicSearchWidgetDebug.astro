@@ -1,0 +1,278 @@
+---
+/**
+ * Debug version of Dynamic Spotify Combobox Widget
+ * Includes production debugging to identify deployment issues
+ */
+
+import { isFeatureEnabled } from '../lib/feature-flags/astro-helper';
+
+// Fallback songs for progressive enhancement
+const SEVENTIES_SONGS = [
+  { title: "Bohemian Rhapsody", artist: "Queen", year: 1975 },
+  { title: "Dancing Queen", artist: "ABBA", year: 1976 },
+  { title: "Stayin' Alive", artist: "Bee Gees", year: 1977 },
+  { title: "Hotel California", artist: "Eagles", year: 1976 }
+];
+
+const formatSongDisplay = (song: any) => `${song.title} - ${song.artist}${song.year ? ` (${song.year})` : ''}`;
+
+// Check if music search feature is enabled
+const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
+---
+
+<!-- Debug info (only visible with debug=true URL param) -->
+<div id="spotify-debug-info" style="display: none; background: #000; color: #0f0; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
+  <div>🔧 Spotify Debug Info:</div>
+  <div id="debug-feature-flag">Feature flag 'musicSearch': {isMusicSearchEnabled ? 'ENABLED' : 'DISABLED'}</div>
+  <div id="debug-component-render">Component rendering: {isMusicSearchEnabled ? 'DYNAMIC' : 'BASIC'}</div>
+  <div id="debug-env-vars">Environment check: <span id="debug-env-status">pending...</span></div>
+  <div id="debug-js-status">JavaScript enhancement: <span id="debug-js-result">pending...</span></div>
+  <div id="debug-dom-state">DOM state: <span id="debug-dom-result">pending...</span></div>
+</div>
+
+{isMusicSearchEnabled ? (
+  <div class="spotify-combobox-container" data-testid="spotify-combobox" data-debug="enabled">
+    <label for="spotify-search" class="block text-phi-sm font-medium text-warm-cream mb-2">
+      Your favorite 70's song (optional)
+    </label>
+
+    <!-- Progressive Enhancement: Static fallback (hidden when JS loads) -->
+    <select
+      name="favoriteSong"
+      id="favoriteSongSelect"
+      class="spotify-fallback-select w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+             focus:outline-none transition-colors"
+      style="background: rgba(255,255,255,0.06);
+             border: 2px solid hsl(270, 30%, 40%);"
+      onfocus="this.style.borderColor='#FFB6D9'"
+      onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+      data-debug-element="fallback-select"
+    >
+      <option value="">Select a groovy tune...</option>
+      {SEVENTIES_SONGS.map(song => (
+        <option value={JSON.stringify({
+          title: song.title,
+          artist: song.artist,
+          year: song.year
+        })}>
+          {formatSongDisplay(song)}
+        </option>
+      ))}
+    </select>
+
+    <!-- Enhanced Combobox (shown when JS loads) -->
+    <div class="spotify-dynamic-container" style="display: none;" data-debug-element="dynamic-container">
+      <div class="relative">
+        <input
+          type="text"
+          id="spotify-search"
+          role="combobox"
+          aria-controls="spotify-results"
+          aria-expanded="false"
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
+          placeholder="Search for songs, artists, albums..."
+          class="spotify-search-input w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+                 placeholder-metallic-silver/50 focus:outline-none transition-colors"
+          style="background: rgba(255,255,255,0.06);
+                 border: 2px solid hsl(270, 30%, 40%);"
+          onfocus="this.style.borderColor='#FFB6D9'"
+          onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+          data-debug-element="search-input"
+        />
+
+        <div
+          id="spotify-results"
+          role="listbox"
+          aria-label="Search results"
+          class="spotify-results-dropdown absolute top-full left-0 right-0 z-50 mt-1
+                 bg-white/95 backdrop-blur-sm border border-purple-200 rounded-lg
+                 shadow-lg max-h-80 overflow-y-auto hidden"
+          style="background: rgba(255,255,255,0.95);"
+          data-debug-element="results-container"
+        >
+          <!-- Results populated via JavaScript -->
+        </div>
+      </div>
+
+      <input type="hidden" name="favoriteSong" id="favoriteSong-value" data-debug-element="hidden-input" />
+    </div>
+  </div>
+
+  <!-- JavaScript Enhancement with Debug Logging -->
+  <script>
+    import { ProductionDebugger } from '../lib/debug/production-debug.js';
+
+    // Initialize debug mode
+    const debugEnabled = ProductionDebugger.enableDebug();
+
+    // Show debug info if debug mode is enabled
+    if (debugEnabled) {
+      const debugInfo = document.getElementById('spotify-debug-info');
+      if (debugInfo) {
+        debugInfo.style.display = 'block';
+      }
+    }
+
+    ProductionDebugger.log('Init', 'Starting Spotify combobox initialization');
+    ProductionDebugger.logFeatureFlag('musicSearch', true);
+    ProductionDebugger.logEnvironmentCheck();
+
+    // Initialize dynamic combobox when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      ProductionDebugger.log('Init', 'DOM Content Loaded event fired');
+
+      const container = document.querySelector('[data-testid="spotify-combobox"]');
+      ProductionDebugger.logElementState(container, 'Main container');
+
+      if (!container) {
+        ProductionDebugger.log('Error', 'Container not found - feature flag or rendering issue');
+        return;
+      }
+
+      try {
+        // Hide fallback select and show dynamic interface
+        const fallbackSelect = container.querySelector('.spotify-fallback-select');
+        const dynamicContainer = container.querySelector('.spotify-dynamic-container');
+
+        ProductionDebugger.logElementState(fallbackSelect, 'Fallback select element');
+        ProductionDebugger.logElementState(dynamicContainer, 'Dynamic container element');
+
+        if (fallbackSelect && dynamicContainer) {
+          ProductionDebugger.log('Enhancement', 'Switching from fallback to dynamic interface');
+
+          fallbackSelect.style.display = 'none';
+          dynamicContainer.style.display = 'block';
+
+          // Update debug status
+          if (debugEnabled) {
+            const jsStatus = document.getElementById('debug-js-result');
+            const domStatus = document.getElementById('debug-dom-result');
+            if (jsStatus) jsStatus.textContent = 'SUCCESS - Dynamic interface activated';
+            if (domStatus) domStatus.textContent = `Fallback hidden: ${fallbackSelect.style.display}, Dynamic visible: ${dynamicContainer.style.display}`;
+          }
+
+          // Initialize combobox functionality
+          import('../components/spotify-combobox/SpotifyCombobox.js').then(({ SpotifyCombobox }) => {
+            ProductionDebugger.log('Enhancement', 'SpotifyCombobox module loaded successfully');
+            const combobox = new SpotifyCombobox(container);
+            ProductionDebugger.log('Enhancement', 'SpotifyCombobox instance created', combobox.getState());
+          }).catch(error => {
+            ProductionDebugger.log('Error', 'Failed to load SpotifyCombobox module', error);
+            if (debugEnabled) {
+              const jsStatus = document.getElementById('debug-js-result');
+              if (jsStatus) jsStatus.textContent = `ERROR: ${error.message}`;
+            }
+          });
+
+          import('../components/spotify-combobox/AudioPreviewManager.js').then(({ AudioPreviewManager }) => {
+            ProductionDebugger.log('Enhancement', 'AudioPreviewManager module loaded successfully');
+            const audioManager = new AudioPreviewManager();
+
+            // Handle audio preview clicks
+            container.addEventListener('click', async (event) => {
+              const playButton = event.target.closest('.spotify-play-button');
+              const openButton = event.target.closest('.spotify-open-button');
+
+              if (playButton) {
+                event.stopPropagation();
+                const previewUrl = playButton.getAttribute('data-preview-url');
+                ProductionDebugger.log('Audio', 'Play button clicked', { previewUrl });
+
+                if (previewUrl) {
+                  try {
+                    if (playButton.textContent === '▶') {
+                      await audioManager.playPreview(previewUrl, playButton);
+                    } else {
+                      audioManager.stopCurrentPreview();
+                    }
+                  } catch (error) {
+                    ProductionDebugger.log('Error', 'Preview playback failed', error);
+                  }
+                }
+              }
+
+              if (openButton) {
+                event.stopPropagation();
+                const spotifyUrl = openButton.getAttribute('data-spotify-url');
+                ProductionDebugger.log('DeepLink', 'Open button clicked', { spotifyUrl });
+
+                if (spotifyUrl) {
+                  const isSpotifyAppAvailable = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                  const spotifyAppUrl = spotifyUrl.replace('https://open.spotify.com/', 'spotify:');
+
+                  if (isSpotifyAppAvailable) {
+                    window.location.href = spotifyAppUrl;
+                    setTimeout(() => {
+                      window.open(spotifyUrl, '_blank');
+                    }, 1000);
+                  } else {
+                    window.open(spotifyUrl, '_blank');
+                  }
+                }
+              }
+            });
+          }).catch(error => {
+            ProductionDebugger.log('Error', 'Failed to load AudioPreviewManager module', error);
+          });
+
+          ProductionDebugger.log('Success', 'Dynamic Spotify combobox initialized successfully');
+        } else {
+          ProductionDebugger.log('Error', 'Required elements not found', {
+            hasFallbackSelect: !!fallbackSelect,
+            hasDynamicContainer: !!dynamicContainer
+          });
+          if (debugEnabled) {
+            const jsStatus = document.getElementById('debug-js-result');
+            if (jsStatus) jsStatus.textContent = 'ERROR: Missing DOM elements';
+          }
+        }
+      } catch (error) {
+        ProductionDebugger.log('Error', 'Failed to initialize Spotify combobox', error);
+        if (debugEnabled) {
+          const jsStatus = document.getElementById('debug-js-result');
+          if (jsStatus) jsStatus.textContent = `ERROR: ${error.message}`;
+        }
+      }
+    });
+
+    // Environment variable check for debug display
+    if (debugEnabled) {
+      setTimeout(() => {
+        const envStatus = document.getElementById('debug-env-status');
+        if (envStatus) {
+          // This is a simplified check - in production we'd need a debug endpoint
+          envStatus.textContent = 'Environment variables check requires server-side debugging';
+        }
+      }, 100);
+    }
+  </script>
+
+) : (
+  <!-- Feature disabled - show basic select -->
+  <div class="music-select-basic" data-debug="feature-disabled">
+    <label class="block text-phi-sm font-medium text-warm-cream mb-2">
+      Your favorite 70's song (optional)
+    </label>
+    <select
+      name="favoriteSong"
+      class="w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+             focus:outline-none transition-colors"
+      style="background: rgba(255,255,255,0.06);
+             border: 2px solid hsl(270, 30%, 40%);"
+      onfocus="this.style.borderColor='#FFB6D9'"
+      onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+    >
+      <option value="">Select a groovy tune...</option>
+      {SEVENTIES_SONGS.map(song => (
+        <option value={JSON.stringify({
+          title: song.title,
+          artist: song.artist,
+          year: song.year
+        })}>
+          {formatSongDisplay(song)}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
