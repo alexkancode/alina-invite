@@ -1,0 +1,18 @@
+---
+import { isFeatureEnabled } from '../lib/feature-flags/astro-helper';
+
+// Check if music search feature is enabled
+const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
+---
+
+{isMusicSearchEnabled ? (
+  <div class="music-search-widget">
+    <label>Your favorite 70's song (optional)</label>
+    <select name="favoriteSong" id="favoriteSongSelect">
+      <option value="">Select a groovy tune...</option>
+      <option value='{"title":"Bohemian Rhapsody","artist":"Queen","year":1975}'>Bohemian Rhapsody - Queen</option>
+      <option value='{"title":"Dancing Queen","artist":"ABBA","year":1976}'>Dancing Queen - ABBA</option>
+      <option value='{"title":"Stayin' Alive","artist":"Bee Gees","year":1977}'>Stayin' Alive - Bee Gees</option>
+    </select>
+  </div>
+) : null}

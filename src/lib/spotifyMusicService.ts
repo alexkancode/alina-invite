@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { SpotifyClient, type Song } from './spotify/client.js';
+import { EnhancedSpotifyClient as SpotifyClient, type Song } from './spotify/enhanced-client.js';
 
 export interface SearchResult {
   success: boolean;
@@ -77,12 +77,23 @@ export class SpotifyMusicService {
     } catch (error) {
       console.warn('Spotify search failed:', error);
 
+      // Provide more specific error messages for different failure types
+      let errorMessage = 'Music search temporarily unavailable';
+
+      if (error.code === 'MISSING_CLIENT_ID' || error.code === 'MISSING_CLIENT_SECRET') {
+        errorMessage = 'Music search not configured - missing credentials';
+      } else if (error.code === 'AUTH_FAILED') {
+        errorMessage = 'Music search authentication failed';
+      } else if (error.code === 'MAX_RETRIES_EXCEEDED') {
+        errorMessage = 'Music search service temporarily unavailable';
+      }
+
       return {
         success: false,
         songs: [],
         source: 'error',
         totalFound: 0,
-        error: 'Music search temporarily unavailable',
+        error: errorMessage,
         cached: false
       };
     }
