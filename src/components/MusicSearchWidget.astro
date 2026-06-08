@@ -12,8 +12,17 @@
  * - Feature flag controlled visibility
  */
 
-import { SEVENTIES_SONGS, formatSongDisplay } from '../data/seventies-songs';
 import { isFeatureEnabled } from '../lib/feature-flags/astro-helper';
+
+// Inline fallback songs for progressive enhancement
+const SEVENTIES_SONGS = [
+  { title: "Bohemian Rhapsody", artist: "Queen", year: 1975, musicbrainz_id: "mock-1" },
+  { title: "Dancing Queen", artist: "ABBA", year: 1975, musicbrainz_id: "mock-2" },
+  { title: "Stayin' Alive", artist: "Bee Gees", year: 1977, musicbrainz_id: "mock-3" },
+  { title: "Hotel California", artist: "Eagles", year: 1976, musicbrainz_id: "mock-4" }
+];
+
+const formatSongDisplay = (song: any) => `${song.title} - ${song.artist}${song.year ? ` (${song.year})` : ''}`;
 
 // Check if music search feature is enabled
 const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
@@ -569,13 +578,34 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
     border-radius: 8px;
     transition: all 0.2s ease;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 12px;
     color: #FFB6D9 !important;
     background: linear-gradient(135deg, rgba(255,182,217,0.08), rgba(139, 47, 201, 0.04));
     border: 1px solid rgba(255,182,217,0.15);
     backdrop-filter: blur(5px);
     box-shadow: 0 2px 8px rgba(139, 47, 201, 0.1);
+  }
+
+  .result-album-art {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .result-album-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .result-explicit {
+    font-size: 10px;
+    color: rgba(255, 182, 217, 0.8);
+    font-weight: bold;
+    margin-left: 4px;
   }
 
   .result-item:hover,
@@ -851,7 +881,30 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 
 <script>
   // Progressive Enhancement: Initialize the music search widget
-  import { musicSearchService, type Song, type SearchResult } from '../lib/musicSearchService.js';
+  // Direct API integration with spotify-only endpoint
+
+  // Updated types for spotify-only API
+  interface Song {
+    id: string;
+    title: string;
+    artist: string;
+    year?: number;
+    source: 'spotify';
+    spotifyId?: string;
+    previewUrl?: string | null;
+    albumArtUrl?: string | null;
+    explicit?: boolean;
+    youtubeSearchUrl?: string;
+  }
+
+  interface SearchResult {
+    success: boolean;
+    songs: Song[];
+    source: 'spotify' | 'error';
+    totalFound: number;
+    error?: string;
+    cached?: boolean;
+  }
 
   interface MusicSearchWidget {
     searchInput: HTMLInputElement;
@@ -970,15 +1023,44 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
       }, 300) as unknown as number;
     }
 
+    private async callSpotifyAPI(query: string, maxResults: number): Promise<SearchResult> {
+      try {
+        const response = await fetch(`/api/music-search?q=${encodeURIComponent(query)}&maxResults=${maxResults}`);
+
+        if (response.status === 403) {
+          throw new Error('Music search feature is disabled');
+        }
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const apiResult = await response.json();
+        return this.formatAPIResponse(apiResult);
+      } catch (error) {
+        if (error instanceof TypeError) {
+          throw new Error('Network connection failed');
+        }
+        throw error;
+      }
+    }
+
+    private formatAPIResponse(apiResult: any): SearchResult {
+      return {
+        success: apiResult.success || false,
+        songs: apiResult.songs || [],
+        source: apiResult.source || 'spotify',
+        totalFound: apiResult.totalFound || 0,
+        error: apiResult.error,
+        cached: apiResult.cached || false
+      };
+    }
+
     private async performSearch(query: string): Promise<void> {
       this.showSearchStatus('Searching...');
 
       try {
-        // Try MusicBrainz API first, then fallback to curated
-        const result = await musicSearchService.search70sSongs(query, {
-          includeFallback: true,
-          maxResults: 8
-        });
+        const result = await this.callSpotifyAPI(query, 8);
 
         if (result.success && result.songs.length > 0) {
           this.displayResults(result);
@@ -1002,12 +1084,19 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
             role="option"
             data-index="${index}"
             data-song='${JSON.stringify(song)}'>
+          ${song.albumArtUrl ? `
+            <div class="result-album-art">
+              <img src="${song.albumArtUrl}" alt="Album art" loading="lazy" />
+            </div>
+          ` : ''}
           <div class="result-song-info">
             <div class="result-title">${this.escapeHtml(song.title)}</div>
             <div class="result-artist-year">
               <div class="result-artist">${this.escapeHtml(song.artist)}</div>
               ${song.year ? `<div class="result-year">(${song.year})</div>` : ''}
+              ${song.explicit ? `<div class="result-explicit">🅴</div>` : ''}
             </div>
+            ${song.spotifyId ? `<div class="result-source">Spotify</div>` : ''}
           </div>
         </li>
       `).join('');
