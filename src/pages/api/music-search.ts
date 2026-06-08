@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'astro';
+import type { APIRoute } from 'astro';
 import { spotifyMusicService, type SearchResult } from '../../lib/spotifyMusicService.js';
 import { createProductionService } from '../../lib/feature-flags/factory.js';
 
