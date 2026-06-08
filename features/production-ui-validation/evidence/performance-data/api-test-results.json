@@ -1,19 +1,19 @@
 {
-  "timestamp": "2026-06-08T14:48:29-05:00",
+  "timestamp": "2026-06-08T14:59:05-05:00",
   "tests": [
     {
       "query": "dancing queen",
       "maxResults": 1,
       "responseTime": "",
-      "response": {"success":true,"songs":[],"source":"spotify","totalFound":0,"cached":false},
+      "response": {"success":true,"songs":[{"id":"0GjEhVFGZW8afUYGChu3Rr","title":"Dancing Queen","artist":"ABBA","year":1976,"source":"spotify","spotifyId":"0GjEhVFGZW8afUYGChu3Rr","albumArtUrl":"https://i.scdn.co/image/ab67616d0000b27370f7a1b35d5165c85b95a0e0","explicit":false,"youtubeSearchUrl":"https://www.youtube.com/results?search_query=Dancing%20Queen%20ABBA%20official"}],"source":"spotify","totalFound":1,"cached":true},
       "songCount": 0
     },
     {
       "query": "queen",
       "maxResults": 3,
       "responseTime": "",
-      "response": {"success":true,"songs":[],"source":"spotify","totalFound":0,"cached":false},
-      "songCount": 0
+      "response": {"success":true,"songs":[{"id":"7hQJA50XrCWABAu5v6QZ4i","title":"Don't Stop Me Now - Remastered 2011","artist":"Queen","year":1978,"source":"spotify","spotifyId":"7hQJA50XrCWABAu5v6QZ4i","albumArtUrl":"https://i.scdn.co/image/ab67616d0000b273008b06ec71019afd70153889","explicit":false,"youtubeSearchUrl":"https://www.youtube.com/results?search_query=Don't%20Stop%20Me%20Now%20-%20Remastered%202011%20Queen%20official"},{"id":"0GjEhVFGZW8afUYGChu3Rr","title":"Dancing Queen","artist":"ABBA","year":1976,"source":"spotify","spotifyId":"0GjEhVFGZW8afUYGChu3Rr","albumArtUrl":"https://i.scdn.co/image/ab67616d0000b27370f7a1b35d5165c85b95a0e0","explicit":false,"youtubeSearchUrl":"https://www.youtube.com/results?search_query=Dancing%20Queen%20ABBA%20official"}],"source":"spotify","totalFound":2,"cached":false},
+      "songCount": 1
     }
   ]
 }

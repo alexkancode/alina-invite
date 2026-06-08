@@ -1,0 +1,201 @@
+---
+/**
+ * Dynamic Spotify Combobox Widget
+ *
+ * Progressive enhancement music search with real-time Spotify integration
+ * Features:
+ * - Real-time search with Spotify API
+ * - ARIA combobox accessibility pattern
+ * - Keyboard navigation support
+ * - Audio preview playback
+ * - Spotify deep-linking
+ * - Progressive enhancement with static fallback
+ */
+
+import { isFeatureEnabled } from '../lib/feature-flags/astro-helper';
+
+// Fallback songs for progressive enhancement
+const SEVENTIES_SONGS = [
+  { title: "Bohemian Rhapsody", artist: "Queen", year: 1975 },
+  { title: "Dancing Queen", artist: "ABBA", year: 1976 },
+  { title: "Stayin' Alive", artist: "Bee Gees", year: 1977 },
+  { title: "Hotel California", artist: "Eagles", year: 1976 }
+];
+
+const formatSongDisplay = (song: any) => `${song.title} - ${song.artist}${song.year ? ` (${song.year})` : ''}`;
+
+// Check if music search feature is enabled
+const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
+---
+
+{isMusicSearchEnabled ? (
+  <div class="spotify-combobox-container" data-testid="spotify-combobox">
+    <label for="spotify-search" class="block text-phi-sm font-medium text-warm-cream mb-2">
+      Your favorite 70's song (optional)
+    </label>
+
+    <!-- Progressive Enhancement: Static fallback (hidden when JS loads) -->
+    <select
+      name="favoriteSong"
+      id="favoriteSongSelect"
+      class="spotify-fallback-select w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+             focus:outline-none transition-colors"
+      style="background: rgba(255,255,255,0.06);
+             border: 2px solid hsl(270, 30%, 40%);"
+      onfocus="this.style.borderColor='#FFB6D9'"
+      onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+    >
+      <option value="">Select a groovy tune...</option>
+      {SEVENTIES_SONGS.map(song => (
+        <option value={JSON.stringify({
+          title: song.title,
+          artist: song.artist,
+          year: song.year
+        })}>
+          {formatSongDisplay(song)}
+        </option>
+      ))}
+    </select>
+
+    <!-- Enhanced Combobox (shown when JS loads) -->
+    <div class="spotify-dynamic-container" style="display: none;">
+      <div class="relative">
+        <input
+          type="text"
+          id="spotify-search"
+          role="combobox"
+          aria-controls="spotify-results"
+          aria-expanded="false"
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
+          placeholder="Search for songs, artists, albums..."
+          class="spotify-search-input w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+                 placeholder-metallic-silver/50 focus:outline-none transition-colors"
+          style="background: rgba(255,255,255,0.06);
+                 border: 2px solid hsl(270, 30%, 40%);"
+          onfocus="this.style.borderColor='#FFB6D9'"
+          onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+        />
+
+        <div
+          id="spotify-results"
+          role="listbox"
+          aria-label="Search results"
+          class="spotify-results-dropdown absolute top-full left-0 right-0 z-50 mt-1
+                 bg-white/95 backdrop-blur-sm border border-purple-200 rounded-lg
+                 shadow-lg max-h-80 overflow-y-auto hidden"
+          style="background: rgba(255,255,255,0.95);"
+        >
+          <!-- Results populated via JavaScript -->
+        </div>
+      </div>
+
+      <input type="hidden" name="favoriteSong" id="favoriteSong-value" />
+    </div>
+  </div>
+
+  <!-- JavaScript Enhancement -->
+  <script>
+    import { SpotifyCombobox } from '../components/spotify-combobox/SpotifyCombobox.js';
+    import { AudioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
+
+    // Initialize dynamic combobox when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.querySelector('[data-testid="spotify-combobox"]');
+      if (!container) return;
+
+      try {
+        // Hide fallback select and show dynamic interface
+        const fallbackSelect = container.querySelector('.spotify-fallback-select');
+        const dynamicContainer = container.querySelector('.spotify-dynamic-container');
+
+        if (fallbackSelect && dynamicContainer) {
+          fallbackSelect.style.display = 'none';
+          dynamicContainer.style.display = 'block';
+
+          // Initialize combobox
+          const combobox = new SpotifyCombobox(container);
+          const audioManager = new AudioPreviewManager();
+
+          // Handle audio preview clicks
+          container.addEventListener('click', async (event) => {
+            const playButton = event.target.closest('.spotify-play-button');
+            const openButton = event.target.closest('.spotify-open-button');
+
+            if (playButton) {
+              event.stopPropagation();
+              const previewUrl = playButton.getAttribute('data-preview-url');
+
+              if (previewUrl) {
+                try {
+                  if (playButton.textContent === '▶') {
+                    await audioManager.playPreview(previewUrl, playButton);
+                  } else {
+                    audioManager.stopCurrentPreview();
+                  }
+                } catch (error) {
+                  console.warn('Preview playback failed:', error);
+                }
+              }
+            }
+
+            if (openButton) {
+              event.stopPropagation();
+              const spotifyUrl = openButton.getAttribute('data-spotify-url');
+
+              if (spotifyUrl) {
+                // Try to open in Spotify app first, fallback to web
+                const isSpotifyAppAvailable = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                const spotifyAppUrl = spotifyUrl.replace('https://open.spotify.com/', 'spotify:');
+
+                if (isSpotifyAppAvailable) {
+                  window.location.href = spotifyAppUrl;
+
+                  // Fallback to web after 1 second if app doesn't open
+                  setTimeout(() => {
+                    window.open(spotifyUrl, '_blank');
+                  }, 1000);
+                } else {
+                  window.open(spotifyUrl, '_blank');
+                }
+              }
+            }
+          });
+
+          console.log('Dynamic Spotify combobox initialized successfully');
+        }
+      } catch (error) {
+        console.warn('Failed to initialize Spotify combobox:', error);
+        // Fallback select remains visible
+      }
+    });
+  </script>
+
+) : (
+  <!-- Feature disabled - show basic select -->
+  <div class="music-select-basic">
+    <label class="block text-phi-sm font-medium text-warm-cream mb-2">
+      Your favorite 70's song (optional)
+    </label>
+    <select
+      name="favoriteSong"
+      class="w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
+             focus:outline-none transition-colors"
+      style="background: rgba(255,255,255,0.06);
+             border: 2px solid hsl(270, 30%, 40%);"
+      onfocus="this.style.borderColor='#FFB6D9'"
+      onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
+    >
+      <option value="">Select a groovy tune...</option>
+      {SEVENTIES_SONGS.map(song => (
+        <option value={JSON.stringify({
+          title: song.title,
+          artist: song.artist,
+          year: song.year
+        })}>
+          {formatSongDisplay(song)}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
