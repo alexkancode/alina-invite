@@ -13,6 +13,7 @@ export class SpotifyCombobox {
   private hiddenInput: HTMLInputElement;
   private debounceTimer: number | null = null;
   private currentRequestId: number = 0;
+  private previousResultsLength: number = 0;
 
   private state: SearchState = {
     query: '',
@@ -228,9 +229,20 @@ export class SpotifyCombobox {
   }
 
   public setState(partialState: Partial<SearchState>): void {
+    const previousState = { ...this.state };
     this.state = { ...this.state, ...partialState };
+
+    // Check if results array has changed to trigger auto-scroll
+    const resultsChanged = partialState.results !== undefined &&
+                          partialState.results !== previousState.results;
+
     this.updateDOM();
     this.updateAriaAttributes();
+
+    // Auto-scroll to top when new results are populated
+    if (resultsChanged && this.state.isOpen && this.state.results.length > 0) {
+      this.scrollResultsToTop();
+    }
   }
 
   private updateDOM(): void {
@@ -242,6 +254,7 @@ export class SpotifyCombobox {
         this.resultsList.appendChild(li);
       });
       this.resultsList.style.display = 'block';
+      this.calculateDropdownPosition();
     } else {
       this.resultsList.style.display = 'none';
     }
@@ -305,6 +318,136 @@ export class SpotifyCombobox {
     });
 
     return li;
+  }
+
+  private scrollResultsToTop(): void {
+    if (this.resultsList) {
+      this.resultsList.scrollTop = 0;
+    }
+  }
+
+  private calculateDropdownPosition(): void {
+    if (!this.resultsList || !this.searchInput) return;
+
+    const inputRect = this.searchInput.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // Estimate dropdown height (max 320px or 80% viewport)
+    const maxDropdownHeight = Math.min(320, viewportHeight * 0.8);
+
+    // Check if dropdown would be clipped at bottom
+    const spaceBelow = viewportHeight - inputRect.bottom - 20; // 20px buffer
+    const shouldShowAbove = spaceBelow < maxDropdownHeight && inputRect.top > maxDropdownHeight;
+
+    // Reset positioning styles
+    this.resultsList.style.top = '';
+    this.resultsList.style.bottom = '';
+    this.resultsList.style.left = '';
+    this.resultsList.style.right = '';
+    this.resultsList.style.position = '';
+
+    // Check for mobile viewport
+    const isMobile = viewportWidth <= 768;
+
+    if (isMobile) {
+      // Mobile: use fixed positioning with full width
+      this.resultsList.style.position = 'fixed';
+      this.resultsList.style.left = '1rem';
+      this.resultsList.style.right = '1rem';
+      this.resultsList.style.maxHeight = '50vh';
+
+      if (shouldShowAbove) {
+        this.resultsList.style.bottom = `${viewportHeight - inputRect.top}px`;
+      } else {
+        this.resultsList.style.top = `${inputRect.bottom}px`;
+      }
+    } else {
+      // Desktop: enhanced positioning
+      const isInModal = this.isInsideModal();
+
+      // Calculate available space and set max height first
+      const availableHeight = shouldShowAbove
+        ? Math.min(inputRect.top - 20, maxDropdownHeight)
+        : Math.min(spaceBelow, maxDropdownHeight);
+
+      this.resultsList.style.maxHeight = `${availableHeight}px`;
+      this.resultsList.style.zIndex = '999';
+
+      // Prefer relative positioning for viewport-aware behavior
+      // Only use fixed positioning when dropdown would be significantly clipped
+      const canUseRelativePositioning = !isInModal ||
+        this.canDropdownFitWithinModal(availableHeight) ||
+        shouldShowAbove; // Always use relative positioning when showing above
+
+      if (canUseRelativePositioning) {
+        // Use relative positioning (absolute within container)
+        this.resultsList.style.position = 'absolute';
+        this.resultsList.style.left = '0';
+        this.resultsList.style.right = '0';
+
+        if (shouldShowAbove) {
+          this.resultsList.style.bottom = '100%';
+          this.resultsList.style.top = 'auto';
+        } else {
+          this.resultsList.style.top = '100%';
+          this.resultsList.style.bottom = 'auto';
+        }
+      } else {
+        // Use fixed positioning to break out of modal
+        this.resultsList.style.position = 'fixed';
+        this.resultsList.style.left = `${inputRect.left}px`;
+        this.resultsList.style.width = `${inputRect.width}px`;
+
+        if (shouldShowAbove) {
+          this.resultsList.style.bottom = `${viewportHeight - inputRect.top}px`;
+        } else {
+          this.resultsList.style.top = `${inputRect.bottom}px`;
+        }
+      }
+    }
+  }
+
+  private isInsideModal(): boolean {
+    let element: Element | null = this.container;
+    while (element && element !== document.body) {
+      if (element.id === 'rsvp-modal' ||
+          element.classList.contains('modal') ||
+          element.classList.contains('overflow-hidden')) {
+        return true;
+      }
+      element = element.parentElement;
+    }
+    return false;
+  }
+
+  private canDropdownFitWithinModal(dropdownHeight: number): boolean {
+    // For testing and simple cases, prefer relative positioning
+    // In complex modal scenarios, we may need fixed positioning
+    const modalContainer = this.findModalContainer();
+    if (!modalContainer) return true;
+
+    const modalRect = modalContainer.getBoundingClientRect();
+    const inputRect = this.searchInput.getBoundingClientRect();
+
+    // Check if dropdown would extend beyond modal boundaries
+    const dropdownBottom = inputRect.bottom + dropdownHeight;
+    const modalBottom = modalRect.bottom;
+
+    return dropdownBottom <= modalBottom + 50; // 50px tolerance
+  }
+
+  private findModalContainer(): Element | null {
+    let element: Element | null = this.container;
+    while (element && element !== document.body) {
+      if (element.id === 'rsvp-modal' ||
+          element.classList.contains('modal') ||
+          element.classList.contains('overflow-hidden')) {
+        return element;
+      }
+      element = element.parentElement;
+    }
+    return null;
   }
 
   private updateAriaAttributes(): void {

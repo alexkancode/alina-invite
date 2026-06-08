@@ -453,7 +453,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
     <!-- ═══ RSVP Modal ═══ -->
     <div id="rsvp-modal" class="fixed inset-0 flex items-center justify-center p-phi-lg hidden z-50"
          style="background: rgba(26, 10, 46, 0.85); backdrop-filter: blur(4px);">
-      <div class="rounded-2xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg relative overflow-hidden"
+      <div class="rounded-2xl p-phi-2xl max-w-[489px] w-full space-y-phi-lg relative dropdown-friendly"
            style="background: linear-gradient(160deg, #2d1254, #1a0a2e);
                   border: 3px solid #FFB6D9;
                   box-shadow: var(--shadow-elevation-high), 0 0 34px hsl(330, 100%, 80% / 0.15);">
@@ -654,6 +654,11 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
     <!-- ═══ Responsive ═══ -->
     <style>
+      /* Dropdown-friendly modal: allows dropdowns to extend beyond boundaries */
+      .dropdown-friendly {
+        overflow: visible;
+      }
+
       /* Mobile arc text: hidden on desktop, visible on mobile */
       .mobile-arc-text {
         display: none;
