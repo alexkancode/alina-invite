@@ -82,9 +82,9 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
           role="listbox"
           aria-label="Search results"
           class="spotify-results-dropdown absolute top-full left-0 right-0 z-50 mt-1
-                 bg-white/95 backdrop-blur-sm border border-purple-200 rounded-lg
-                 shadow-lg max-h-80 overflow-y-auto hidden"
-          style="background: rgba(255,255,255,0.95);"
+                 backdrop-blur-sm rounded-lg shadow-lg max-h-80 overflow-y-auto hidden"
+          style="background: rgba(255,255,255,0.06);
+                 border: 2px solid hsl(270, 30%, 40%);"
         >
           <!-- Results populated via JavaScript -->
         </div>
@@ -93,6 +93,18 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
       <input type="hidden" name="favoriteSong" id="favoriteSong-value" />
     </div>
   </div>
+
+  <!-- Spotify Combobox Styling -->
+  <style>
+    .spotify-result-highlighted .spotify-result-content {
+      background: rgba(255, 182, 217, 0.1) !important;
+      border-left: 3px solid #FFB6D9;
+    }
+
+    .spotify-results-dropdown:focus-within {
+      border-color: #FFB6D9;
+    }
+  </style>
 
   <!-- JavaScript Enhancement -->
   <script>

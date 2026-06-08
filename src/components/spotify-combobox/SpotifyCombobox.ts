@@ -255,7 +255,7 @@ export class SpotifyCombobox {
     li.setAttribute('data-track-id', track.id);
 
     li.innerHTML = `
-      <div class="spotify-result-content flex items-center gap-3 p-3 cursor-pointer hover:bg-purple-50">
+      <div class="spotify-result-content flex items-center gap-phi-md px-phi-md py-phi-sm cursor-pointer hover:bg-white/5 transition-colors">
         ${track.albumArtUrl ? `
           <img
             src="${track.albumArtUrl}"
@@ -264,7 +264,7 @@ export class SpotifyCombobox {
             loading="lazy"
           />
         ` : `
-          <div class="w-12 h-12 rounded bg-purple-100 flex items-center justify-center text-purple-400">🎵</div>
+          <div class="w-12 h-12 rounded bg-white/10 flex items-center justify-center text-warm-cream/50">🎵</div>
         `}
 
         <div class="flex-1 min-w-0">
