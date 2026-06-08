@@ -42,6 +42,17 @@ async function disableFlag(flagName, filePath) {
   console.log(`Feature flag "${flagName}" disabled`);
 }
 
+async function toggleFlag(flagName, filePath) {
+  validateFlagName(flagName);
+  const flags = await loadFlags(filePath);
+  const currentState = flags[flagName];
+  const newState = !currentState;
+  flags[flagName] = newState;
+  await saveFlags(filePath, flags);
+  const action = newState ? 'enabled' : 'disabled';
+  console.log(`Feature flag "${flagName}" toggled: ${currentState ? 'enabled' : 'disabled'} → ${action}`);
+}
+
 async function showStatus(flagName, filePath) {
   validateFlagName(flagName);
   const flags = await loadFlags(filePath);
@@ -65,6 +76,7 @@ Usage: node scripts/feature-flags.js <command> [arguments]
 Commands:
   enable <flag>     Enable a feature flag
   disable <flag>    Disable a feature flag
+  toggle <flag>     Toggle a feature flag (flip current state)
   status <flag>     Show status of a feature flag
   list              List all feature flags
   help              Show this help message
@@ -77,6 +89,7 @@ Valid flags: ${VALID_FLAGS.join(', ')}
 Examples:
   node scripts/feature-flags.js enable musicSearch
   node scripts/feature-flags.js disable musicSearch
+  node scripts/feature-flags.js toggle musicSearch
   node scripts/feature-flags.js status musicSearch
   node scripts/feature-flags.js list
 `);
@@ -116,6 +129,13 @@ async function main() {
           throw new Error('Flag name is required for disable command');
         }
         await disableFlag(flagName, filePath);
+        break;
+
+      case 'toggle':
+        if (!flagName) {
+          throw new Error('Flag name is required for toggle command');
+        }
+        await toggleFlag(flagName, filePath);
         break;
 
       case 'status':
