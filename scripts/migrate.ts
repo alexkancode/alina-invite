@@ -2,13 +2,18 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 
-const client = new pg.Client({
-  host: 'localhost',
-  port: 5432,
-  database: 'party',
-  user: 'postgres',
-  password: 'dev'
-});
+// Use DATABASE_URL for production (Railway), individual params for local development
+const client = new pg.Client(
+  process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost')
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+        host: 'localhost',
+        port: 5432,
+        database: 'party',
+        user: 'postgres',
+        password: 'dev'
+      }
+);
 
 async function migrate() {
   await client.connect();
