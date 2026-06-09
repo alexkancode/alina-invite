@@ -55,13 +55,30 @@
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Local Build
-**Status:** pending
+**Status:** COMPLETED (pushed 9a68a10..dbbe507; build clean)
 
 ### Stage 2: Railway Upload and Build
-**Status:** pending
+**Status:** COMPLETED
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=d10f34cd-9836-432c-acbd-8d1be6aeada3&
 
 ### Stage 3: Service Health and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** New CSS bundle (`/_astro/index.DYT13ivE.css`) containing `guest-status-mark`
+detected 55 seconds after upload; page 200 throughout; the asset-based marker fixed the
+blind spot from the previous deploy
 
 ### Stage 4: UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (play states via reversible write to the same-IP "test" entry, then reverted):**
+- 4 guest entries, each showing the inline check beside the name; zero standalone status
+  lines remain
+- Idle play button: CSS-drawn triangle centered (6x zoom screenshot)
+- Playing: CSS-drawn pause bars centered (6x zoom screenshot)
+- Test entry's song fields reverted to null; guest count unchanged at 4
+- Regression: `/api/preview` 200
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (no downtime observed)
+**Functionality:** VERIFIED against all success criteria
