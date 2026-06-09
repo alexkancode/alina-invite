@@ -60,16 +60,35 @@
 ## Deployment Process Tracking
 
 ### Stage 1: Local Build
-**Status:** pending
+**Status:** COMPLETED (no errors)
 
 ### Stage 2: Railway Upload
-**Status:** pending
+**Status:** COMPLETED
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=2553356a-f8c0-49cb-b479-24df30f889db&
 
 ### Stage 3: Railway Build
-**Status:** pending
+**Status:** COMPLETED (image built and pushed)
 
 ### Stage 4: Service Health
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Page served 200 throughout the rollout; no 502s. Monitoring note: the planned
+cutover marker (grepping the page HTML for `guest-song-play`) was invalid - the styles live
+in the external `/_astro/index.*.css` bundle, not inline, so the initial poll timed out while
+the deploy had in fact cut over. Verified by grepping the served CSS bundle (1 hit on prod,
+matching local). Future code-only deploys should marker on a fetchable asset or API change.
 
 ### Stage 5: UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (via reversible write to the pre-existing same-IP "test" entry):**
+- Guest list rendered 4 entries; the entry with a song showed "Dancing Queen - ABBA" with
+  the compact play button; entries without songs unchanged
+- Clicking the entry's play button reached the pause state (audio playing in browser)
+- "Chelsea & Atlas" renders correctly (HTML escaping handles ampersands)
+- Test data reverted: song fields back to null, guest count unchanged at 4
+- Regressions: `/api/preview` 200, `/api/rsvp` GET 200
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (no downtime observed)
+**Functionality:** VERIFIED against all success criteria
