@@ -156,13 +156,13 @@ describe('SpotifyMusicService', () => {
     vi.mocked(SpotifyClient).mockImplementation(() => ({ searchTracks }) as never);
   });
 
-  it('scopes the Spotify query to the 70s decade with the default maxResults', async () => {
+  it('passes the query through unscoped with the default maxResults', async () => {
     searchTracks.mockResolvedValue([]);
     const service = await createService();
 
     await service.searchMusic('queen');
 
-    expect(searchTracks).toHaveBeenCalledWith('queen year:1970-1979', 15);
+    expect(searchTracks).toHaveBeenCalledWith('queen', 15);
   });
 
   it('passes an explicit maxResults to the client', async () => {
@@ -171,14 +171,14 @@ describe('SpotifyMusicService', () => {
 
     await service.searchMusic('queen', 5);
 
-    expect(searchTracks).toHaveBeenCalledWith('queen year:1970-1979', 5);
+    expect(searchTracks).toHaveBeenCalledWith('queen', 5);
   });
 
-  it('filters out tracks released outside the 70s', async () => {
+  it('returns tracks from any era without filtering', async () => {
     searchTracks.mockResolvedValue([
-      { id: '1', title: 'In Decade', artist: 'A', year: 1975 },
-      { id: '2', title: 'Too Early', artist: 'B', year: 1969 },
-      { id: '3', title: 'Too Late', artist: 'C', year: 1980 },
+      { id: '1', title: 'Seventies', artist: 'A', year: 1975 },
+      { id: '2', title: 'Sixties', artist: 'B', year: 1969 },
+      { id: '3', title: 'Modern', artist: 'C', year: 2024 },
       { id: '4', title: 'No Year', artist: 'D' }
     ]);
     const service = await createService();
@@ -186,8 +186,8 @@ describe('SpotifyMusicService', () => {
     const result = await service.searchMusic('test');
 
     expect(result.success).toBe(true);
-    expect(result.songs.map(s => s.id)).toEqual(['1']);
-    expect(result.totalFound).toBe(1);
+    expect(result.songs.map(s => s.id)).toEqual(['1', '2', '3', '4']);
+    expect(result.totalFound).toBe(4);
   });
 
   it('rejects a blank query without calling the client', async () => {

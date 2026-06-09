@@ -8,7 +8,7 @@ describe('Spotify Combobox Accessibility Tests', () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div data-testid="spotify-combobox">
-        <label for="spotify-search">Your favorite 70's song (optional)</label>
+        <label for="spotify-search">Disco song for the party playlist (optional)</label>
         <select class="spotify-fallback-select" name="favoriteSong">
           <option value="">Select a groovy tune...</option>
           <option value="test1">Test Song 1</option>

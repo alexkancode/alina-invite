@@ -58,16 +58,14 @@ export class SpotifyMusicService {
     }
 
     try {
-      const decade70sQuery = `${query.trim()} year:1970-1979`;
-      const spotifyResults = await this.spotifyClient.searchTracks(decade70sQuery, maxResults);
-
-      const filteredResults = this.filter70sOnly(spotifyResults || []);
+      const spotifyResults = await this.spotifyClient.searchTracks(query.trim(), maxResults);
+      const songs = spotifyResults || [];
 
       const result: SearchResult = {
         success: true,
-        songs: filteredResults,
+        songs,
         source: 'spotify',
-        totalFound: filteredResults.length,
+        totalFound: songs.length,
         cached: false
       };
 
@@ -105,12 +103,6 @@ export class SpotifyMusicService {
 
   private validateQuery(query: string): boolean {
     return typeof query === 'string' && query.trim().length > 0;
-  }
-
-  private filter70sOnly(songs: Song[]): Song[] {
-    return songs.filter(song =>
-      song.year && song.year >= 1970 && song.year <= 1979
-    );
   }
 
   private generateCacheKey(query: string, maxResults: number): string {

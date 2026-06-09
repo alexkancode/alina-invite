@@ -53,15 +53,15 @@ describe('SpotifyMusicService', () => {
         cached: false
       });
 
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith('queen year:1970-1979', 15);
+      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith('queen', 15);
     });
 
-    it('should apply 70s decade filter to search query', async () => {
+    it('should pass the query through without decade scoping', async () => {
       mockSpotifyClient.searchTracks.mockResolvedValue([]);
 
       await spotifyMusicService.searchMusic('test query');
 
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith('test query year:1970-1979', 15);
+      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith('test query', 15);
     });
 
     it('should respect maxResults parameter', async () => {
@@ -69,7 +69,7 @@ describe('SpotifyMusicService', () => {
 
       await spotifyMusicService.searchMusic('queen', 5);
 
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith('queen year:1970-1979', 5);
+      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith('queen', 5);
     });
 
     it('should return cached results when available', async () => {
@@ -155,7 +155,7 @@ describe('SpotifyMusicService', () => {
       });
     });
 
-    it('should filter results to 70s decade only', async () => {
+    it('should return songs from any decade unfiltered', async () => {
       const mockSongs: Song[] = [
         {
           id: 'song-1',
@@ -179,10 +179,9 @@ describe('SpotifyMusicService', () => {
 
       const result = await spotifyMusicService.searchMusic('artist');
 
-      // Should filter out the 80s song
-      expect(result.songs).toHaveLength(1);
-      expect(result.songs[0].year).toBe(1975);
-      expect(result.totalFound).toBe(1);
+      expect(result.songs).toHaveLength(2);
+      expect(result.songs.map(s => s.year)).toEqual([1975, 1985]);
+      expect(result.totalFound).toBe(2);
     });
 
     it('should use different cache keys for different queries', async () => {

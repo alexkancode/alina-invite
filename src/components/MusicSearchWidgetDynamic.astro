@@ -31,7 +31,7 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 {isMusicSearchEnabled ? (
   <div class="spotify-combobox-container" data-testid="spotify-combobox">
     <label for="spotify-search" class="block text-phi-sm font-medium text-warm-cream mb-2">
-      Your favorite 70's song (optional)
+      Disco song for the party playlist (optional)
     </label>
 
     <!-- Progressive Enhancement: Static fallback (hidden when JS loads) -->
@@ -231,7 +231,7 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
   <!-- Feature disabled - show basic select -->
   <div class="music-select-basic">
     <label class="block text-phi-sm font-medium text-warm-cream mb-2">
-      Your favorite 70's song (optional)
+      Disco song for the party playlist (optional)
     </label>
     <select
       name="favoriteSong"
