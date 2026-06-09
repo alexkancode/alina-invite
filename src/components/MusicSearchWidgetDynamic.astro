@@ -156,7 +156,7 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
   <!-- JavaScript Enhancement -->
   <script>
     import { SpotifyCombobox } from '../components/spotify-combobox/SpotifyCombobox.js';
-    import { AudioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
+    import { audioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
     import { PreviewResolver } from '../components/spotify-combobox/PreviewResolver.js';
     import { PreviewPlaybackController } from '../components/spotify-combobox/PreviewPlaybackController.js';
 
@@ -178,7 +178,7 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
           // Initialize combobox
           const combobox = new SpotifyCombobox(container);
           container.spotifyCombobox = combobox;
-          const audioManager = new AudioPreviewManager();
+          const audioManager = audioPreviewManager;
           const previewController = new PreviewPlaybackController(new PreviewResolver(), audioManager);
 
           // Handle audio preview clicks

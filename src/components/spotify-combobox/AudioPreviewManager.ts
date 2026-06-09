@@ -51,3 +51,5 @@ export class AudioPreviewManager {
     this.playButton = null;
   }
 }
+
+export const audioPreviewManager = new AudioPreviewManager();
