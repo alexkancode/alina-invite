@@ -442,6 +442,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
       <!-- ═══ RSVP Guest List ═══ -->
       <div id="rsvp-guest-list" class="mt-phi-2xl guest-list-fade-in">
+        <button type="button" id="guest-play-all" class="guest-play-all" hidden>Play all</button>
         <div id="rsvp-guests" class="flex flex-wrap justify-center gap-phi-md">
           <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
         </div>
@@ -751,6 +752,30 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         background: rgb(34, 197, 94);
       }
 
+      :global(.guest-play-all) {
+        display: block;
+        margin: 0 auto 0.75rem;
+        padding: 0.35rem 1.25rem;
+        border-radius: 9999px;
+        background: rgb(34, 197, 94);
+        color: #fff;
+        font-size: 0.8rem;
+        line-height: 1.2;
+        transition: background-color 0.15s ease;
+      }
+
+      :global(.guest-play-all:hover) {
+        background: rgb(22, 163, 74);
+      }
+
+      :global(.guest-play-all[data-playlist-state="running"]) {
+        background: #8B2FC9;
+      }
+
+      :global(.guest-play-all[hidden]) {
+        display: none;
+      }
+
       /* Mobile arc text: hidden on desktop, visible on mobile */
       .mobile-arc-text {
         display: none;
@@ -932,6 +957,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
     <script>
       import { renderGuestEntries } from '../components/guest-list/GuestListRenderer.js';
+      import { PlayAllController } from '../components/guest-list/PlayAllController.js';
       import { audioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
       import { PreviewResolver } from '../components/spotify-combobox/PreviewResolver.js';
       import { PreviewPlaybackController } from '../components/spotify-combobox/PreviewPlaybackController.js';
@@ -1225,6 +1251,21 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       }
 
       // ── RSVP Guest List ──
+      const guestListContainer = document.getElementById('rsvp-guests')!;
+      const playAllButton = document.getElementById('guest-play-all') as HTMLButtonElement;
+      const guestPreviewController = new PreviewPlaybackController(new PreviewResolver(), audioPreviewManager);
+      const playAllController = new PlayAllController(guestListContainer, playAllButton, guestPreviewController);
+      playAllButton.addEventListener('click', () => playAllController.toggle());
+      guestListContainer.addEventListener('click', async (event) => {
+        const playButton = (event.target as Element).closest('.guest-song-play') as HTMLButtonElement | null;
+        if (!playButton) return;
+        try {
+          await guestPreviewController.handlePlayClick(playButton);
+        } catch (error) {
+          console.warn('Guest list preview failed:', error);
+        }
+      });
+
       async function loadGuestList() {
         const container = document.getElementById('rsvp-guests')!;
         try {
@@ -1235,24 +1276,13 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
             return;
           }
           container.innerHTML = renderGuestEntries(data.rsvps);
+          playAllButton.hidden = container.querySelectorAll('.guest-song-play').length === 0;
         } catch {
           container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Could not load guest list</p>';
         }
       }
 
       loadGuestList();
-
-      const guestListContainer = document.getElementById('rsvp-guests')!;
-      const guestPreviewController = new PreviewPlaybackController(new PreviewResolver(), audioPreviewManager);
-      guestListContainer.addEventListener('click', async (event) => {
-        const playButton = (event.target as Element).closest('.guest-song-play') as HTMLButtonElement | null;
-        if (!playButton) return;
-        try {
-          await guestPreviewController.handlePlayClick(playButton);
-        } catch (error) {
-          console.warn('Guest list preview failed:', error);
-        }
-      });
 
       // ── Enable 3D + spin after bounce lands ──
       const arcUnit = document.querySelector('.arc-disco-unit');

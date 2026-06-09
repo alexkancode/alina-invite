@@ -31,27 +31,30 @@ export class AudioPreviewManager {
       this.currentAudio = null;
     }
 
-    if (this.playButton) {
-      this.playButton.textContent = '▶';
-      this.playButton.dataset.previewState = 'idle';
-      this.playButton.disabled = false;
-      this.playButton = null;
-    }
+    this.release('stopped');
   }
 
   private handlePreviewEnd(): void {
-    this.stopCurrentPreview();
+    this.currentAudio = null;
+    this.release('ended');
   }
 
   private handlePreviewError(): void {
-    if (this.playButton) {
-      this.playButton.textContent = '▶';
-      this.playButton.dataset.previewState = 'idle';
-      this.playButton.disabled = false;
+    this.currentAudio = null;
+    this.release('error');
+  }
+
+  private release(reason: 'ended' | 'stopped' | 'error'): void {
+    if (!this.playButton) {
+      return;
     }
 
-    this.currentAudio = null;
+    const button = this.playButton;
     this.playButton = null;
+    button.textContent = '▶';
+    button.dataset.previewState = 'idle';
+    button.disabled = false;
+    button.dispatchEvent(new CustomEvent('preview-ended', { bubbles: true, detail: { reason } }));
   }
 }
 

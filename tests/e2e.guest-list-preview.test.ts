@@ -59,6 +59,30 @@ test.describe('guest list song preview', () => {
     await expect(entry.locator('.guest-song-play')).toHaveCount(0);
   });
 
+  test('the play all button starts the first card and toggles to stop', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-song-play');
+
+    const playAll = page.locator('#guest-play-all');
+    await expect(playAll).toBeVisible();
+    await expect(playAll).toHaveText('Play all');
+
+    await playAll.click();
+
+    await expect(playAll).toHaveAttribute('data-playlist-state', 'running');
+    await expect(playAll).toHaveText('Stop');
+    await expect(async () => {
+      const playing = await page.locator('.guest-song-play[data-preview-state="playing"]').count();
+      expect(playing).toBe(1);
+    }).toPass({ timeout: 15000 });
+
+    await playAll.click();
+
+    await expect(playAll).toHaveAttribute('data-playlist-state', 'idle');
+    await expect(playAll).toHaveText('Play all');
+    await expect(page.locator('.guest-song-play[data-preview-state="playing"]')).toHaveCount(0);
+  });
+
   test('a guest name containing HTML renders as text, not elements', async ({ page, request }) => {
     const stamp = `${Date.now() % 100000}`;
     const xssName = `<b data-xss-probe>Bold ${stamp}</b>`;

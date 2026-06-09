@@ -67,6 +67,53 @@ describe('AudioPreviewManager preview state attribute', () => {
     expect(button.dataset.previewState).toBe('idle');
   });
 
+  test('natural completion dispatches a bubbling preview-ended event with reason ended', async () => {
+    const reasons: string[] = [];
+    document.body.addEventListener('preview-ended', e => reasons.push((e as CustomEvent).detail.reason));
+
+    await manager.playPreview('https://a.example/p.m4a', button);
+    FakeAudio.instances[0].emit('ended');
+
+    expect(reasons).toEqual(['ended']);
+  });
+
+  test('manual stop dispatches preview-ended with reason stopped', async () => {
+    const reasons: string[] = [];
+    document.body.addEventListener('preview-ended', e => reasons.push((e as CustomEvent).detail.reason));
+
+    await manager.playPreview('https://a.example/p.m4a', button);
+    manager.stopCurrentPreview();
+
+    expect(reasons).toEqual(['stopped']);
+  });
+
+  test('a playback error dispatches preview-ended with reason error', async () => {
+    const reasons: string[] = [];
+    document.body.addEventListener('preview-ended', e => reasons.push((e as CustomEvent).detail.reason));
+
+    await manager.playPreview('https://a.example/p.m4a', button);
+    FakeAudio.instances[0].emit('error');
+
+    expect(reasons).toEqual(['error']);
+  });
+
+  test('takeover by a second play dispatches stopped on the first button only', async () => {
+    const events: Array<{ reason: string; target: EventTarget | null }> = [];
+    document.body.addEventListener('preview-ended', e =>
+      events.push({ reason: (e as CustomEvent).detail.reason, target: e.target }));
+
+    const second = document.createElement('button');
+    second.textContent = '▶';
+    document.body.appendChild(second);
+
+    await manager.playPreview('https://a.example/one.m4a', button);
+    await manager.playPreview('https://a.example/two.m4a', second);
+
+    expect(events).toHaveLength(1);
+    expect(events[0].reason).toBe('stopped');
+    expect(events[0].target).toBe(button);
+  });
+
   test('playing a second button idles the first', async () => {
     const second = document.createElement('button');
     second.textContent = '▶';
