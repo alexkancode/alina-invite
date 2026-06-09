@@ -660,6 +660,21 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
       :global(.guest-name) {
         color: #483D8B;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      :global(.guest-name-row) {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        max-width: 100%;
+      }
+
+      :global(.guest-status-mark) {
+        flex-shrink: 0;
+        font-size: 0.85em;
       }
 
       :global(.guest-status-going) {

@@ -25,10 +25,10 @@ function trackIdFor(guest: GuestRsvp): string {
   return `guest-${guest.name}-${guest.song_title}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
-function renderStatus(attending: string): string {
+function renderStatusMark(attending: string): string {
   return attending === 'yes'
-    ? '<span class="guest-status-going text-phi-xs">Going ✓</span>'
-    : '<span class="guest-status-not-going text-phi-xs">Not going</span>';
+    ? '<span class="guest-status-mark guest-status-going">✓</span>'
+    : '<span class="guest-status-mark guest-status-not-going">✗</span>';
 }
 
 function renderSongRow(guest: GuestRsvp): string {
@@ -54,8 +54,10 @@ function renderSongRow(guest: GuestRsvp): string {
 export function renderGuestEntries(rsvps: GuestRsvp[]): string {
   return rsvps.map(guest => `
     <div class="guest-entry flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg">
-      <span class="guest-name font-medium text-phi-sm">${escapeHtml(guest.name)}</span>
-      ${renderStatus(guest.attending)}
+      <span class="guest-name-row">
+        <span class="guest-name font-medium text-phi-sm">${escapeHtml(guest.name)}</span>
+        ${renderStatusMark(guest.attending)}
+      </span>
       ${renderSongRow(guest)}
     </div>
   `).join('');

@@ -60,7 +60,8 @@ test.describe('guest list song preview', () => {
   });
 
   test('a guest name containing HTML renders as text, not elements', async ({ page, request }) => {
-    const xssName = `<b data-xss-probe>Bold ${Date.now() % 100000}</b>`;
+    const stamp = `${Date.now() % 100000}`;
+    const xssName = `<b data-xss-probe>Bold ${stamp}</b>`;
     await request.post('/api/rsvp', {
       headers: { 'x-forwarded-for': `10.79.0.${Date.now() % 250}` },
       data: { name: xssName, attending: 'yes', favoriteSong: null }
@@ -70,6 +71,6 @@ test.describe('guest list song preview', () => {
     await page.waitForSelector('#rsvp-guests .guest-entry');
 
     await expect(page.locator('[data-xss-probe]')).toHaveCount(0);
-    await expect(page.locator('.guest-name', { hasText: 'Bold' })).toContainText('<b');
+    await expect(page.locator('.guest-name', { hasText: `Bold ${stamp}` })).toContainText('<b');
   });
 });

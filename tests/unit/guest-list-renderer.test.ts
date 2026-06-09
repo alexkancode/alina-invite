@@ -17,19 +17,32 @@ const guestWithSong = (overrides: Partial<GuestRsvp> = {}): GuestRsvp => ({
 });
 
 describe('renderGuestEntries', () => {
-  test('renders name and going status', () => {
+  test('renders the name with an inline check mark for a going guest', () => {
     const host = render([{ name: 'Alex', attending: 'yes' }]);
 
-    const entry = host.querySelector('.guest-entry')!;
-    expect(entry.querySelector('.guest-name')?.textContent).toBe('Alex');
-    expect(entry.querySelector('.guest-status-going')?.textContent).toContain('Going');
+    const row = host.querySelector('.guest-name-row')!;
+    expect(row.querySelector('.guest-name')?.textContent).toBe('Alex');
+    const mark = row.querySelector('.guest-status-mark')!;
+    expect(mark.classList.contains('guest-status-going')).toBe(true);
+    expect(mark.textContent).toBe('✓');
   });
 
-  test('renders not-going status', () => {
+  test('renders the name with an inline x mark for a not-going guest', () => {
     const host = render([{ name: 'Sam', attending: 'no' }]);
 
-    expect(host.querySelector('.guest-status-not-going')?.textContent).toBe('Not going');
-    expect(host.querySelector('.guest-status-going')).toBeNull();
+    const mark = host.querySelector('.guest-status-mark')!;
+    expect(mark.classList.contains('guest-status-not-going')).toBe(true);
+    expect(mark.textContent).toBe('✗');
+  });
+
+  test('no standalone status line text remains', () => {
+    const host = render([
+      { name: 'Alex', attending: 'yes' },
+      { name: 'Sam', attending: 'no' }
+    ]);
+
+    expect(host.textContent).not.toContain('Going');
+    expect(host.textContent).not.toContain('Not going');
   });
 
   test('a guest without a song has no song line and no play button', () => {
