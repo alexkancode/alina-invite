@@ -10,6 +10,7 @@ export class AudioPreviewManager {
       this.playButton = button;
 
       button.textContent = '⏸';
+      button.dataset.previewState = 'playing';
       button.disabled = true;
 
       this.currentAudio.addEventListener('ended', () => this.handlePreviewEnd());
@@ -32,6 +33,7 @@ export class AudioPreviewManager {
 
     if (this.playButton) {
       this.playButton.textContent = '▶';
+      this.playButton.dataset.previewState = 'idle';
       this.playButton.disabled = false;
       this.playButton = null;
     }
@@ -44,6 +46,7 @@ export class AudioPreviewManager {
   private handlePreviewError(): void {
     if (this.playButton) {
       this.playButton.textContent = '▶';
+      this.playButton.dataset.previewState = 'idle';
       this.playButton.disabled = false;
     }
 

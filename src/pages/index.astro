@@ -713,7 +713,15 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         color: #fff;
         font-size: 0.7rem;
         line-height: 1;
+        padding-bottom: 4px;
+        padding-right: 2px;
         transition: background-color 0.15s ease;
+      }
+
+      :global(.guest-song-play[data-preview-state="playing"]) {
+        padding-bottom: 0;
+        padding-right: 0;
+        padding-top: 2px;
       }
 
       :global(.guest-song-play:hover) {
