@@ -136,6 +136,51 @@ describe('SpotifyCombobox selected state', () => {
     });
   });
 
+  describe('highlight navigation DOM reuse', () => {
+    const createTracks = (count: number): SpotifyTrack[] =>
+      Array.from({ length: count }, (_, i) => ({
+        id: `track-${i}`,
+        title: `Song ${i}`,
+        artist: `Artist ${i}`,
+        year: 1970 + i,
+        spotifyUrl: `https://open.spotify.com/track/track-${i}`,
+        spotifyId: `track-${i}`
+      }));
+
+    test('moving the highlight reuses the existing dropdown rows', () => {
+      combobox.setState({ results: createTracks(5), isOpen: true, highlightedIndex: 0 });
+      const rowsBefore = Array.from(container.querySelectorAll('#spotify-results li'));
+
+      searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+
+      const rowsAfter = Array.from(container.querySelectorAll('#spotify-results li'));
+      expect(rowsAfter).toHaveLength(5);
+      rowsAfter.forEach((row, i) => expect(row).toBe(rowsBefore[i]));
+    });
+
+    test('moving the highlight updates the highlighted class and aria-activedescendant', () => {
+      combobox.setState({ results: createTracks(5), isOpen: true, highlightedIndex: 0 });
+
+      searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+
+      const rows = container.querySelectorAll('#spotify-results li');
+      expect(rows[0].classList.contains('spotify-result-highlighted')).toBe(false);
+      expect(rows[1].classList.contains('spotify-result-highlighted')).toBe(true);
+      expect(searchInput.getAttribute('aria-activedescendant')).toBe('spotify-option-track-1');
+    });
+
+    test('new results still trigger a full rebuild', () => {
+      combobox.setState({ results: createTracks(5), isOpen: true, highlightedIndex: 0 });
+      const rowsBefore = Array.from(container.querySelectorAll('#spotify-results li'));
+
+      combobox.setState({ results: createTracks(3), isOpen: true, highlightedIndex: -1 });
+
+      const rowsAfter = Array.from(container.querySelectorAll('#spotify-results li'));
+      expect(rowsAfter).toHaveLength(3);
+      expect(rowsAfter[0]).not.toBe(rowsBefore[0]);
+    });
+  });
+
   describe('blur race protection', () => {
     test('result item mousedown is default-prevented so the input never blurs mid-click', () => {
       combobox.setState({ results: [createTrack()], isOpen: true });

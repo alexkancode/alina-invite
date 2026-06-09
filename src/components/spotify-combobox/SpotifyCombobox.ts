@@ -16,6 +16,9 @@ export class SpotifyCombobox {
   private debounceTimer: number | null = null;
   private currentRequestId: number = 0;
   private previousResultsLength: number = 0;
+  private renderedResults: SpotifyTrack[] | null = null;
+  private renderedIsOpen: boolean = false;
+  private renderedSelectedTrack: SpotifyTrack | null = null;
 
   private state: SearchState = {
     query: '',
@@ -263,6 +266,13 @@ export class SpotifyCombobox {
   }
 
   private renderDropdown(): void {
+    if (this.state.results === this.renderedResults && this.state.isOpen === this.renderedIsOpen) {
+      this.updateHighlight();
+      return;
+    }
+
+    this.renderedResults = this.state.results;
+    this.renderedIsOpen = this.state.isOpen;
     this.resultsList.innerHTML = '';
 
     if (this.state.isOpen && this.state.results.length > 0) {
@@ -277,8 +287,19 @@ export class SpotifyCombobox {
     }
   }
 
+  private updateHighlight(): void {
+    this.resultsList.querySelectorAll('li').forEach((row, index) => {
+      row.classList.toggle('spotify-result-highlighted', index === this.state.highlightedIndex);
+    });
+  }
+
   private renderSelection(): void {
     const track = this.state.selectedTrack;
+
+    if (track === this.renderedSelectedTrack) {
+      return;
+    }
+    this.renderedSelectedTrack = track;
 
     if (!track) {
       this.selectedContainer.innerHTML = '';

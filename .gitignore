@@ -28,3 +28,4 @@ pnpm-debug.log*
 
 # test artifacts
 test-results/
+test-audit.log

@@ -1,319 +1,237 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GET } from '../../src/pages/api/music-search.js';
+import { spotifyMusicService } from '../../src/lib/spotifyMusicService.js';
+import { createProductionService } from '../../src/lib/feature-flags/factory.js';
+import { SpotifyClient } from '../../src/lib/spotify/client.js';
 
-// Mock the Spotify client
-vi.mock('../../src/lib/spotify/client.js', () => ({
-  SpotifyClient: vi.fn().mockImplementation(() => ({
-    searchTracks: vi.fn()
-  }))
+vi.mock('../../src/lib/spotifyMusicService.js', () => ({
+  spotifyMusicService: {
+    searchMusic: vi.fn()
+  }
 }));
 
-// Mock the feature flag service
 vi.mock('../../src/lib/feature-flags/factory.js', () => ({
-  createProductionService: vi.fn(() => ({
-    isEnabled: vi.fn()
-  }))
+  createProductionService: vi.fn()
 }));
 
-describe('Spotify-Only Music Search Integration', () => {
-  let mockFeatureFlagService: any;
-  let mockSpotifyClient: any;
+vi.mock('../../src/lib/spotify/client.js', () => ({
+  SpotifyClient: vi.fn()
+}));
 
-  beforeEach(async () => {
-    // Reset mocks
+const searchMusicMock = vi.mocked(spotifyMusicService.searchMusic);
+
+const successResult = {
+  success: true,
+  songs: [
+    {
+      id: 'spotify-123',
+      title: 'Bohemian Rhapsody',
+      artist: 'Queen',
+      year: 1975,
+      source: 'spotify',
+      spotifyId: 'spotify-123',
+      previewUrl: 'https://example.com/preview.mp3',
+      albumArtUrl: 'https://example.com/album.jpg'
+    }
+  ],
+  source: 'spotify',
+  totalFound: 1,
+  cached: false
+};
+
+describe('Music search route', () => {
+  let featureFlagService: { isEnabled: ReturnType<typeof vi.fn> };
+
+  beforeEach(() => {
     vi.clearAllMocks();
-
-    // Setup feature flag service mock
-    const { createProductionService } = await import('../../src/lib/feature-flags/factory.js');
-    mockFeatureFlagService = {
-      isEnabled: vi.fn()
-    };
-    vi.mocked(createProductionService).mockReturnValue(mockFeatureFlagService);
-
-    // Setup Spotify client mock
-    const { SpotifyClient } = await import('../../src/lib/spotify/client.js');
-    mockSpotifyClient = {
-      searchTracks: vi.fn()
-    };
-    vi.mocked(SpotifyClient).mockImplementation(() => mockSpotifyClient);
+    featureFlagService = { isEnabled: vi.fn().mockResolvedValue(true) };
+    vi.mocked(createProductionService).mockReturnValue(featureFlagService as never);
   });
 
-  describe('Feature Flag Protection', () => {
-    it('should return 403 when music search feature is disabled', async () => {
-      mockFeatureFlagService.isEnabled.mockResolvedValue(false);
+  describe('feature flag protection', () => {
+    it('returns 403 when music search is disabled and never calls the service', async () => {
+      featureFlagService.isEnabled.mockResolvedValue(false);
 
-      const request = new Request('http://localhost/api/music-search?q=queen');
-      const response = await GET(request);
+      const response = await GET(new Request('http://localhost/api/music-search?q=queen'));
 
       expect(response.status).toBe(403);
-
-      const result = await response.json();
-      expect(result).toEqual({
+      expect(await response.json()).toEqual({
         error: 'Music search feature is disabled',
         code: 'FEATURE_DISABLED'
       });
-
-      expect(mockFeatureFlagService.isEnabled).toHaveBeenCalledWith('musicSearch');
+      expect(featureFlagService.isEnabled).toHaveBeenCalledWith('musicSearch');
+      expect(searchMusicMock).not.toHaveBeenCalled();
     });
   });
 
-  describe('Query Validation', () => {
-    beforeEach(() => {
-      mockFeatureFlagService.isEnabled.mockResolvedValue(true);
-    });
-
-    it('should return 400 for missing query parameter', async () => {
-      const request = new Request('http://localhost/api/music-search');
-      const response = await GET(request);
-
-      expect(response.status).toBe(400);
-
-      const result = await response.json();
-      expect(result.error).toBe('Search query is required');
-    });
-
-    it('should return 400 for empty query parameter', async () => {
-      const request = new Request('http://localhost/api/music-search?q=');
-      const response = await GET(request);
+  describe('query validation', () => {
+    it.each([
+      ['missing', 'http://localhost/api/music-search'],
+      ['empty', 'http://localhost/api/music-search?q='],
+      ['whitespace-only', 'http://localhost/api/music-search?q=%20%20%20']
+    ])('returns 400 for a %s query parameter', async (_label, url) => {
+      const response = await GET(new Request(url));
 
       expect(response.status).toBe(400);
-
-      const result = await response.json();
-      expect(result.error).toBe('Search query is required');
-    });
-
-    it('should return 400 for whitespace-only query parameter', async () => {
-      const request = new Request('http://localhost/api/music-search?q=%20%20%20');
-      const response = await GET(request);
-
-      expect(response.status).toBe(400);
-
-      const result = await response.json();
-      expect(result.error).toBe('Search query is required');
+      expect((await response.json()).error).toBe('Search query is required');
+      expect(searchMusicMock).not.toHaveBeenCalled();
     });
   });
 
-  describe('Successful Spotify Search', () => {
-    beforeEach(() => {
-      mockFeatureFlagService.isEnabled.mockResolvedValue(true);
-    });
+  describe('search delegation', () => {
+    it('returns the service result verbatim for a valid query', async () => {
+      searchMusicMock.mockResolvedValue(successResult as never);
 
-    it('should return Spotify search results for valid query', async () => {
-      const mockSongs = [
-        {
-          id: 'spotify-123',
-          title: 'Bohemian Rhapsody',
-          artist: 'Queen',
-          year: 1975,
-          source: 'spotify',
-          spotifyId: 'spotify-123',
-          previewUrl: 'https://example.com/preview.mp3',
-          albumArtUrl: 'https://example.com/album.jpg',
-          popularity: 90,
-          explicit: false
-        }
-      ];
-
-      mockSpotifyClient.searchTracks.mockResolvedValue(mockSongs);
-
-      const request = new Request('http://localhost/api/music-search?q=bohemian%20rhapsody');
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-
-      const result = await response.json();
-      expect(result).toEqual({
-        success: true,
-        songs: mockSongs,
-        source: 'spotify',
-        totalFound: 1,
-        cached: false
-      });
-
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith(
-        'bohemian rhapsody year:1970-1979',
-        15
+      const response = await GET(
+        new Request('http://localhost/api/music-search?q=bohemian%20rhapsody')
       );
-    });
-
-    it('should respect maxResults parameter', async () => {
-      mockSpotifyClient.searchTracks.mockResolvedValue([]);
-
-      const request = new Request('http://localhost/api/music-search?q=queen&maxResults=5');
-      const response = await GET(request);
 
       expect(response.status).toBe(200);
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith(
-        'queen year:1970-1979',
-        5
+      expect(await response.json()).toEqual(successResult);
+      expect(searchMusicMock).toHaveBeenCalledWith('bohemian rhapsody', 15);
+    });
+
+    it('passes an explicit maxResults through to the service', async () => {
+      searchMusicMock.mockResolvedValue(successResult as never);
+
+      await GET(new Request('http://localhost/api/music-search?q=queen&maxResults=5'));
+
+      expect(searchMusicMock).toHaveBeenCalledWith('queen', 5);
+    });
+
+    it.each([
+      ['includeSpotify', 'q=queen&includeSpotify=false'],
+      ['spotifyPrimary', 'q=queen&spotifyPrimary=false'],
+      ['includeFallback', 'q=queen&includeFallback=true']
+    ])('ignores the legacy %s parameter', async (_param, queryString) => {
+      searchMusicMock.mockResolvedValue(successResult as never);
+
+      const response = await GET(
+        new Request(`http://localhost/api/music-search?${queryString}`)
       );
-    });
-
-    it('should default to 15 maxResults when parameter not provided', async () => {
-      mockSpotifyClient.searchTracks.mockResolvedValue([]);
-
-      const request = new Request('http://localhost/api/music-search?q=queen');
-      const response = await GET(request);
 
       expect(response.status).toBe(200);
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalledWith(
-        'queen year:1970-1979',
-        15
-      );
-    });
-
-    it('should handle empty Spotify results gracefully', async () => {
-      mockSpotifyClient.searchTracks.mockResolvedValue([]);
-
-      const request = new Request('http://localhost/api/music-search?q=unknown%20song');
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-
-      const result = await response.json();
-      expect(result).toEqual({
-        success: true,
-        songs: [],
-        source: 'spotify',
-        totalFound: 0,
-        cached: false
-      });
+      expect(searchMusicMock).toHaveBeenCalledTimes(1);
+      expect(searchMusicMock).toHaveBeenCalledWith('queen', 15);
     });
   });
 
-  describe('Error Handling', () => {
-    beforeEach(() => {
-      mockFeatureFlagService.isEnabled.mockResolvedValue(true);
-    });
+  describe('error handling', () => {
+    it('maps an unexpected service throw to a stable error body', async () => {
+      searchMusicMock.mockRejectedValue(new Error('boom'));
 
-    it('should handle Spotify API errors gracefully', async () => {
-      mockSpotifyClient.searchTracks.mockRejectedValue(new Error('Spotify API error'));
-
-      const request = new Request('http://localhost/api/music-search?q=queen');
-      const response = await GET(request);
+      const response = await GET(new Request('http://localhost/api/music-search?q=queen'));
 
       expect(response.status).toBe(200);
-
-      const result = await response.json();
-      expect(result).toEqual({
+      expect(await response.json()).toEqual({
         success: false,
         songs: [],
-        source: 'error',
-        totalFound: 0,
-        error: 'Music search temporarily unavailable',
-        cached: false
+        error: 'Search service temporarily unavailable',
+        source: 'error'
       });
     });
+  });
+});
 
-    it('should handle authentication errors', async () => {
-      mockSpotifyClient.searchTracks.mockRejectedValue(new Error('Authentication failed'));
+describe('SpotifyMusicService', () => {
+  type ServiceModule = typeof import('../../src/lib/spotifyMusicService.js');
 
-      const request = new Request('http://localhost/api/music-search?q=queen');
-      const response = await GET(request);
+  let searchTracks: ReturnType<typeof vi.fn>;
 
-      expect(response.status).toBe(200);
+  const createService = async () => {
+    const { SpotifyMusicService } =
+      await vi.importActual<ServiceModule>('../../src/lib/spotifyMusicService.js');
+    return new SpotifyMusicService('client-id', 'client-secret');
+  };
 
-      const result = await response.json();
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Music search temporarily unavailable');
-    });
+  const errorWithCode = (code: string) => {
+    const error = new Error(code) as Error & { code: string };
+    error.code = code;
+    return error;
+  };
 
-    it('should handle network timeout errors', async () => {
-      mockSpotifyClient.searchTracks.mockRejectedValue(new Error('Network timeout'));
+  beforeEach(() => {
+    vi.clearAllMocks();
+    searchTracks = vi.fn();
+    vi.mocked(SpotifyClient).mockImplementation(() => ({ searchTracks }) as never);
+  });
 
-      const request = new Request('http://localhost/api/music-search?q=queen');
-      const response = await GET(request);
+  it('scopes the Spotify query to the 70s decade with the default maxResults', async () => {
+    searchTracks.mockResolvedValue([]);
+    const service = await createService();
 
-      expect(response.status).toBe(200);
+    await service.searchMusic('queen');
 
-      const result = await response.json();
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Music search temporarily unavailable');
+    expect(searchTracks).toHaveBeenCalledWith('queen year:1970-1979', 15);
+  });
+
+  it('passes an explicit maxResults to the client', async () => {
+    searchTracks.mockResolvedValue([]);
+    const service = await createService();
+
+    await service.searchMusic('queen', 5);
+
+    expect(searchTracks).toHaveBeenCalledWith('queen year:1970-1979', 5);
+  });
+
+  it('filters out tracks released outside the 70s', async () => {
+    searchTracks.mockResolvedValue([
+      { id: '1', title: 'In Decade', artist: 'A', year: 1975 },
+      { id: '2', title: 'Too Early', artist: 'B', year: 1969 },
+      { id: '3', title: 'Too Late', artist: 'C', year: 1980 },
+      { id: '4', title: 'No Year', artist: 'D' }
+    ]);
+    const service = await createService();
+
+    const result = await service.searchMusic('test');
+
+    expect(result.success).toBe(true);
+    expect(result.songs.map(s => s.id)).toEqual(['1']);
+    expect(result.totalFound).toBe(1);
+  });
+
+  it('rejects a blank query without calling the client', async () => {
+    const service = await createService();
+
+    const result = await service.searchMusic('   ');
+
+    expect(result).toMatchObject({ success: false, source: 'error', error: 'Search query is required' });
+    expect(searchTracks).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['AUTH_FAILED', 'Music search authentication failed'],
+    ['MAX_RETRIES_EXCEEDED', 'Music search service temporarily unavailable'],
+    ['MISSING_CLIENT_ID', 'Music search not configured - missing credentials'],
+    ['ANYTHING_ELSE', 'Music search temporarily unavailable']
+  ])('maps a %s client failure to its error message', async (code, message) => {
+    searchTracks.mockRejectedValue(errorWithCode(code));
+    const service = await createService();
+
+    const result = await service.searchMusic('queen');
+
+    expect(result).toEqual({
+      success: false,
+      songs: [],
+      source: 'error',
+      totalFound: 0,
+      error: message,
+      cached: false
     });
   });
 
-  describe('Parameter Simplification', () => {
-    beforeEach(() => {
-      mockFeatureFlagService.isEnabled.mockResolvedValue(true);
-      mockSpotifyClient.searchTracks.mockResolvedValue([]);
-    });
+  it('serves a repeated query from cache without a second client call', async () => {
+    searchTracks.mockResolvedValue([
+      { id: '1', title: 'Cached Song', artist: 'A', year: 1975 }
+    ]);
+    const service = await createService();
 
-    it('should ignore legacy includeSpotify parameter', async () => {
-      const request = new Request('http://localhost/api/music-search?q=queen&includeSpotify=false');
-      const response = await GET(request);
+    const first = await service.searchMusic('queen', 10);
+    const second = await service.searchMusic('queen', 10);
 
-      expect(response.status).toBe(200);
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalled();
-    });
-
-    it('should ignore legacy spotifyPrimary parameter', async () => {
-      const request = new Request('http://localhost/api/music-search?q=queen&spotifyPrimary=false');
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalled();
-    });
-
-    it('should ignore legacy includeFallback parameter', async () => {
-      const request = new Request('http://localhost/api/music-search?q=queen&includeFallback=true');
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-      expect(mockSpotifyClient.searchTracks).toHaveBeenCalled();
-    });
-  });
-
-  describe('Response Format Consistency', () => {
-    beforeEach(() => {
-      mockFeatureFlagService.isEnabled.mockResolvedValue(true);
-    });
-
-    it('should maintain consistent response format for success', async () => {
-      const mockSongs = [
-        {
-          id: 'test-id',
-          title: 'Test Song',
-          artist: 'Test Artist',
-          year: 1975,
-          source: 'spotify',
-          spotifyId: 'test-id'
-        }
-      ];
-
-      mockSpotifyClient.searchTracks.mockResolvedValue(mockSongs);
-
-      const request = new Request('http://localhost/api/music-search?q=test');
-      const response = await GET(request);
-
-      const result = await response.json();
-
-      expect(result).toHaveProperty('success');
-      expect(result).toHaveProperty('songs');
-      expect(result).toHaveProperty('source');
-      expect(result).toHaveProperty('totalFound');
-      expect(result).toHaveProperty('cached');
-
-      expect(typeof result.success).toBe('boolean');
-      expect(Array.isArray(result.songs)).toBe(true);
-      expect(typeof result.source).toBe('string');
-      expect(typeof result.totalFound).toBe('number');
-      expect(typeof result.cached).toBe('boolean');
-    });
-
-    it('should maintain consistent response format for errors', async () => {
-      mockSpotifyClient.searchTracks.mockRejectedValue(new Error('Test error'));
-
-      const request = new Request('http://localhost/api/music-search?q=test');
-      const response = await GET(request);
-
-      const result = await response.json();
-
-      expect(result).toHaveProperty('success', false);
-      expect(result).toHaveProperty('songs', []);
-      expect(result).toHaveProperty('source', 'error');
-      expect(result).toHaveProperty('totalFound', 0);
-      expect(result).toHaveProperty('error');
-      expect(result).toHaveProperty('cached', false);
-    });
+    expect(searchTracks).toHaveBeenCalledTimes(1);
+    expect(first.cached).toBe(false);
+    expect(second.cached).toBe(true);
+    expect(second.songs).toEqual(first.songs);
   });
 });
