@@ -45,7 +45,23 @@ unchanged in behavior (events are additive); locked by 69 unit/canary/integratio
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed ec344ab..80fdd86; play-all button detected in served HTML 74 seconds
+after upload; page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=f59d48a3-f9d8-460d-919b-df79fb4dd09e&
 
 ### Stage 2: UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (via reversible write to the same-IP "test" entry, then reverted):**
+- Play all button visible above the guest list, label "Play all"
+- Click: state running, label "Stop" (magenta), exactly one card playing
+- Click again: state idle, label "Play all", zero cards playing
+- Test entry song fields reverted to null; guest count unchanged at 4
+- Screenshot confirms the running Stop pill centered above the entries with the playing
+  card showing centered pause bars
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
