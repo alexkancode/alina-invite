@@ -14,9 +14,11 @@ const devRsvps: Array<{
   message: string;
   attending: string;
   timestamp: string;
-  favorite_song_title?: string;
-  favorite_song_artist?: string;
-  favorite_song_year?: number;
+  song_title?: string;
+  song_artist?: string;
+  song_year?: number;
+  song_spotify_url?: string;
+  song_spotify_id?: string;
   ip_hash: string;
 }> = [];
 
@@ -38,8 +40,11 @@ function checkProfanity(text: string, field: string, ip: string): boolean {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  const body = await request.json();
-  const { name, message, attending, favoriteSong } = body;
+  const formData = await request.formData();
+  const name = formData.get('name') as string;
+  const message = formData.get('message') as string;
+  const attending = formData.get('attending') as string;
+  const favoriteSongJson = formData.get('favoriteSong') as string;
 
   if (!name || !attending) {
     return new Response(JSON.stringify({ error: 'Name and attendance required' }), {
@@ -72,6 +77,16 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
+  // Parse song data from JSON string
+  let favoriteSong = null;
+  if (favoriteSongJson && favoriteSongJson.trim()) {
+    try {
+      favoriteSong = JSON.parse(favoriteSongJson);
+    } catch (error) {
+      console.warn('Invalid song data format:', favoriteSongJson);
+    }
+  }
+
   const entry = {
     name,
     message: message || '',
@@ -84,23 +99,25 @@ export const POST: APIRoute = async ({ request }) => {
   const songTitle = favoriteSong?.title || null;
   const songArtist = favoriteSong?.artist || null;
   const songYear = favoriteSong?.year || null;
-  const musicbrainzId = favoriteSong?.musicbrainz_id || null;
+  const songSpotifyUrl = favoriteSong?.spotifyUrl || null;
+  const songSpotifyId = favoriteSong?.spotifyId || null;
 
   // Insert or update RSVP and get the ID
   const { rows: insertRows } = await pool.query(
-    `INSERT INTO rsvps (name, message, attending, ip_hash, favorite_song_title, favorite_song_artist, favorite_song_year, musicbrainz_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `INSERT INTO rsvps (name, message, attending, ip_hash, song_title, song_artist, song_year, song_spotify_url, song_spotify_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      ON CONFLICT (ip_hash) DO UPDATE SET
        name = EXCLUDED.name,
        message = EXCLUDED.message,
        attending = EXCLUDED.attending,
-       favorite_song_title = EXCLUDED.favorite_song_title,
-       favorite_song_artist = EXCLUDED.favorite_song_artist,
-       favorite_song_year = EXCLUDED.favorite_song_year,
-       musicbrainz_id = EXCLUDED.musicbrainz_id,
+       song_title = EXCLUDED.song_title,
+       song_artist = EXCLUDED.song_artist,
+       song_year = EXCLUDED.song_year,
+       song_spotify_url = EXCLUDED.song_spotify_url,
+       song_spotify_id = EXCLUDED.song_spotify_id,
        updated_at = now()
      RETURNING id`,
-    [name.trim(), entry.message, attending, ipHash, songTitle, songArtist, songYear, musicbrainzId]
+    [name.trim(), entry.message, attending, ipHash, songTitle, songArtist, songYear, songSpotifyUrl, songSpotifyId]
   );
 
   const rsvpId = insertRows[0].id;
@@ -124,9 +141,11 @@ export const POST: APIRoute = async ({ request }) => {
       message: message || '',
       attending,
       timestamp: new Date().toISOString(),
-      favorite_song_title: favoriteSong?.title || null,
-      favorite_song_artist: favoriteSong?.artist || null,
-      favorite_song_year: favoriteSong?.year || null,
+      song_title: favoriteSong?.title || null,
+      song_artist: favoriteSong?.artist || null,
+      song_year: favoriteSong?.year || null,
+      song_spotify_url: favoriteSong?.spotifyUrl || null,
+      song_spotify_id: favoriteSong?.spotifyId || null,
       ip_hash: ipHash
     };
 
@@ -227,7 +246,7 @@ export const GET: APIRoute = async ({ request }) => {
   try {
     const { rows } = await pool.query(
       `SELECT name, message, attending, created_at as timestamp,
-              favorite_song_title, favorite_song_artist, favorite_song_year, musicbrainz_id
+              song_title, song_artist, song_year, song_spotify_url, song_spotify_id
        FROM rsvps ORDER BY created_at`
     );
 
@@ -244,16 +263,16 @@ export const GET: APIRoute = async ({ request }) => {
         name: "Alex K",
         attending: "yes",
         message: "Can't wait to celebrate!",
-        favorite_song_title: "Bohemian Rhapsody",
-        favorite_song_artist: "Queen",
+        song_title: "Bohemian Rhapsody",
+        song_artist: "Queen",
         timestamp: "2026-01-15T10:30:00Z"
       },
       {
         name: "Sarah M",
         attending: "yes",
         message: "So excited!",
-        favorite_song_title: "Stayin' Alive",
-        favorite_song_artist: "Bee Gees",
+        song_title: "Stayin' Alive",
+        song_artist: "Bee Gees",
         timestamp: "2026-01-14T15:20:00Z"
       },
       {
@@ -269,9 +288,11 @@ export const GET: APIRoute = async ({ request }) => {
       name: r.name,
       attending: r.attending,
       message: r.message,
-      favorite_song_title: r.favorite_song_title,
-      favorite_song_artist: r.favorite_song_artist,
-      favorite_song_year: r.favorite_song_year,
+      song_title: r.song_title,
+      song_artist: r.song_artist,
+      song_year: r.song_year,
+      song_spotify_url: r.song_spotify_url,
+      song_spotify_id: r.song_spotify_id,
       timestamp: r.timestamp
     }))];
 

@@ -209,6 +209,7 @@ export class SpotifyCombobox {
         title: track.title,
         artist: track.artist,
         year: track.year,
+        spotifyUrl: track.spotifyUrl,
         spotifyId: track.spotifyId
       });
 
