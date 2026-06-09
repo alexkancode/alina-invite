@@ -1,4 +1,4 @@
-# Deployment Forensics - Any Song Search
+# Deployment Forensics - Play All Previews
 
 ## Deployment Details
 
@@ -8,62 +8,44 @@
 
 ## Commits Being Deployed
 
-- any-song-search implementation
-- any-song-search plan
+- play-all-previews implementation (plan was pushed with the previous deploy)
 
 ## Changes Deployed
 
-1. **Unscoped music search** - the `year:1970-1979` Spotify query suffix and the 70s-only
-   result filter are removed; guests can pick any song
-2. **New field label** - "Disco song for the party playlist (optional)" in both widget
-   branches
-3. **No database migrations** - code-only deploy
+1. **Play All button** on the guest list: plays each RSVP card's preview sequentially in
+   DOM order, one at a time; toggles to Stop while running; hidden when no card has a song
+2. **`preview-ended` CustomEvents** from `AudioPreviewManager` (reasons: ended, stopped,
+   error) driving the new `PlayAllController`; manual interaction aborts the sequence
+3. **No API or database changes** - front-end only
 
 ## Pre-Deployment Baseline
 
-- Cutover marker: the page HTML server-renders the field label, so the new label text
-  appearing at `/` marks the new version (verified locally: 1 occurrence)
-- Production search currently returns only 70s results
+- Cutover marker: `id="guest-play-all"` appears in the served page HTML of the new version
+  (server-rendered button), absent today
 
 ## Risk Assessment
 
-**Low Risk:** a deletion in the service plus label text; behavior locked by updated suites
-(108 unit/canary/integration + 13 e2e green locally). Search cache is in-memory, so stale
-70s-scoped cache entries vanish with the container swap.
+**Low Risk:** additive front-end controller and one button; existing playback paths
+unchanged in behavior (events are additive); locked by 69 unit/canary/integration tests and
+14 e2e tests locally, including a real-time observation of a sequential handoff
 
 **High Risk:** none identified
 
 ## Rollback Plan
 
-- Code-only: redeploy previous commit `f6dc8af` via Railway if needed
+- Code-only: redeploy previous commit via Railway if needed
 
 ## Success Criteria
 
-- Page HTML contains the new label (cutover marker)
-- Prod search for a modern song returns post-2020 results
-- Prod search for a 70s song still returns results; missing query still 400
-- RSVP, preview, and guest list endpoints unchanged
+- Page HTML contains the play-all button (cutover marker)
+- With a song card present, clicking Play all puts the first card into the playing state
+  and the trigger into the running Stop state; clicking again stops and resets
+- Individual card playback and modal previews unchanged
 
 ## Deployment Process Tracking
 
-### Stage 1: Push and Build
-**Status:** COMPLETED (pushed f6dc8af..3e35f03; build clean)
+### Stage 1: Push and Cutover
+**Status:** pending
 
-### Stage 2: Railway Upload and Cutover
-**Status:** COMPLETED
-**Result:** New label detected in served HTML 85 seconds after upload; page 200 throughout
-**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=5eb609cc-3c5f-4cc3-acb6-792466953a8a&
-
-### Stage 3: API and UI Validation
-**Status:** COMPLETED
-**Results:**
-- Modern search: "espresso sabrina carpenter" returns Espresso (2024) - decade scope gone
-- 70s search: "dancing queen" still returns Dancing Queen (1976)
-- Missing query: 400 unchanged
-- RSVP and preview endpoints: 200
-
-## Final Status Assessment
-
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE
-**Functionality:** VERIFIED against all success criteria
+### Stage 2: UI Validation
+**Status:** pending
