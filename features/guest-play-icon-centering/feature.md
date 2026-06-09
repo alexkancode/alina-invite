@@ -23,12 +23,17 @@ flowchart LR
     style E fill:#1e5c2e,color:#fff
 ```
 
-## Outcome
+## Outcome (revised after field feedback)
 
-- The idle triangle renders visually centered in the guest-list button at desktop and mobile
-  sizes; the pause glyph remains acceptable (checked in the same pass).
-- CSS-only change to the existing `.guest-song-play` rule; no markup, renderer, or playback
-  changes.
-- Because glyph ink cannot be measured from the DOM, the tuned values are validated by
-  high-zoom screenshots during implementation; the e2e suite continues to lock the
-  behavioral states.
+Padding compensation tuned against one machine's fallback font proved wrong on another
+machine's fonts — the pause glyph still rendered low for the user. Glyph-metric compensation
+is inherently device-dependent, so the final fix removes the dependence entirely:
+
+- The button's text glyphs are made transparent (the text remains in the DOM because the
+  playback state machine keys off it) and the icons are drawn in pure CSS on `::before` —
+  a border-built triangle for idle, gradient-built bars for playing, switched by the
+  `data-preview-state` attribute the AudioPreviewManager now maintains.
+- Shapes are em-sized so the smaller mobile button scales them automatically.
+- Geometric centering via absolute position and transform: identical on every OS and font
+  stack; the triangle gets a slight optical x-offset, standard for play icons.
+- The earlier padding compensation is removed.

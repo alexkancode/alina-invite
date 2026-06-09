@@ -705,23 +705,40 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         width: 1.5rem;
         height: 1.5rem;
         flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: relative;
         border-radius: 9999px;
         background: rgb(34, 197, 94);
-        color: #fff;
+        color: transparent;
         font-size: 0.7rem;
         line-height: 1;
-        padding-bottom: 4px;
-        padding-right: 2px;
         transition: background-color 0.15s ease;
       }
 
-      :global(.guest-song-play[data-preview-state="playing"]) {
-        padding-bottom: 0;
-        padding-right: 0;
-        padding-top: 2px;
+      :global(.guest-song-play::before) {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-38%, -50%);
+        border-left: 0.7em solid #fff;
+        border-top: 0.45em solid transparent;
+        border-bottom: 0.45em solid transparent;
+      }
+
+      :global(.guest-song-play[data-preview-state="playing"]::before) {
+        border: 0;
+        width: 0.7em;
+        height: 0.85em;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(
+          to right,
+          #fff 0,
+          #fff 0.26em,
+          transparent 0.26em,
+          transparent 0.44em,
+          #fff 0.44em,
+          #fff 0.7em
+        );
       }
 
       :global(.guest-song-play:hover) {
