@@ -3,6 +3,7 @@ import consistentImportPatterns from './rules/consistent-import-patterns.js';
 import noSqlConcatenation from './rules/no-sql-concatenation.js';
 import validateTsconfigConsistency from './rules/validate-tsconfig-consistency.js';
 import databaseConfigConsistency from './rules/simplified/database-config-consistency.js';
+import noHardcodedLocalhost from './rules/no-hardcoded-localhost.js';
 
 export default {
   rules: {
@@ -10,7 +11,8 @@ export default {
     'consistent-import-patterns': consistentImportPatterns,
     'no-sql-concatenation': noSqlConcatenation,
     'validate-tsconfig-consistency': validateTsconfigConsistency,
-    'database-config-consistency': databaseConfigConsistency
+    'database-config-consistency': databaseConfigConsistency,
+    'no-hardcoded-localhost': noHardcodedLocalhost
   },
   configs: {
     recommended: {
