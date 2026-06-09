@@ -339,7 +339,10 @@ export class SpotifyCombobox {
       event.preventDefault();
     });
 
-    li.addEventListener('click', () => {
+    li.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('.spotify-track-actions')) {
+        return;
+      }
       this.selectTrack(track);
     });
 
@@ -370,16 +373,17 @@ export class SpotifyCombobox {
         </div>
 
         <div class="spotify-track-actions flex gap-2">
-          ${track.previewUrl ? `
-            <button
-              type="button"
-              class="spotify-play-button w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors"
-              title="Play preview"
-              data-preview-url="${track.previewUrl}"
-            >
-              ▶
-            </button>
-          ` : ''}
+          <button
+            type="button"
+            class="spotify-play-button w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors"
+            title="Play preview"
+            data-track-id="${this.escapeAttribute(track.id)}"
+            data-title="${this.escapeAttribute(track.title)}"
+            data-artist="${this.escapeAttribute(track.artist)}"
+            ${track.previewUrl ? `data-preview-url="${this.escapeAttribute(track.previewUrl)}"` : ''}
+          >
+            ▶
+          </button>
 
           <button
             type="button"
@@ -539,6 +543,10 @@ export class SpotifyCombobox {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  private escapeAttribute(text: string): string {
+    return this.escapeHtml(text).replace(/"/g, '&quot;');
   }
 
   public getState(): SearchState {

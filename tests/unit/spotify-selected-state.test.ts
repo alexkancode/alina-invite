@@ -181,6 +181,37 @@ describe('SpotifyCombobox selected state', () => {
     });
   });
 
+  describe('action button isolation', () => {
+    test('every dropdown row renders a play button with track data attributes', () => {
+      combobox.setState({ results: [createTrack()], isOpen: true });
+
+      const playButton = container.querySelector('#spotify-results .spotify-play-button') as HTMLButtonElement;
+      expect(playButton).not.toBeNull();
+      expect(playButton.dataset.trackId).toBe('track-1');
+      expect(playButton.dataset.title).toBe('Dancing Queen');
+      expect(playButton.dataset.artist).toBe('ABBA');
+    });
+
+    test('clicking the play button does not select the track', () => {
+      combobox.setState({ results: [createTrack()], isOpen: true });
+
+      const playButton = container.querySelector('#spotify-results .spotify-play-button') as HTMLButtonElement;
+      playButton.click();
+
+      expect(combobox.getState().selectedTrack).toBeNull();
+      expect(hiddenInput.value).toBe('');
+    });
+
+    test('clicking the open-in-spotify button does not select the track', () => {
+      combobox.setState({ results: [createTrack()], isOpen: true });
+
+      const openButton = container.querySelector('#spotify-results .spotify-open-button') as HTMLButtonElement;
+      openButton.click();
+
+      expect(combobox.getState().selectedTrack).toBeNull();
+    });
+  });
+
   describe('blur race protection', () => {
     test('result item mousedown is default-prevented so the input never blurs mid-click', () => {
       combobox.setState({ results: [createTrack()], isOpen: true });

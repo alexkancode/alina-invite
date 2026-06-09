@@ -142,12 +142,23 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
       background: rgba(255, 182, 217, 0.25);
       outline: 2px solid #FFB6D9;
     }
+
+    .spotify-preview-unavailable {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .spotify-preview-unavailable:hover {
+      background: rgb(34, 197, 94);
+    }
   </style>
 
   <!-- JavaScript Enhancement -->
   <script>
     import { SpotifyCombobox } from '../components/spotify-combobox/SpotifyCombobox.js';
     import { AudioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
+    import { PreviewResolver } from '../components/spotify-combobox/PreviewResolver.js';
+    import { PreviewPlaybackController } from '../components/spotify-combobox/PreviewPlaybackController.js';
 
     // Initialize dynamic combobox when DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
@@ -168,6 +179,7 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
           const combobox = new SpotifyCombobox(container);
           container.spotifyCombobox = combobox;
           const audioManager = new AudioPreviewManager();
+          const previewController = new PreviewPlaybackController(new PreviewResolver(), audioManager);
 
           // Handle audio preview clicks
           container.addEventListener('click', async (event) => {
@@ -176,18 +188,10 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 
             if (playButton) {
               event.stopPropagation();
-              const previewUrl = playButton.getAttribute('data-preview-url');
-
-              if (previewUrl) {
-                try {
-                  if (playButton.textContent === '▶') {
-                    await audioManager.playPreview(previewUrl, playButton);
-                  } else {
-                    audioManager.stopCurrentPreview();
-                  }
-                } catch (error) {
-                  console.warn('Preview playback failed:', error);
-                }
+              try {
+                await previewController.handlePlayClick(playButton);
+              } catch (error) {
+                console.warn('Preview playback failed:', error);
               }
             }
 
