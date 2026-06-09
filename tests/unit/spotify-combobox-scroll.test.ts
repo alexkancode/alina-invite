@@ -12,6 +12,7 @@ describe('Spotify Combobox Auto-scroll Behavior', () => {
           <option value="">Select a groovy tune...</option>
         </select>
         <div class="spotify-dynamic-container" style="display: none;">
+          <div class="spotify-input-wrapper relative">
           <input
             type="text"
             id="spotify-search"
@@ -24,6 +25,8 @@ describe('Spotify Combobox Auto-scroll Behavior', () => {
             role="listbox"
             class="spotify-results-dropdown"
           ></ul>
+          </div>
+          <div class="spotify-selected-container hidden"></div>
           <input type="hidden" name="favoriteSong" />
         </div>
       </div>

@@ -3,6 +3,7 @@ import { Profanease } from 'profanease';
 import en from 'profanease/langs/en';
 import { createHash } from 'crypto';
 import pool from '../../lib/db';
+import { parseRsvpSong } from '../../lib/rsvpSong';
 
 export const prerender = false;
 
@@ -40,11 +41,20 @@ function checkProfanity(text: string, field: string, ip: string): boolean {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  const formData = await request.formData();
-  const name = formData.get('name') as string;
-  const message = formData.get('message') as string;
-  const attending = formData.get('attending') as string;
-  const favoriteSongJson = formData.get('favoriteSong') as string;
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Request body must be JSON' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const name = typeof body.name === 'string' ? body.name : '';
+  const message = typeof body.message === 'string' ? body.message : '';
+  const attending = typeof body.attending === 'string' ? body.attending : '';
+  const favoriteSong = parseRsvpSong(body.favoriteSong);
 
   if (!name || !attending) {
     return new Response(JSON.stringify({ error: 'Name and attendance required' }), {
@@ -75,16 +85,6 @@ export const POST: APIRoute = async ({ request }) => {
       status: 409,
       headers: { 'Content-Type': 'application/json' },
     });
-  }
-
-  // Parse song data from JSON string
-  let favoriteSong = null;
-  if (favoriteSongJson && favoriteSongJson.trim()) {
-    try {
-      favoriteSong = JSON.parse(favoriteSongJson);
-    } catch (error) {
-      console.warn('Invalid song data format:', favoriteSongJson);
-    }
   }
 
   const entry = {

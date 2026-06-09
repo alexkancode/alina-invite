@@ -12,7 +12,7 @@ describe('Spotify Combobox Integration', () => {
         </select>
 
         <div class="spotify-dynamic-container" style="display: none;">
-          <div class="relative">
+          <div class="spotify-input-wrapper relative">
             <input
               type="text"
               id="spotify-search"
@@ -28,6 +28,8 @@ describe('Spotify Combobox Integration', () => {
               class="hidden"
             ></ul>
           </div>
+
+          <div class="spotify-selected-container hidden"></div>
 
           <input type="hidden" name="favoriteSong" id="favoriteSong-value" />
         </div>
@@ -131,7 +133,8 @@ describe('Spotify Combobox Integration', () => {
       // Verify form integration
       expect(hiddenInput.value).toContain('Dancing Queen');
       expect(hiddenInput.value).toContain('ABBA');
-      expect(searchInput.value).toBe('Dancing Queen - ABBA');
+      expect(searchInput.value).toBe('');
+      expect(container.querySelector('.spotify-selected-card')?.textContent).toContain('Dancing Queen');
 
       vi.useRealTimers();
     });

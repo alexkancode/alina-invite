@@ -30,8 +30,15 @@ describe('SpotifyCombobox', () => {
     hiddenInput.type = 'hidden';
     hiddenInput.name = 'favoriteSong';
 
-    container.appendChild(searchInput);
-    container.appendChild(resultsList);
+    const inputWrapper = mockElement('div') as HTMLDivElement;
+    inputWrapper.className = 'spotify-input-wrapper relative';
+    const selectedContainer = mockElement('div') as HTMLDivElement;
+    selectedContainer.className = 'spotify-selected-container hidden';
+
+    inputWrapper.appendChild(searchInput);
+    inputWrapper.appendChild(resultsList);
+    container.appendChild(inputWrapper);
+    container.appendChild(selectedContainer);
     container.appendChild(hiddenInput);
     document.body.appendChild(container);
 
@@ -220,10 +227,12 @@ describe('SpotifyCombobox', () => {
         title: track.title,
         artist: track.artist,
         year: track.year,
+        spotifyUrl: track.spotifyUrl,
         spotifyId: track.spotifyId
       }));
 
-      expect(searchInput.value).toBe(`${track.title} - ${track.artist}`);
+      expect(searchInput.value).toBe('');
+      expect(container.querySelector('.spotify-selected-card')?.textContent).toContain(track.title);
       expect(combobox.getState().selectedTrack).toEqual(track);
     });
 

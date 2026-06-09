@@ -7,8 +7,11 @@ const createMockDOM = () => {
   const container = document.createElement('div');
   container.innerHTML = `
     <div data-testid="spotify-combobox">
-      <input type="text" id="spotify-search" role="combobox" />
-      <div id="spotify-results" role="listbox"></div>
+      <div class="spotify-input-wrapper relative">
+        <input type="text" id="spotify-search" role="combobox" />
+        <div id="spotify-results" role="listbox"></div>
+      </div>
+      <div class="spotify-selected-container hidden"></div>
       <input type="hidden" name="favoriteSong" id="favoriteSong-value" />
     </div>
   `;
@@ -73,12 +76,16 @@ describe('SpotifyCombobox RSVP Integration', () => {
       expect(parsedData.spotifyUrl).toBe('https://open.spotify.com/track/test-track-id');
     });
 
-    test('selectTrack should update search input display', () => {
+    test('selectTrack should render the selected card instead of input text', () => {
       const track = createMockTrack();
 
       combobox.selectTrack(track);
 
-      expect(searchInput.value).toBe('Dancing Queen - ABBA');
+      expect(searchInput.value).toBe('');
+      const card = container.querySelector('.spotify-selected-card');
+      expect(card).not.toBeNull();
+      expect(card!.textContent).toContain('Dancing Queen');
+      expect(card!.textContent).toContain('ABBA');
     });
 
     test('selectTrack should dispatch change event on hidden field', () => {
@@ -107,7 +114,7 @@ describe('SpotifyCombobox RSVP Integration', () => {
 
       // Verify selection occurred
       expect(hiddenInput.value).toContain(track.title);
-      expect(searchInput.value).toContain(track.title);
+      expect(container.querySelector('.spotify-selected-card')?.textContent).toContain(track.title);
     });
   });
 

@@ -1,117 +1,112 @@
-import { describe, test, expect, beforeEach } from 'vitest';
+import { beforeAll, describe, expect, test } from 'vitest';
 
-const TEST_API_BASE = 'http://localhost:4321';
+const BASE = 'http://localhost:4321';
 
-describe('RSVP Song Submission Integration', () => {
-  const createFormData = (data: Record<string, string>) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-    return formData;
+let testIpCounter = 0;
+
+function uniqueIp(): string {
+  testIpCounter++;
+  return `10.9.${Math.floor(testIpCounter / 256)}.${testIpCounter % 256}`;
+}
+
+function uniqueName(prefix: string): string {
+  return `${prefix} ${testIpCounter}-${process.pid}`;
+}
+
+async function postJson(body: unknown, ip: string) {
+  return fetch(`${BASE}/api/rsvp`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-forwarded-for': ip
+    },
+    body: typeof body === 'string' ? body : JSON.stringify(body)
+  });
+}
+
+beforeAll(async () => {
+  try {
+    await fetch(BASE);
+  } catch {
+    throw new Error('Dev server not running. Start it with: npm run dev');
+  }
+});
+
+describe('RSVP song submission over the browser JSON contract', () => {
+  const songData = {
+    title: 'Dancing Queen',
+    artist: 'ABBA',
+    year: 1976,
+    spotifyUrl: 'https://open.spotify.com/track/0GjEhVFGZW8afUYGChu3Rr',
+    spotifyId: '0GjEhVFGZW8afUYGChu3Rr'
   };
 
-  test('RSVP submission with song data should save to database', async () => {
-    const songData = {
-      title: 'Test Song',
-      artist: 'Test Artist',
-      year: 2023,
-      spotifyUrl: 'https://open.spotify.com/track/test123',
-      spotifyId: 'test123'
-    };
+  test('saves an RSVP with a song object exactly as index.astro submits it', async () => {
+    const ip = uniqueIp();
+    const name = uniqueName('Song Submitter');
 
-    const formData = createFormData({
-      name: 'Integration Test User',
+    const res = await postJson({
+      name,
+      message: 'Saved my jam',
       attending: 'yes',
-      message: 'Test RSVP with song',
-      favoriteSong: JSON.stringify(songData)
-    });
+      favoriteSong: songData
+    }, ip);
 
-    const response = await fetch(`${TEST_API_BASE}/api/rsvp`, {
-      method: 'POST',
-      body: formData
-    });
-
-    expect(response.status).toBe(200);
-
-    const result = await response.json();
+    expect(res.status).toBe(200);
+    const result = await res.json();
     expect(result.success).toBe(true);
-    expect(result.entry.name).toBe('Integration Test User');
+    expect(result.entry.name).toBe(name);
     expect(result.entry.favoriteSong).toMatchObject(songData);
   });
 
-  test('RSVP submission without song data should work', async () => {
-    const formData = createFormData({
-      name: 'No Song User',
-      attending: 'yes',
-      message: 'Test RSVP without song'
-    });
+  test('returns the stored song fields in the RSVP list', async () => {
+    const ip = uniqueIp();
+    const name = uniqueName('Song Lister');
 
-    const response = await fetch(`${TEST_API_BASE}/api/rsvp`, {
-      method: 'POST',
-      body: formData
-    });
+    await postJson({ name, attending: 'yes', favoriteSong: songData }, ip);
 
-    expect(response.status).toBe(200);
+    const listRes = await fetch(`${BASE}/api/rsvp`);
+    expect(listRes.status).toBe(200);
+    const list = await listRes.json();
+    const saved = list.rsvps.find((r: { name: string }) => r.name === name);
 
-    const result = await response.json();
-    expect(result.success).toBe(true);
-    expect(result.entry.name).toBe('No Song User');
+    expect(saved).toBeDefined();
+    expect(saved.song_title).toBe(songData.title);
+    expect(saved.song_artist).toBe(songData.artist);
+    expect(Number(saved.song_year)).toBe(songData.year);
+    expect(saved.song_spotify_url).toBe(songData.spotifyUrl);
+    expect(saved.song_spotify_id).toBe(songData.spotifyId);
+  });
+
+  test('accepts an RSVP with no song', async () => {
+    const ip = uniqueIp();
+    const name = uniqueName('No Song');
+
+    const res = await postJson({ name, attending: 'yes', favoriteSong: null }, ip);
+
+    expect(res.status).toBe(200);
+    const result = await res.json();
     expect(result.entry.favoriteSong).toBeNull();
   });
 
-  test('RSVP submission with malformed song JSON should handle gracefully', async () => {
-    const formData = createFormData({
-      name: 'Malformed JSON User',
-      attending: 'yes',
-      message: 'Test with bad JSON',
-      favoriteSong: 'invalid-json{'
-    });
+  test('degrades a malformed favoriteSong to null instead of rejecting the RSVP', async () => {
+    const ip = uniqueIp();
+    const name = uniqueName('Bad Song Shape');
 
-    const response = await fetch(`${TEST_API_BASE}/api/rsvp`, {
-      method: 'POST',
-      body: formData
-    });
+    const res = await postJson({ name, attending: 'yes', favoriteSong: 'not an object' }, ip);
 
-    expect(response.status).toBe(200);
-
-    const result = await response.json();
-    expect(result.success).toBe(true);
+    expect(res.status).toBe(200);
+    const result = await res.json();
     expect(result.entry.favoriteSong).toBeNull();
   });
 
-  test('saved RSVP should appear in GET list with song data', async () => {
-    // First submit an RSVP with song data
-    const songData = {
-      title: 'List Test Song',
-      artist: 'List Test Artist',
-      year: 2023,
-      spotifyUrl: 'https://open.spotify.com/track/listtest',
-      spotifyId: 'listtest'
-    };
+  test('rejects a missing name with 400', async () => {
+    const res = await postJson({ attending: 'yes', favoriteSong: songData }, uniqueIp());
+    expect(res.status).toBe(400);
+  });
 
-    const formData = createFormData({
-      name: 'List Test User',
-      attending: 'yes',
-      favoriteSong: JSON.stringify(songData)
-    });
-
-    await fetch(`${TEST_API_BASE}/api/rsvp`, {
-      method: 'POST',
-      body: formData
-    });
-
-    // Then check if it appears in the list
-    const listResponse = await fetch(`${TEST_API_BASE}/api/rsvp`);
-    expect(listResponse.status).toBe(200);
-
-    const listResult = await listResponse.json();
-    expect(listResult.rsvps).toBeInstanceOf(Array);
-
-    // Find our test RSVP
-    const testRsvp = listResult.rsvps.find((rsvp: any) => rsvp.name === 'List Test User');
-    expect(testRsvp).toBeDefined();
-    expect(testRsvp.song_title).toBe('List Test Song');
-    expect(testRsvp.song_artist).toBe('List Test Artist');
+  test('rejects a non-JSON body with 400, not 500', async () => {
+    const res = await postJson('this is not json {', uniqueIp());
+    expect(res.status).toBe(400);
   });
 });

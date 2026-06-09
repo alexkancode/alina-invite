@@ -59,7 +59,7 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 
     <!-- Enhanced Combobox (shown when JS loads) -->
     <div class="spotify-dynamic-container" style="display: none;">
-      <div class="relative">
+      <div class="spotify-input-wrapper relative">
         <input
           type="text"
           id="spotify-search"
@@ -90,12 +90,14 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
         </div>
       </div>
 
+      <div class="spotify-selected-container hidden"></div>
+
       <input type="hidden" name="favoriteSong" id="favoriteSong-value" />
     </div>
   </div>
 
   <!-- Spotify Combobox Styling -->
-  <style>
+  <style is:global>
     .spotify-result-highlighted .spotify-result-content {
       background: rgba(255, 182, 217, 0.1) !important;
       border-left: 3px solid #FFB6D9;
@@ -103,6 +105,42 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 
     .spotify-results-dropdown:focus-within {
       border-color: #FFB6D9;
+    }
+
+    .spotify-selected-card {
+      display: flex;
+      align-items: center;
+      border-radius: 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid hsl(270, 30%, 40%);
+    }
+
+    .spotify-selected-card .spotify-result-content {
+      flex: 1;
+      cursor: default;
+    }
+
+    .spotify-selected-card .spotify-result-content:hover {
+      background: transparent;
+    }
+
+    .spotify-clear-button {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      margin-right: 0.75rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--color-warm-cream, #FFF8E7);
+      font-size: 1.25rem;
+      line-height: 1;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .spotify-clear-button:hover,
+    .spotify-clear-button:focus-visible {
+      background: rgba(255, 182, 217, 0.25);
+      outline: 2px solid #FFB6D9;
     }
   </style>
 
@@ -123,10 +161,12 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 
         if (fallbackSelect && dynamicContainer) {
           fallbackSelect.style.display = 'none';
+          fallbackSelect.removeAttribute('name');
           dynamicContainer.style.display = 'block';
 
           // Initialize combobox
           const combobox = new SpotifyCombobox(container);
+          container.spotifyCombobox = combobox;
           const audioManager = new AudioPreviewManager();
 
           // Handle audio preview clicks

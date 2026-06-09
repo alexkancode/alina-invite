@@ -11,6 +11,8 @@ export class SpotifyCombobox {
   private searchInput: HTMLInputElement;
   private resultsList: HTMLUListElement;
   private hiddenInput: HTMLInputElement;
+  private inputWrapper: HTMLElement;
+  private selectedContainer: HTMLElement;
   private debounceTimer: number | null = null;
   private currentRequestId: number = 0;
   private previousResultsLength: number = 0;
@@ -35,8 +37,11 @@ export class SpotifyCombobox {
     this.searchInput = this.container.querySelector('[role="combobox"]') as HTMLInputElement;
     this.resultsList = this.container.querySelector('[role="listbox"]') as HTMLUListElement;
     this.hiddenInput = this.container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    this.inputWrapper = this.container.querySelector('.spotify-input-wrapper') as HTMLElement;
+    this.selectedContainer = this.container.querySelector('.spotify-selected-container') as HTMLElement;
 
-    if (!this.searchInput || !this.resultsList || !this.hiddenInput) {
+    if (!this.searchInput || !this.resultsList || !this.hiddenInput ||
+        !this.inputWrapper || !this.selectedContainer) {
       throw new Error('Required elements not found in container');
     }
   }
@@ -213,9 +218,10 @@ export class SpotifyCombobox {
         spotifyId: track.spotifyId
       });
 
-      this.searchInput.value = `${track.title} - ${track.artist}`;
+      this.searchInput.value = '';
       this.setState({
         selectedTrack: track,
+        query: '',
         isOpen: false,
         highlightedIndex: -1,
         results: []
@@ -223,10 +229,15 @@ export class SpotifyCombobox {
     } else {
       this.hiddenInput.value = '';
       this.searchInput.value = '';
-      this.setState({ selectedTrack: null });
+      this.setState({ selectedTrack: null, query: '' });
     }
 
     this.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  private handleClearClick(): void {
+    this.selectTrack(null);
+    this.searchInput.focus();
   }
 
   public setState(partialState: Partial<SearchState>): void {
@@ -247,6 +258,11 @@ export class SpotifyCombobox {
   }
 
   private updateDOM(): void {
+    this.renderDropdown();
+    this.renderSelection();
+  }
+
+  private renderDropdown(): void {
     this.resultsList.innerHTML = '';
 
     if (this.state.isOpen && this.state.results.length > 0) {
@@ -261,6 +277,34 @@ export class SpotifyCombobox {
     }
   }
 
+  private renderSelection(): void {
+    const track = this.state.selectedTrack;
+
+    if (!track) {
+      this.selectedContainer.innerHTML = '';
+      this.selectedContainer.classList.add('hidden');
+      this.inputWrapper.classList.remove('hidden');
+      return;
+    }
+
+    this.selectedContainer.innerHTML = `
+      <div class="spotify-selected-card" data-testid="spotify-selected-card">
+        ${this.renderTrackContent(track)}
+        <button
+          type="button"
+          class="spotify-clear-button"
+          aria-label="Clear selected song"
+        >&times;</button>
+      </div>
+    `;
+
+    const clearButton = this.selectedContainer.querySelector('.spotify-clear-button') as HTMLButtonElement;
+    clearButton.addEventListener('click', this.handleClearClick.bind(this));
+
+    this.selectedContainer.classList.remove('hidden');
+    this.inputWrapper.classList.add('hidden');
+  }
+
   private createResultItem(track: SpotifyTrack, index: number): HTMLLIElement {
     const li = document.createElement('li');
     li.role = 'option';
@@ -268,7 +312,21 @@ export class SpotifyCombobox {
     li.className = `spotify-result-item${index === this.state.highlightedIndex ? ' spotify-result-highlighted' : ''}`;
     li.setAttribute('data-track-id', track.id);
 
-    li.innerHTML = `
+    li.innerHTML = this.renderTrackContent(track);
+
+    li.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+    });
+
+    li.addEventListener('click', () => {
+      this.selectTrack(track);
+    });
+
+    return li;
+  }
+
+  private renderTrackContent(track: SpotifyTrack): string {
+    return `
       <div class="spotify-result-content flex items-center gap-phi-md px-phi-md py-phi-sm cursor-pointer hover:bg-white/5 transition-colors">
         ${track.albumArtUrl ? `
           <img
@@ -313,12 +371,6 @@ export class SpotifyCombobox {
         </div>
       </div>
     `;
-
-    li.addEventListener('click', () => {
-      this.selectTrack(track);
-    });
-
-    return li;
   }
 
   private scrollResultsToTop(): void {

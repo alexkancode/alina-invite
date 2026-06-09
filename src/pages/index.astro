@@ -994,10 +994,15 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           if (radio) radio.checked = true;
 
           // Restore favorite song selection
-          const songSelect = form.elements.namedItem('favoriteSong') as HTMLSelectElement;
-          if (data.favoriteSong) {
-            const songValue = JSON.stringify(data.favoriteSong);
-            songSelect.value = songValue;
+          const savedSong = data.favoriteSong && typeof data.favoriteSong === 'object'
+            ? data.favoriteSong
+            : null;
+          const comboboxHost = document.querySelector('[data-testid="spotify-combobox"]') as any;
+          if (comboboxHost?.spotifyCombobox) {
+            comboboxHost.spotifyCombobox.selectTrack(savedSong);
+          } else if (savedSong) {
+            const songField = form.elements.namedItem('favoriteSong') as HTMLInputElement;
+            songField.value = JSON.stringify(savedSong);
           }
         }
         savedSnapshot = getCurrentFormData();
@@ -1019,9 +1024,19 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         }
       });
 
+      function parseSongField(raw: FormDataEntryValue | undefined): object | null {
+        if (typeof raw !== 'string' || !raw) return null;
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const data = Object.fromEntries(new FormData(form));
+        const formValues = Object.fromEntries(new FormData(form));
+        const data = { ...formValues, favoriteSong: parseSongField(formValues.favoriteSong) };
 
         try {
           const res = await fetch('/api/rsvp', {

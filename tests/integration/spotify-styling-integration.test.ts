@@ -12,6 +12,7 @@ describe('Spotify Combobox Styling Integration', () => {
           <option value="">Select a groovy tune...</option>
         </select>
         <div class="spotify-dynamic-container" style="display: none;">
+          <div class="spotify-input-wrapper relative">
           <input
             type="text"
             id="spotify-search"
@@ -26,6 +27,8 @@ describe('Spotify Combobox Styling Integration', () => {
             class="spotify-results-dropdown hidden"
             style="background: rgba(255,255,255,0.06); border: 2px solid hsl(270, 30%, 40%);"
           ></ul>
+          </div>
+          <div class="spotify-selected-container hidden"></div>
           <input type="hidden" name="favoriteSong" />
         </div>
       </div>

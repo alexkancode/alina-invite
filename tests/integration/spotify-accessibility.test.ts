@@ -15,6 +15,7 @@ describe('Spotify Combobox Accessibility Tests', () => {
           <option value="test2">Test Song 2</option>
         </select>
         <div class="spotify-dynamic-container" style="display: none;">
+          <div class="spotify-input-wrapper relative">
           <input
             type="text"
             id="spotify-search"
@@ -26,6 +27,8 @@ describe('Spotify Combobox Accessibility Tests', () => {
             placeholder="Search for songs, artists, albums..."
           />
           <ul id="spotify-results" role="listbox" aria-label="Search results" class="hidden"></ul>
+          </div>
+          <div class="spotify-selected-container hidden"></div>
           <input type="hidden" name="favoriteSong" id="favoriteSong-value" />
         </div>
       </div>

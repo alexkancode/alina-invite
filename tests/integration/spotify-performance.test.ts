@@ -11,6 +11,7 @@ describe('Spotify Combobox Performance Tests', () => {
           <option value="">Select a groovy tune...</option>
         </select>
         <div class="spotify-dynamic-container" style="display: none;">
+          <div class="spotify-input-wrapper relative">
           <input
             type="text"
             id="spotify-search"
@@ -20,6 +21,8 @@ describe('Spotify Combobox Performance Tests', () => {
             placeholder="Search for songs, artists, albums..."
           />
           <ul id="spotify-results" role="listbox" class="hidden"></ul>
+          </div>
+          <div class="spotify-selected-container hidden"></div>
           <input type="hidden" name="favoriteSong" id="favoriteSong-value" />
         </div>
       </div>
