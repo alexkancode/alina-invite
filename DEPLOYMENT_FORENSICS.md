@@ -1,4 +1,4 @@
-# Deployment Forensics - Song Preview Playback
+# Deployment Forensics - Song Preview Playback and Hidden Spotify Open Button
 
 ## Deployment Details
 
@@ -20,7 +20,9 @@
    first click, plays via the existing AudioPreviewManager, mutes the button when no
    preview exists
 3. **Click-bubbling guard** - play and open-in-Spotify clicks no longer select the track
-4. **No database migrations** - code-only deploy
+4. **Open-in-Spotify button hidden** - no longer rendered in rows or the selected card;
+   widget handler kept dormant for easy restoration (hide-spotify-open-button)
+5. **No database migrations** - code-only deploy
 
 ## Pre-Deployment Baseline (captured before deploy)
 
@@ -64,16 +66,37 @@
 ## Deployment Process Tracking
 
 ### Stage 1: Local Build
-**Status:** pending
+**Status:** COMPLETED (no errors; pre-existing TypeScript warnings only)
 
 ### Stage 2: Railway Upload
-**Status:** pending
+**Status:** COMPLETED
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=e917ccd4-dd2a-4ea0-8786-ff5aa77dc3f3&
 
 ### Stage 3: Railway Build
-**Status:** pending
+**Status:** COMPLETED (image built and pushed, no errors in build log)
 
 ### Stage 4: Service Health
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Cutover detected 148s after upload (`/api/preview` flipped 404 to 200); page
+served 200 throughout; no 502s observed
 
 ### Stage 5: API and UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results:**
+- Preview happy path: 200, ABBA Dancing Queen previewUrl returned; the audio URL itself
+  fetched 200 audio/x-m4p, 1.1MB
+- Missing params: 400 "Title and artist are required"
+- Unknown song: 200 success false (no error surface)
+- Regressions: RSVP GET 200 with song fields; music search 200 with results
+- Production UI: 10 dropdown rows, 10 play buttons, 0 open-in-Spotify buttons; clicking
+  play reached the pause state (audio playing) without selecting the track;
+  screenshot-verified identical to local
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (no downtime observed)
+**Functionality:** VERIFIED against all success criteria
+
+Deployed commits also included `hide-spotify-open-button` (plan d1+, implementation in
+`5f6123c` push set) alongside `song-preview-playback`.
