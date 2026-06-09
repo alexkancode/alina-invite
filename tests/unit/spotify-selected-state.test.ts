@@ -202,13 +202,12 @@ describe('SpotifyCombobox selected state', () => {
       expect(hiddenInput.value).toBe('');
     });
 
-    test('clicking the open-in-spotify button does not select the track', () => {
+    test('the open-in-spotify button is not rendered in rows or the selected card', () => {
       combobox.setState({ results: [createTrack()], isOpen: true });
+      expect(container.querySelector('#spotify-results .spotify-open-button')).toBeNull();
 
-      const openButton = container.querySelector('#spotify-results .spotify-open-button') as HTMLButtonElement;
-      openButton.click();
-
-      expect(combobox.getState().selectedTrack).toBeNull();
+      combobox.selectTrack(createTrack());
+      expect(container.querySelector('.spotify-selected-card .spotify-open-button')).toBeNull();
     });
   });
 

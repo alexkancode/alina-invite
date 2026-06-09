@@ -384,15 +384,6 @@ export class SpotifyCombobox {
           >
             ▶
           </button>
-
-          <button
-            type="button"
-            class="spotify-open-button w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors"
-            title="Open in Spotify"
-            data-spotify-url="${track.spotifyUrl}"
-          >
-            🎧
-          </button>
         </div>
       </div>
     `;
