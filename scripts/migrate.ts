@@ -2,7 +2,13 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 
-const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+const client = new pg.Client({
+  host: 'localhost',
+  port: 5432,
+  database: 'party',
+  user: 'postgres',
+  password: 'dev'
+});
 
 async function migrate() {
   await client.connect();
