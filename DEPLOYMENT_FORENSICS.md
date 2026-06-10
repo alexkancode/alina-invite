@@ -1,4 +1,4 @@
-# Deployment Forensics - Song Input Placeholder
+# Deployment Forensics - Album Art Cards
 
 ## Deployment Details
 
@@ -8,57 +8,47 @@
 
 ## Commits Being Deployed
 
-- song-input-placeholder implementation
-- song-input-placeholder plan
+- album-art-cards implementation
+- album-art-cards plan
 
 ## Changes Deployed
 
-1. **New placeholder** - "Search Spotify for a fun song for the party playlist"
-2. **Readable placeholder styling** - dedicated `::placeholder` rule (warm cream, 0.8
-   alpha, 0.75em so the full sentence fits the input) replacing the 50%-opacity utility
-3. **Visible label removed** - input carries `aria-label` so the accessible name remains;
-   the flag-disabled fallback select keeps its label
-4. **No API or database changes** - front-end only
+1. **Album art card backgrounds** - guest cards with a song show the album cover under a
+   50% white gradient overlay (one style rule; per-entry URL via CSS custom property)
+2. **Art travels the save pipeline** - combobox hidden field, `parseRsvpSong`, RSVP API
+   insert/update and list GET all carry `albumArtUrl` / `song_album_art_url`
+3. **Migration 0009** - `ADD COLUMN IF NOT EXISTS song_album_art_url TEXT` (additive,
+   idempotent; applied cleanly on local boot)
 
 ## Pre-Deployment Baseline
 
-- Cutover marker: the new placeholder text is server-rendered in the page HTML (verified
-  locally: 1 occurrence); absent on prod today
+- Cutover marker: list GET response gains the `song_album_art_url` key after migration
+- Existing prod entries have no stored art and keep the plain background by design
 
 ## Risk Assessment
 
-**Low Risk:** markup text and one style rule; accessibility suite updated and green;
-combobox e2e suites green locally
+**Low Risk:** additive column; style-attribute injection covered by a renderer test that
+asserts a hostile URL cannot create extra CSS declarations; 88 unit/canary/integration
+tests and 5 e2e green locally
+
+**Medium Risk:** migration on the prod database (mitigated: single idempotent ADD COLUMN,
+same shape as 0008 which applied cleanly)
 
 ## Rollback Plan
 
-- Code-only: redeploy previous commit via Railway if needed
+- Code rollback is safe (column is additive); redeploy previous commit via Railway
 
 ## Success Criteria
 
-- Page HTML contains the new placeholder text and the aria-label; no label element above
-  the search input
-- Modal shows the readable single-line placeholder fully within the input
-- Search, selection, and submit flows unchanged
+- List GET returns `song_album_art_url`
+- A test write with art renders the white-washed cover background with readable text, then
+  reverts cleanly
+- Song-less cards unchanged; previews and play-all unaffected
 
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** COMPLETED
-**Result:** Pushed 475b7f6..7d11187; new placeholder text detected in served HTML 141
-seconds after upload; page 200 throughout
-**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=5489e360-c7a6-4be9-853f-b200745c831a&
+**Status:** pending
 
-### Stage 2: UI Validation
-**Status:** COMPLETED
-**Results (client-side only, zero data writes):**
-- Placeholder: "Search Spotify for a fun song for the party playlist", rendered at
-  rgba(255, 248, 231, 0.8) and fully visible within the input
-- No label element above the input; aria-label present
-- Search still returns 10 results; screenshot confirms the cleaner one-line field
-
-## Final Status Assessment
-
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE
-**Functionality:** VERIFIED against all success criteria
+### Stage 2: Migration and UI Validation
+**Status:** pending
