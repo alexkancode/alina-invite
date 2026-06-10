@@ -38,7 +38,8 @@ describe('RSVP song submission over the browser JSON contract', () => {
     artist: 'ABBA',
     year: 1976,
     spotifyUrl: 'https://open.spotify.com/track/0GjEhVFGZW8afUYGChu3Rr',
-    spotifyId: '0GjEhVFGZW8afUYGChu3Rr'
+    spotifyId: '0GjEhVFGZW8afUYGChu3Rr',
+    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27370f7a1b35d5165c85b95a0e0'
   };
 
   test('saves an RSVP with a song object exactly as index.astro submits it', async () => {
@@ -76,6 +77,7 @@ describe('RSVP song submission over the browser JSON contract', () => {
     expect(Number(saved.song_year)).toBe(songData.year);
     expect(saved.song_spotify_url).toBe(songData.spotifyUrl);
     expect(saved.song_spotify_id).toBe(songData.spotifyId);
+    expect(saved.song_album_art_url).toBe(songData.albumArtUrl);
   });
 
   test('accepts an RSVP with no song', async () => {

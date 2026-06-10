@@ -10,7 +10,8 @@ const exactListApiRow = {
   song_artist: 'CHIC',
   song_year: 1978,
   song_spotify_url: 'https://open.spotify.com/track/abc',
-  song_spotify_id: 'abc'
+  song_spotify_id: 'abc',
+  song_album_art_url: 'https://i.scdn.co/image/lefreak.jpg'
 };
 
 describe('Guest list payload contract canary', () => {
@@ -20,6 +21,9 @@ describe('Guest list payload contract canary', () => {
 
     expect(host.querySelector('.guest-song-line')?.textContent).toContain('Le Freak');
     expect(host.querySelector('.guest-song-line')?.textContent).not.toContain('CHIC');
+    const entry = host.querySelector('.guest-entry') as HTMLElement;
+    expect(entry.classList.contains('guest-entry-art')).toBe(true);
+    expect(entry.getAttribute('style')).toContain('https://i.scdn.co/image/lefreak.jpg');
     const button = host.querySelector('.guest-song-play') as HTMLButtonElement;
     expect(button?.dataset.trackId).toBe('abc');
     expect(button?.dataset.title).toBe('Le Freak');

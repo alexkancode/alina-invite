@@ -6,6 +6,7 @@ export interface GuestRsvp {
   song_title?: string | null;
   song_artist?: string | null;
   song_spotify_id?: string | null;
+  song_album_art_url?: string | null;
 }
 
 const ESCAPE_MAP: Record<string, string> = {
@@ -53,14 +54,29 @@ function renderSongRow(guest: GuestRsvp): string {
   `;
 }
 
+function entryArt(guest: GuestRsvp): { className: string; styleAttribute: string } {
+  if (!guest.song_album_art_url) {
+    return { className: '', styleAttribute: '' };
+  }
+
+  const safeUrl = guest.song_album_art_url.replace(/["'()\\]/g, '');
+  return {
+    className: ' guest-entry-art',
+    styleAttribute: ` style="--album-art: url(&quot;${escapeHtml(safeUrl)}&quot;)"`
+  };
+}
+
 export function renderGuestEntries(rsvps: GuestRsvp[]): string {
-  return rsvps.map(guest => `
-    <div class="guest-entry flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg">
+  return rsvps.map(guest => {
+    const art = entryArt(guest);
+    return `
+    <div class="guest-entry${art.className} flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg"${art.styleAttribute}>
       <span class="guest-name-row">
         <span class="guest-name font-medium text-phi-sm">${escapeHtml(guest.name)}</span>
         ${renderStatusMark(guest.attending)}
       </span>
       ${renderSongRow(guest)}
     </div>
-  `).join('');
+  `;
+  }).join('');
 }

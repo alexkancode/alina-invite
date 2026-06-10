@@ -20,6 +20,7 @@ const devRsvps: Array<{
   song_year?: number;
   song_spotify_url?: string;
   song_spotify_id?: string;
+  song_album_art_url?: string;
   ip_hash: string;
 }> = [];
 
@@ -101,11 +102,12 @@ export const POST: APIRoute = async ({ request }) => {
   const songYear = favoriteSong?.year || null;
   const songSpotifyUrl = favoriteSong?.spotifyUrl || null;
   const songSpotifyId = favoriteSong?.spotifyId || null;
+  const songAlbumArtUrl = favoriteSong?.albumArtUrl || null;
 
   // Insert or update RSVP and get the ID
   const { rows: insertRows } = await pool.query(
-    `INSERT INTO rsvps (name, message, attending, ip_hash, song_title, song_artist, song_year, song_spotify_url, song_spotify_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `INSERT INTO rsvps (name, message, attending, ip_hash, song_title, song_artist, song_year, song_spotify_url, song_spotify_id, song_album_art_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      ON CONFLICT (ip_hash) DO UPDATE SET
        name = EXCLUDED.name,
        message = EXCLUDED.message,
@@ -115,9 +117,10 @@ export const POST: APIRoute = async ({ request }) => {
        song_year = EXCLUDED.song_year,
        song_spotify_url = EXCLUDED.song_spotify_url,
        song_spotify_id = EXCLUDED.song_spotify_id,
+       song_album_art_url = EXCLUDED.song_album_art_url,
        updated_at = now()
      RETURNING id`,
-    [name.trim(), entry.message, attending, ipHash, songTitle, songArtist, songYear, songSpotifyUrl, songSpotifyId]
+    [name.trim(), entry.message, attending, ipHash, songTitle, songArtist, songYear, songSpotifyUrl, songSpotifyId, songAlbumArtUrl]
   );
 
   const rsvpId = insertRows[0].id;
@@ -146,6 +149,7 @@ export const POST: APIRoute = async ({ request }) => {
       song_year: favoriteSong?.year || null,
       song_spotify_url: favoriteSong?.spotifyUrl || null,
       song_spotify_id: favoriteSong?.spotifyId || null,
+      song_album_art_url: favoriteSong?.albumArtUrl || null,
       ip_hash: ipHash
     };
 
@@ -246,7 +250,8 @@ export const GET: APIRoute = async ({ request }) => {
   try {
     const { rows } = await pool.query(
       `SELECT name, message, attending, created_at as timestamp,
-              song_title, song_artist, song_year, song_spotify_url, song_spotify_id
+              song_title, song_artist, song_year, song_spotify_url, song_spotify_id,
+              song_album_art_url
        FROM rsvps ORDER BY created_at`
     );
 
@@ -293,6 +298,7 @@ export const GET: APIRoute = async ({ request }) => {
       song_year: r.song_year,
       song_spotify_url: r.song_spotify_url,
       song_spotify_id: r.song_spotify_id,
+      song_album_art_url: r.song_album_art_url,
       timestamp: r.timestamp
     }))];
 

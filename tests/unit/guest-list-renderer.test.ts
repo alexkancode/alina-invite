@@ -13,6 +13,7 @@ const guestWithSong = (overrides: Partial<GuestRsvp> = {}): GuestRsvp => ({
   song_title: 'Dancing Queen',
   song_artist: 'ABBA',
   song_spotify_id: 'spotify-123',
+  song_album_art_url: null,
   ...overrides
 });
 
@@ -104,6 +105,32 @@ describe('renderGuestEntries', () => {
     const button = host.querySelector('.guest-song-play') as HTMLButtonElement;
     expect(button.dataset.title).toBe('"><script>alert(1)</script>');
     expect(button.dataset.artist).toBe('A&B "Quotes"');
+  });
+
+  describe('album art background', () => {
+    test('an entry with art gets the art class and custom property', () => {
+      const host = render([guestWithSong({ song_album_art_url: 'https://i.scdn.co/image/cover.jpg' })]);
+
+      const entry = host.querySelector('.guest-entry') as HTMLElement;
+      expect(entry.classList.contains('guest-entry-art')).toBe(true);
+      expect(entry.getAttribute('style')).toContain('--album-art: url("https://i.scdn.co/image/cover.jpg")');
+    });
+
+    test('an entry without art has neither the class nor the property', () => {
+      const host = render([guestWithSong()]);
+
+      const entry = host.querySelector('.guest-entry') as HTMLElement;
+      expect(entry.classList.contains('guest-entry-art')).toBe(false);
+      expect(entry.getAttribute('style')).toBeNull();
+    });
+
+    test('an art url with quotes cannot break out into extra declarations', () => {
+      const host = render([guestWithSong({ song_album_art_url: 'https://x.example/a.jpg"); background: red; --x: url("' })]);
+
+      const entry = host.querySelector('.guest-entry') as HTMLElement;
+      expect(entry.style.getPropertyValue('background')).toBe('');
+      expect(entry.style.getPropertyValue('--album-art')).toBeTruthy();
+    });
   });
 
   test('renders one entry per rsvp in order', () => {

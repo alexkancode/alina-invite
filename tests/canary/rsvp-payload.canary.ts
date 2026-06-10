@@ -7,6 +7,7 @@ const track: SpotifyTrack = {
   title: 'Stayin\' Alive',
   artist: 'Bee Gees',
   year: 1977,
+  albumArtUrl: 'https://i.scdn.co/image/canary-art.jpg',
   spotifyUrl: 'https://open.spotify.com/track/canary-1',
   spotifyId: 'canary-1'
 };
@@ -17,7 +18,8 @@ const hiddenFieldJson = JSON.stringify({
   artist: track.artist,
   year: track.year,
   spotifyUrl: track.spotifyUrl,
-  spotifyId: track.spotifyId
+  spotifyId: track.spotifyId,
+  albumArtUrl: track.albumArtUrl
 });
 
 describe('RSVP payload contract canary', () => {
@@ -31,7 +33,8 @@ describe('RSVP payload contract canary', () => {
       artist: track.artist,
       year: track.year,
       spotifyUrl: track.spotifyUrl,
-      spotifyId: track.spotifyId
+      spotifyId: track.spotifyId,
+      albumArtUrl: track.albumArtUrl
     });
   });
 

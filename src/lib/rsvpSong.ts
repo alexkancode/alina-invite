@@ -1,7 +1,7 @@
 import type { SpotifyTrack } from '../components/spotify-combobox/types.js';
 
 export type RsvpSong = Pick<SpotifyTrack, 'title' | 'artist'> &
-  Partial<Pick<SpotifyTrack, 'id' | 'year' | 'spotifyUrl' | 'spotifyId'>>;
+  Partial<Pick<SpotifyTrack, 'id' | 'year' | 'spotifyUrl' | 'spotifyId' | 'albumArtUrl'>>;
 
 export function parseRsvpSong(value: unknown): RsvpSong | null {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
@@ -19,6 +19,7 @@ export function parseRsvpSong(value: unknown): RsvpSong | null {
     id: typeof candidate.id === 'string' ? candidate.id : undefined,
     year: typeof candidate.year === 'number' ? candidate.year : undefined,
     spotifyUrl: typeof candidate.spotifyUrl === 'string' ? candidate.spotifyUrl : undefined,
-    spotifyId: typeof candidate.spotifyId === 'string' ? candidate.spotifyId : undefined
+    spotifyId: typeof candidate.spotifyId === 'string' ? candidate.spotifyId : undefined,
+    albumArtUrl: typeof candidate.albumArtUrl === 'string' ? candidate.albumArtUrl : undefined
   };
 }

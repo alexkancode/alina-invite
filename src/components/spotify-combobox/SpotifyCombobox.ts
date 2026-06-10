@@ -219,7 +219,8 @@ export class SpotifyCombobox {
         artist: track.artist,
         year: track.year,
         spotifyUrl: track.spotifyUrl,
-        spotifyId: track.spotifyId
+        spotifyId: track.spotifyId,
+        albumArtUrl: track.albumArtUrl
       });
 
       this.searchInput.value = '';

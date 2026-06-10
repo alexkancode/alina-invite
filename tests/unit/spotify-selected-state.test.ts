@@ -81,7 +81,8 @@ describe('SpotifyCombobox selected state', () => {
         artist: 'ABBA',
         year: 1976,
         spotifyUrl: 'https://open.spotify.com/track/track-1',
-        spotifyId: 'track-1'
+        spotifyId: 'track-1',
+        albumArtUrl: 'https://i.scdn.co/image/cover.jpg'
       });
     });
 

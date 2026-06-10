@@ -14,7 +14,8 @@ test.describe('guest list song preview', () => {
           artist: 'ABBA',
           year: 1976,
           spotifyUrl: 'https://open.spotify.com/track/0GjEhVFGZW8afUYGChu3Rr',
-          spotifyId: '0GjEhVFGZW8afUYGChu3Rr'
+          spotifyId: '0GjEhVFGZW8afUYGChu3Rr',
+          albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27370f7a1b35d5165c85b95a0e0'
         }
       }
     });
@@ -29,6 +30,10 @@ test.describe('guest list song preview', () => {
     await expect(entry.locator('.guest-song-line')).toContainText('Dancing Queen');
     await expect(entry.locator('.guest-song-line')).not.toContainText('ABBA');
     await expect(entry.locator('.guest-song-play')).toHaveCount(1);
+
+    const background = await entry.evaluate(el => getComputedStyle(el).backgroundImage);
+    expect(background).toContain('i.scdn.co');
+    expect(background).toContain('linear-gradient');
   });
 
   test('clicking the entry play button leaves the idle state', async ({ page }) => {
