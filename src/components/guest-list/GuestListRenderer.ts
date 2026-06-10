@@ -38,7 +38,7 @@ function renderSongRow(guest: GuestRsvp): string {
 
   return `
     <div class="guest-song-row">
-      <span class="guest-song-line text-phi-xs">♪ ${escapeHtml(guest.song_title)} - ${escapeHtml(guest.song_artist)}</span>
+      <span class="guest-song-line text-phi-xs">♪ ${escapeHtml(guest.song_title)}</span>
       <button
         type="button"
         class="guest-song-play"

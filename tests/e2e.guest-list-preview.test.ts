@@ -26,7 +26,8 @@ test.describe('guest list song preview', () => {
     await page.waitForSelector('#rsvp-guests .guest-entry');
 
     const entry = page.locator('.guest-entry', { hasText: seededName });
-    await expect(entry.locator('.guest-song-line')).toContainText('Dancing Queen - ABBA');
+    await expect(entry.locator('.guest-song-line')).toContainText('Dancing Queen');
+    await expect(entry.locator('.guest-song-line')).not.toContainText('ABBA');
     await expect(entry.locator('.guest-song-play')).toHaveCount(1);
   });
 

@@ -58,10 +58,11 @@ describe('renderGuestEntries', () => {
     expect(host.querySelector('.guest-song-line')).toBeNull();
   });
 
-  test('a guest with a song shows the song line and a play button with track data', () => {
+  test('a guest with a song shows the title-only song line and a play button with track data', () => {
     const host = render([guestWithSong()]);
 
-    expect(host.querySelector('.guest-song-line')?.textContent).toContain('Dancing Queen - ABBA');
+    expect(host.querySelector('.guest-song-line')?.textContent).toContain('Dancing Queen');
+    expect(host.querySelector('.guest-song-line')?.textContent).not.toContain('ABBA');
     const button = host.querySelector('.guest-song-play') as HTMLButtonElement;
     expect(button).not.toBeNull();
     expect(button.dataset.trackId).toBe('spotify-123');

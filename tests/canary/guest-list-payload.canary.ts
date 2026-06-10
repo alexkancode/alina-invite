@@ -18,7 +18,8 @@ describe('Guest list payload contract canary', () => {
     const host = document.createElement('div');
     host.innerHTML = renderGuestEntries([exactListApiRow]);
 
-    expect(host.querySelector('.guest-song-line')?.textContent).toContain('Le Freak - CHIC');
+    expect(host.querySelector('.guest-song-line')?.textContent).toContain('Le Freak');
+    expect(host.querySelector('.guest-song-line')?.textContent).not.toContain('CHIC');
     const button = host.querySelector('.guest-song-play') as HTMLButtonElement;
     expect(button?.dataset.trackId).toBe('abc');
     expect(button?.dataset.title).toBe('Le Freak');
