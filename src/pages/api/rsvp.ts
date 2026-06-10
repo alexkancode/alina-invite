@@ -256,7 +256,7 @@ export const GET: APIRoute = async ({ request }) => {
   // Default: list all RSVPs (no IPs/hashes exposed)
   try {
     const { rows } = await pool.query(
-      `SELECT name, message, attending, created_at as timestamp,
+      `SELECT name, attending, created_at as timestamp,
               song_title, song_artist, song_year, song_spotify_url, song_spotify_id,
               song_album_art_url
        FROM rsvps ORDER BY created_at`
@@ -274,7 +274,6 @@ export const GET: APIRoute = async ({ request }) => {
       {
         name: "Alex K",
         attending: "yes",
-        message: "Can't wait to celebrate!",
         song_title: "Bohemian Rhapsody",
         song_artist: "Queen",
         timestamp: "2026-01-15T10:30:00Z"
@@ -282,7 +281,6 @@ export const GET: APIRoute = async ({ request }) => {
       {
         name: "Sarah M",
         attending: "yes",
-        message: "So excited!",
         song_title: "Stayin' Alive",
         song_artist: "Bee Gees",
         timestamp: "2026-01-14T15:20:00Z"
@@ -290,7 +288,6 @@ export const GET: APIRoute = async ({ request }) => {
       {
         name: "Mike R",
         attending: "no",
-        message: "Sorry, can't make it",
         timestamp: "2026-01-13T09:15:00Z"
       }
     ];
@@ -299,7 +296,6 @@ export const GET: APIRoute = async ({ request }) => {
     const allRsvps = [...baseMockRsvps, ...devRsvps.map(r => ({
       name: r.name,
       attending: r.attending,
-      message: r.message,
       song_title: r.song_title,
       song_artist: r.song_artist,
       song_year: r.song_year,

@@ -171,7 +171,8 @@ describe('GET /api/rsvp', () => {
     const json = await res.json();
     const found = json.rsvps.find((r: { name: string }) => r.name === unique);
     expect(found).toBeTruthy();
-    expect(found.message).toBe('tracking test');
+    expect(found.attending).toBe('yes');
+    expect(found).not.toHaveProperty('message');
   });
 });
 

@@ -155,6 +155,22 @@ describe('RSVP song submission over the browser JSON contract', () => {
     });
   });
 
+  test('messages are echoed to the submitter but never appear in the public list', async () => {
+    const ip = uniqueIp();
+    const name = uniqueName('Private Messenger');
+    const secret = 'Severe peanut allergy, please';
+
+    const res = await postJson({ name, attending: 'yes', message: secret, favoriteSong: null }, ip);
+    const result = await res.json();
+    expect(result.entry.message).toBe(secret);
+
+    const list = await (await fetch(`${BASE}/api/rsvp`)).json();
+    const row = list.rsvps.find((r: { name: string }) => r.name === name);
+    expect(row).toBeDefined();
+    expect(row).not.toHaveProperty('message');
+    expect(JSON.stringify(list)).not.toContain(secret);
+  });
+
   test('rejects a missing name with 400', async () => {
     const res = await postJson({ attending: 'yes', favoriteSong: songData }, uniqueIp());
     expect(res.status).toBe(400);

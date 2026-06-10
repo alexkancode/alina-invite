@@ -3,7 +3,6 @@ import { renderGuestEntries } from '../../src/components/guest-list/GuestListRen
 
 const exactListApiRow = {
   name: 'Smoke Happy',
-  message: 'groovy',
   attending: 'yes',
   timestamp: '2026-06-09T19:14:21.789Z',
   song_title: 'Le Freak',
