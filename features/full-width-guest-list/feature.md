@@ -27,6 +27,11 @@ flowchart TD
     style M2 fill:#1a3a5c,color:#fff
 ```
 
+## Follow-up after field review
+
+The cards sat too far down the page; the section's 2.5rem top margin is removed so the
+list hugs the content above it.
+
 ## Outcome
 
 - The list container's width equals the viewport (minus its own padding) instead of 791px.
