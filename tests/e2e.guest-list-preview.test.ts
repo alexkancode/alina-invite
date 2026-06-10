@@ -44,6 +44,29 @@ test.describe('guest list song preview', () => {
     expect(listWidth).toBeGreaterThan(900);
   });
 
+  test('the list is a fixed dock pinned to the viewport bottom', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-entry');
+
+    const dock = page.locator('#rsvp-guest-list');
+    const before = await dock.evaluate(el => {
+      const r = el.getBoundingClientRect();
+      return { position: getComputedStyle(el).position, bottomGap: Math.round(window.innerHeight - r.bottom), height: r.height };
+    });
+    expect(before.position).toBe('fixed');
+    expect(Math.abs(before.bottomGap)).toBeLessThanOrEqual(1);
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
+
+    const after = await dock.evaluate(el => {
+      const r = el.getBoundingClientRect();
+      return { bottomGap: Math.round(window.innerHeight - r.bottom), heightRatio: r.height / window.innerHeight };
+    });
+    expect(Math.abs(after.bottomGap)).toBeLessThanOrEqual(1);
+    expect(after.heightRatio).toBeLessThanOrEqual(0.4);
+  });
+
   test('clicking the entry play button leaves the idle state', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('#rsvp-guests .guest-entry');

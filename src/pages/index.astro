@@ -656,7 +656,20 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       }
 
       :global(#rsvp-guest-list) {
-        padding: 0 1.5rem 3rem;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 40;
+        padding: 0.75rem 1.5rem 1rem;
+        max-height: 34vh;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(8px);
+      }
+
+      :global(main) {
+        padding-bottom: 30vh;
       }
 
       :global(.guest-entry) {
@@ -1296,7 +1309,11 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         }
       }
 
-      loadGuestList();
+      if (document.readyState === 'complete') {
+        loadGuestList();
+      } else {
+        window.addEventListener('load', () => loadGuestList(), { once: true });
+      }
 
       // ── Enable 3D + spin after bounce lands ──
       const arcUnit = document.querySelector('.arc-disco-unit');
