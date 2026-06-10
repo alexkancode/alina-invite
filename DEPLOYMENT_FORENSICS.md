@@ -48,7 +48,24 @@ same shape as 0008 which applied cleanly)
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 15baede..1bd4e97; list API exposed `song_album_art_url` 85 seconds
+after upload; page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=23f9564a-085d-4c7a-af0c-10502989d0b2&
 
 ### Stage 2: Migration and UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results:**
+- Railway logs show "Applying 0009_add_song_album_art.sql... Done" on container start
+- Validation write to the user's same-IP "testing music" entry with art: the card rendered
+  the album cover under the white gradient with readable purple text (computed background
+  contains both the gradient and the i.scdn.co image); screenshots captured
+- Entry restored to the guest's original pick (Bohemian Rhapsody - Remastered 2011) and
+  upgraded with its real album art via the search API; guest count unchanged at 4
+- Song-less cards unchanged alongside the art card
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
