@@ -41,7 +41,22 @@ updated legacy api test (32 green locally)
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 6f28a5b..1ab329b; new placeholder text detected in served HTML 139
+seconds after upload; page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=b23e271d-80c6-411c-be9f-43b21fb3d0c4&
 
 ### Stage 2: Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results:**
+- List GET keys contain no `message`; a probe message posted to the test row was echoed in
+  the submitter's own response and never appeared in the list payload; probe cleared after
+- Incidental re-proof: the probe POST carried no albumArtUrl and the row's art survived
+  (preserve-album-art behaving in production)
+- Final state: test row going with song and art, guest count 4
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
