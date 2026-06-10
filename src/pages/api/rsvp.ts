@@ -117,7 +117,11 @@ export const POST: APIRoute = async ({ request }) => {
        song_year = EXCLUDED.song_year,
        song_spotify_url = EXCLUDED.song_spotify_url,
        song_spotify_id = EXCLUDED.song_spotify_id,
-       song_album_art_url = EXCLUDED.song_album_art_url,
+       song_album_art_url = COALESCE(
+         EXCLUDED.song_album_art_url,
+         CASE WHEN rsvps.song_spotify_id = EXCLUDED.song_spotify_id
+              THEN rsvps.song_album_art_url END
+       ),
        updated_at = now()
      RETURNING id`,
     [name.trim(), entry.message, attending, ipHash, songTitle, songArtist, songYear, songSpotifyUrl, songSpotifyId, songAlbumArtUrl]
@@ -139,6 +143,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Store in development memory when database is not available
     const existingIndex = devRsvps.findIndex(r => r.ip_hash === ipHash);
+    const previous = existingIndex >= 0 ? devRsvps[existingIndex] : null;
+    const preservedArt = favoriteSong?.albumArtUrl
+      || (previous && previous.song_spotify_id === favoriteSong?.spotifyId ? previous.song_album_art_url : null);
     const devEntry = {
       name,
       message: message || '',
@@ -149,7 +156,7 @@ export const POST: APIRoute = async ({ request }) => {
       song_year: favoriteSong?.year || null,
       song_spotify_url: favoriteSong?.spotifyUrl || null,
       song_spotify_id: favoriteSong?.spotifyId || null,
-      song_album_art_url: favoriteSong?.albumArtUrl || null,
+      song_album_art_url: preservedArt || null,
       ip_hash: ipHash
     };
 

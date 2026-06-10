@@ -102,6 +102,59 @@ describe('RSVP song submission over the browser JSON contract', () => {
     expect(result.entry.favoriteSong).toBeNull();
   });
 
+  describe('album art preservation on resubmit', () => {
+    const artUrl = 'https://i.scdn.co/image/preserve-me.jpg';
+    const baseSong = {
+      title: 'Le Freak',
+      artist: 'CHIC',
+      year: 1978,
+      spotifyUrl: 'https://open.spotify.com/track/lefreak',
+      spotifyId: 'lefreak-id'
+    };
+
+    const artFor = async (name: string) => {
+      const list = await (await fetch(`${BASE}/api/rsvp`)).json();
+      return list.rsvps.find((r: { name: string }) => r.name === name)?.song_album_art_url ?? null;
+    };
+
+    test('resubmitting the same track without art keeps the stored art', async () => {
+      const ip = uniqueIp();
+      const name = uniqueName('Art Keeper');
+
+      await postJson({ name, attending: 'yes', favoriteSong: { ...baseSong, albumArtUrl: artUrl } }, ip);
+      expect(await artFor(name)).toBe(artUrl);
+
+      await postJson({ name, attending: 'no', favoriteSong: baseSong }, ip);
+
+      expect(await artFor(name)).toBe(artUrl);
+    });
+
+    test('a different track without art replaces the art with null', async () => {
+      const ip = uniqueIp();
+      const name = uniqueName('Art Switcher');
+
+      await postJson({ name, attending: 'yes', favoriteSong: { ...baseSong, albumArtUrl: artUrl } }, ip);
+      await postJson({
+        name,
+        attending: 'yes',
+        favoriteSong: { ...baseSong, title: 'Good Times', spotifyId: 'goodtimes-id' }
+      }, ip);
+
+      expect(await artFor(name)).toBeNull();
+    });
+
+    test('explicit new art always wins', async () => {
+      const ip = uniqueIp();
+      const name = uniqueName('Art Updater');
+      const newArt = 'https://i.scdn.co/image/new-art.jpg';
+
+      await postJson({ name, attending: 'yes', favoriteSong: { ...baseSong, albumArtUrl: artUrl } }, ip);
+      await postJson({ name, attending: 'yes', favoriteSong: { ...baseSong, albumArtUrl: newArt } }, ip);
+
+      expect(await artFor(name)).toBe(newArt);
+    });
+  });
+
   test('rejects a missing name with 400', async () => {
     const res = await postJson({ attending: 'yes', favoriteSong: songData }, uniqueIp());
     expect(res.status).toBe(400);
