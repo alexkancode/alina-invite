@@ -42,7 +42,23 @@ tests green locally); the original stale-localStorage repro now preserves art en
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed b6c6d82..cf5b2da. Server-behavior-only change, so the cutover marker
+was the behavior itself: a self-healing poll seeding art and flipping attendance without
+art on the test row, succeeding when the art survived - detected 65 seconds after upload
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=f2d98674-3e8a-4eef-8e24-c2649c7b2bc8&
 
 ### Stage 2: Behavior Validation and Repair
-**Status:** pending
+**Status:** COMPLETED
+**Results:**
+- The cutover poll itself proved the fix live: same-track no-art resubmit preserved art
+- Final state restored: "testing music" going, Bohemian Rhapsody - Remastered 2011 with
+  album art, guest count 4; screenshot shows the art card back in the dock
+- Locally: 40 integration/API tests green, and the original stale-localStorage Playwright
+  repro now ends with the art intact
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
