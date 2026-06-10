@@ -41,7 +41,21 @@ payload canary, and the guest-list e2e suite (all green locally)
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 0cb6aaa..f3367f4; hashed asset set changed 64 seconds after upload;
+page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=bbe412e7-dea7-4930-a781-fe4baa91600e&
 
 ### Stage 2: UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (via reversible write to the same-IP "test" entry, then reverted):**
+- Card song line reads exactly "♪ Dancing Queen" with no artist text
+- Preview playback from the card still works (data-artist intact for the lookup)
+- Play all button present; screenshot confirms layout
+- Test data reverted; guest count unchanged at 4
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
