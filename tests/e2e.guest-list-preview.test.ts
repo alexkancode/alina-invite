@@ -37,7 +37,7 @@ test.describe('guest list song preview', () => {
 
     const nameSize = await entry.locator('.guest-name').evaluate(el => parseFloat(getComputedStyle(el).fontSize));
     const songSize = await entry.locator('.guest-song-line').evaluate(el => parseFloat(getComputedStyle(el).fontSize));
-    expect(nameSize).toBeGreaterThanOrEqual(18);
+    expect(nameSize).toBeGreaterThanOrEqual(21);
     expect(songSize).toBeGreaterThanOrEqual(16);
   });
 

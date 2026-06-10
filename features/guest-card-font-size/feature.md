@@ -18,6 +18,11 @@ flowchart LR
     style C fill:#1a3a5c,color:#fff
 ```
 
+## Follow-up after field review
+
+The first bump (name 19px / mobile 13px) read better but the user wants names a couple
+sizes larger still: name 22px desktop, 15px mobile. Song line stays at 17px/12px.
+
 ## Outcome
 
 - More readable cards at both breakpoints; layout verified by screenshot at desktop and
