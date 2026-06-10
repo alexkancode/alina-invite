@@ -134,10 +134,31 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
       margin-right: 0.75rem;
       border-radius: 9999px;
       background: rgba(255, 255, 255, 0.1);
-      color: var(--color-warm-cream, #FFF8E7);
+      color: transparent;
+      position: relative;
       font-size: 1.25rem;
       line-height: 1;
       transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .spotify-clear-button::before,
+    .spotify-clear-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0.75em;
+      height: 2px;
+      border-radius: 1px;
+      background: var(--color-warm-cream, #FFF8E7);
+    }
+
+    .spotify-clear-button::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .spotify-clear-button::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
     }
 
     .spotify-clear-button:hover,

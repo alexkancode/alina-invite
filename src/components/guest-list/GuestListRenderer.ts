@@ -44,7 +44,7 @@ function renderSongRow(guest: GuestRsvp): string {
       <span class="guest-song-line text-phi-xs">♪ ${escapeHtml(succinctSongTitle(guest.song_title))}</span>
       <button
         type="button"
-        class="guest-song-play"
+        class="guest-song-play preview-icon-button"
         title="Play preview"
         data-track-id="${escapeHtml(trackIdFor(guest))}"
         data-title="${escapeHtml(guest.song_title)}"

@@ -66,6 +66,7 @@ describe('renderGuestEntries', () => {
     expect(host.querySelector('.guest-song-line')?.textContent).not.toContain('ABBA');
     const button = host.querySelector('.guest-song-play') as HTMLButtonElement;
     expect(button).not.toBeNull();
+    expect(button.classList.contains('preview-icon-button')).toBe(true);
     expect(button.dataset.trackId).toBe('spotify-123');
     expect(button.dataset.title).toBe('Dancing Queen');
     expect(button.dataset.artist).toBe('ABBA');

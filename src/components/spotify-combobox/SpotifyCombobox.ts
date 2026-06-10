@@ -377,7 +377,7 @@ export class SpotifyCombobox {
         <div class="spotify-track-actions flex gap-2">
           <button
             type="button"
-            class="spotify-play-button w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors"
+            class="spotify-play-button preview-icon-button w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 transition-colors"
             title="Play preview"
             data-track-id="${this.escapeAttribute(track.id)}"
             data-title="${this.escapeAttribute(track.title)}"

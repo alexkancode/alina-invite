@@ -421,3 +421,35 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+.preview-icon-button {
+  color: transparent;
+  position: relative;
+}
+
+.preview-icon-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-38%, -50%);
+  border-left: 0.7em solid #fff;
+  border-top: 0.45em solid transparent;
+  border-bottom: 0.45em solid transparent;
+}
+
+.preview-icon-button[data-preview-state="playing"]::before {
+  border: 0;
+  width: 0.7em;
+  height: 0.85em;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(
+    to right,
+    #fff 0,
+    #fff 0.26em,
+    transparent 0.26em,
+    transparent 0.44em,
+    #fff 0.44em,
+    #fff 0.7em
+  );
+}

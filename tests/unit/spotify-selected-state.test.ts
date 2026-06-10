@@ -220,6 +220,15 @@ describe('SpotifyCombobox selected state', () => {
       expect(playButton.dataset.trackId).toBe('track-1');
       expect(playButton.dataset.title).toBe('Dancing Queen');
       expect(playButton.dataset.artist).toBe('ABBA');
+      expect(playButton.classList.contains('preview-icon-button')).toBe(true);
+    });
+
+    test('the selected card play button carries the shared icon class', () => {
+      combobox.selectTrack(createTrack());
+
+      const playButton = selectedContainer.querySelector('.spotify-play-button') as HTMLButtonElement;
+      expect(playButton.classList.contains('preview-icon-button')).toBe(true);
+      expect(selectedContainer.querySelector('button[aria-label="Clear selected song"]')).not.toBeNull();
     });
 
     test('clicking the play button does not select the track', () => {
