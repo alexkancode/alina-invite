@@ -661,11 +661,18 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         right: 0;
         bottom: 0;
         z-index: 40;
+        display: flex;
+        align-items: stretch;
+        gap: 0.75rem;
         padding: 0.75rem 1.5rem 1rem;
-        max-height: 34vh;
-        overflow-y: auto;
         background: rgba(255, 255, 255, 0.35);
         backdrop-filter: blur(8px);
+      }
+
+      :global(#rsvp-guests) {
+        flex: 1;
+        max-height: 30vh;
+        overflow-y: auto;
       }
 
       :global(main) {
@@ -780,14 +787,17 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       }
 
       :global(.guest-play-all) {
-        display: block;
-        margin: 0 auto 0.75rem;
-        padding: 0.35rem 1.25rem;
+        align-self: stretch;
+        flex-shrink: 0;
+        margin: 0;
+        padding: 1.25rem 0.35rem;
         border-radius: 9999px;
         background: rgb(34, 197, 94);
         color: #fff;
         font-size: 0.8rem;
         line-height: 1.2;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
         transition: background-color 0.15s ease;
       }
 

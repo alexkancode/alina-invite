@@ -104,6 +104,14 @@ test.describe('guest list song preview', () => {
     await expect(playAll).toBeVisible();
     await expect(playAll).toHaveText('Play all');
 
+    const geometry = await playAll.evaluate(el => {
+      const r = el.getBoundingClientRect();
+      const dock = document.getElementById('rsvp-guest-list').getBoundingClientRect();
+      return { width: r.width, height: r.height, leftInset: r.left - dock.left };
+    });
+    expect(geometry.height).toBeGreaterThan(geometry.width);
+    expect(geometry.leftInset).toBeLessThan(40);
+
     await playAll.click();
 
     await expect(playAll).toHaveAttribute('data-playlist-state', 'running');
