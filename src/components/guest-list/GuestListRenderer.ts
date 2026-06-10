@@ -1,3 +1,5 @@
+import { succinctSongTitle } from '../../lib/songTitle.js';
+
 export interface GuestRsvp {
   name: string;
   attending: string;
@@ -38,7 +40,7 @@ function renderSongRow(guest: GuestRsvp): string {
 
   return `
     <div class="guest-song-row">
-      <span class="guest-song-line text-phi-xs">♪ ${escapeHtml(guest.song_title)}</span>
+      <span class="guest-song-line text-phi-xs">♪ ${escapeHtml(succinctSongTitle(guest.song_title))}</span>
       <button
         type="button"
         class="guest-song-play"

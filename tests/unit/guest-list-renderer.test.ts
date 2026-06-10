@@ -71,6 +71,14 @@ describe('renderGuestEntries', () => {
     expect(button.textContent?.trim()).toBe('▶');
   });
 
+  test('a verbose title displays succinct while data-title keeps the full string', () => {
+    const host = render([guestWithSong({ song_title: 'Bohemian Rhapsody - Remastered 2011' })]);
+
+    expect(host.querySelector('.guest-song-line')?.textContent?.trim()).toBe('♪ Bohemian Rhapsody');
+    const button = host.querySelector('.guest-song-play') as HTMLButtonElement;
+    expect(button.dataset.title).toBe('Bohemian Rhapsody - Remastered 2011');
+  });
+
   test('falls back to a name-derived track id when no spotify id exists', () => {
     const host = render([guestWithSong({ song_spotify_id: null })]);
 
