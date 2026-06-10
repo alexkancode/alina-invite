@@ -90,10 +90,63 @@ test.describe('guest list song preview', () => {
 
     await page.goto('/');
     await page.waitForSelector('#rsvp-guests .guest-entry');
+    await page.click('#guest-notgoing-toggle');
 
     const entry = page.locator('.guest-entry', { hasText: noSongName });
     await expect(entry).toHaveCount(1);
+    await expect(entry).toBeVisible();
     await expect(entry.locator('.guest-song-play')).toHaveCount(0);
+  });
+
+  test('not-going guests without songs hide behind the floating toggle', async ({ page, request }) => {
+    const hiddenName = `Hidden NotGoing ${Date.now() % 100000}`;
+    await request.post('/api/rsvp', {
+      headers: { 'x-forwarded-for': `10.81.0.${Date.now() % 250}` },
+      data: { name: hiddenName, attending: 'no', favoriteSong: null }
+    });
+
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-entry');
+
+    const entry = page.locator('.guest-entry', { hasText: hiddenName });
+    await expect(entry).toBeHidden();
+
+    const toggle = page.locator('#guest-notgoing-toggle');
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveText(/Not Going \([1-9]\d*\)/);
+
+    await toggle.click();
+    await expect(entry).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+
+    await toggle.click();
+    await expect(entry).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('a not-going guest with a song stays visible by default', async ({ page, request }) => {
+    const songName = `NotGoing Singer ${Date.now() % 100000}`;
+    await request.post('/api/rsvp', {
+      headers: { 'x-forwarded-for': `10.82.0.${Date.now() % 250}` },
+      data: {
+        name: songName,
+        attending: 'no',
+        favoriteSong: {
+          title: 'Le Freak',
+          artist: 'CHIC',
+          year: 1978,
+          spotifyUrl: 'https://open.spotify.com/track/x',
+          spotifyId: 'lefreak-x'
+        }
+      }
+    });
+
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-entry');
+
+    const entry = page.locator('.guest-entry', { hasText: songName });
+    await expect(entry).toBeVisible();
+    await expect(entry.locator('.guest-song-play')).toHaveCount(1);
   });
 
   test('the play all button starts the first card and toggles to stop', async ({ page }) => {

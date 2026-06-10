@@ -446,6 +446,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
     <!-- ═══ RSVP Guest List ═══ -->
     <section id="rsvp-guest-list" class="relative z-10 guest-list-fade-in">
       <button type="button" id="guest-play-all" class="guest-play-all" hidden>Play all</button>
+      <button type="button" id="guest-notgoing-toggle" class="guest-notgoing-toggle" aria-pressed="false" hidden></button>
       <div id="rsvp-guests" class="flex flex-wrap justify-center gap-phi-md">
         <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
       </div>
@@ -681,6 +682,37 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
       :global(.guest-entry) {
         background: rgba(72, 61, 139, 0.06);
+      }
+
+      :global(.guest-entry-deferred) {
+        display: none;
+      }
+
+      :global(#rsvp-guest-list.show-deferred .guest-entry-deferred) {
+        display: flex;
+      }
+
+      :global(.guest-notgoing-toggle) {
+        position: absolute;
+        top: -0.85rem;
+        right: 1.5rem;
+        padding: 0.2rem 0.85rem;
+        border-radius: 9999px;
+        background: rgba(72, 61, 139, 0.75);
+        color: #fff;
+        font-size: 0.7rem;
+        line-height: 1.4;
+        backdrop-filter: blur(4px);
+        transition: background-color 0.15s ease;
+      }
+
+      :global(.guest-notgoing-toggle:hover),
+      :global(.guest-notgoing-toggle[aria-pressed="true"]) {
+        background: #8B2FC9;
+      }
+
+      :global(.guest-notgoing-toggle[hidden]) {
+        display: none;
       }
 
       :global(.guest-entry-art) {
@@ -993,7 +1025,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
     </style>
 
     <script>
-      import { renderGuestEntries } from '../components/guest-list/GuestListRenderer.js';
+      import { isDeferredGuest, renderGuestEntries } from '../components/guest-list/GuestListRenderer.js';
       import { PlayAllController } from '../components/guest-list/PlayAllController.js';
       import { audioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
       import { PreviewResolver } from '../components/spotify-combobox/PreviewResolver.js';
@@ -1290,6 +1322,12 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       // ── RSVP Guest List ──
       const guestListContainer = document.getElementById('rsvp-guests')!;
       const playAllButton = document.getElementById('guest-play-all') as HTMLButtonElement;
+      const notGoingToggle = document.getElementById('guest-notgoing-toggle') as HTMLButtonElement;
+      const guestListSection = document.getElementById('rsvp-guest-list')!;
+      notGoingToggle.addEventListener('click', () => {
+        const shown = guestListSection.classList.toggle('show-deferred');
+        notGoingToggle.setAttribute('aria-pressed', String(shown));
+      });
       const guestPreviewController = new PreviewPlaybackController(new PreviewResolver(), audioPreviewManager);
       const playAllController = new PlayAllController(guestListContainer, playAllButton, guestPreviewController);
       playAllButton.addEventListener('click', () => playAllController.toggle());
@@ -1314,6 +1352,9 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           }
           container.innerHTML = renderGuestEntries(data.rsvps);
           playAllButton.hidden = container.querySelectorAll('.guest-song-play').length === 0;
+          const deferredCount = data.rsvps.filter(isDeferredGuest).length;
+          notGoingToggle.textContent = `Not Going (${deferredCount})`;
+          notGoingToggle.hidden = deferredCount === 0;
         } catch {
           container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Could not load guest list</p>';
         }

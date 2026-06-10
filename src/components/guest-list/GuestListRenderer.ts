@@ -54,6 +54,10 @@ function renderSongRow(guest: GuestRsvp): string {
   `;
 }
 
+export function isDeferredGuest(guest: GuestRsvp): boolean {
+  return guest.attending !== 'yes' && !(guest.song_title && guest.song_artist);
+}
+
 function entryArt(guest: GuestRsvp): { className: string; styleAttribute: string } {
   if (!guest.song_album_art_url) {
     return { className: '', styleAttribute: '' };
@@ -69,8 +73,9 @@ function entryArt(guest: GuestRsvp): { className: string; styleAttribute: string
 export function renderGuestEntries(rsvps: GuestRsvp[]): string {
   return rsvps.map(guest => {
     const art = entryArt(guest);
+    const deferred = isDeferredGuest(guest) ? ' guest-entry-deferred' : '';
     return `
-    <div class="guest-entry${art.className} flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg"${art.styleAttribute}>
+    <div class="guest-entry${art.className}${deferred} flex flex-col items-center text-center px-phi-md py-phi-sm rounded-lg"${art.styleAttribute}>
       <span class="guest-name-row">
         <span class="guest-name font-medium text-phi-sm">${escapeHtml(guest.name)}</span>
         ${renderStatusMark(guest.attending)}

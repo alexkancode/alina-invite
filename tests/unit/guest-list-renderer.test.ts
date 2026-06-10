@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { renderGuestEntries, type GuestRsvp } from '../../src/components/guest-list/GuestListRenderer';
+import { isDeferredGuest, renderGuestEntries, type GuestRsvp } from '../../src/components/guest-list/GuestListRenderer';
 
 const render = (rsvps: GuestRsvp[]): HTMLElement => {
   const host = document.createElement('div');
@@ -130,6 +130,30 @@ describe('renderGuestEntries', () => {
       const entry = host.querySelector('.guest-entry') as HTMLElement;
       expect(entry.style.getPropertyValue('background')).toBe('');
       expect(entry.style.getPropertyValue('--album-art')).toBeTruthy();
+    });
+  });
+
+  describe('not-going deferral', () => {
+    test.each([
+      ['going without a song', { name: 'A', attending: 'yes' }, false],
+      ['going with a song', guestWithSong({ name: 'B' }), false],
+      ['not going with a song', guestWithSong({ name: 'C', attending: 'no' }), false],
+      ['not going without a song', { name: 'D', attending: 'no' }, true]
+    ] as Array<[string, GuestRsvp, boolean]>)('classifies %s', (_label, guest, expectedDeferred) => {
+      expect(isDeferredGuest(guest)).toBe(expectedDeferred);
+    });
+
+    test('only the not-going songless entry carries the deferred class', () => {
+      const host = render([
+        { name: 'Going Plain', attending: 'yes' },
+        guestWithSong({ name: 'Going Song' }),
+        guestWithSong({ name: 'NotGoing Song', attending: 'no' }),
+        { name: 'NotGoing Plain', attending: 'no' }
+      ]);
+
+      const deferred = Array.from(host.querySelectorAll('.guest-entry-deferred .guest-name'))
+        .map(n => n.textContent);
+      expect(deferred).toEqual(['NotGoing Plain']);
     });
   });
 
