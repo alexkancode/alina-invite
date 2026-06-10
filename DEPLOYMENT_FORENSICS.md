@@ -35,7 +35,20 @@ screenshot-verified locally with intact ellipsis and art-card layout
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 716f37a..9e56ba4; asset set changed 53 seconds after upload; page 200
+throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=7c3f98e2-531c-4e8e-a419-30da41cf41dc&
 
 ### Stage 2: UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (zero data writes):**
+- Computed sizes: name 22px desktop / 15px mobile; song line unchanged at 17px/12px
+- Screenshot: names are the visual anchor of each card; art card and plain cards fit
+  cleanly at both widths
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
