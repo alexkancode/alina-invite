@@ -57,7 +57,7 @@ test.describe('combobox selected state', () => {
     await expect(page.locator('#rsvp-modal')).not.toHaveClass(/hidden/);
 
     await page.fill('#rsvp-name-input', name);
-    await page.check('input[name="attending"][value="yes"]');
+    await page.click('.attending-option:has(input[value="yes"])');
 
     await page.fill('#spotify-search', 'dancing queen');
     await page.waitForSelector('#spotify-results li');

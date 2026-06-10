@@ -484,15 +484,13 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
             onblur="this.style.borderColor='hsl(270, 30%, 40%)'"
           />
           <div id="rsvp-name-badge" class="hidden text-phi-xs rounded px-phi-sm py-phi-xs" style="margin-top: -4px;"></div>
-          <fieldset class="flex flex-col sm:flex-row gap-phi-md sm:gap-phi-xl text-warm-cream">
-            <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
-              <input type="radio" name="attending" value="yes" required
-                     class="w-[18px] h-[18px] shrink-0" style="accent-color: #FFB6D9;" />
+          <fieldset class="attending-toggle text-warm-cream">
+            <label class="attending-option">
+              <input type="radio" name="attending" value="yes" required class="attending-input" />
               <span class="font-medium select-none">I'll be there</span>
             </label>
-            <label class="flex items-center gap-phi-sm cursor-pointer px-phi-md py-phi-sm rounded-lg hover:bg-white/5 transition-colors min-h-[44px]">
-              <input type="radio" name="attending" value="no" required
-                     class="w-[18px] h-[18px] shrink-0" style="accent-color: #FF007F;" />
+            <label class="attending-option">
+              <input type="radio" name="attending" value="no" required class="attending-input" />
               <span class="font-medium select-none">Can't make it</span>
             </label>
           </fieldset>
@@ -654,6 +652,56 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       /* Dropdown-friendly modal: allows dropdowns to extend beyond boundaries */
       .dropdown-friendly {
         overflow: visible;
+      }
+
+      .attending-toggle {
+        display: flex;
+        border: 2px solid hsl(270, 30%, 40%);
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        padding: 0;
+        transition: border-color 0.15s ease;
+      }
+
+      .attending-toggle:focus-within {
+        border-color: #FFB6D9;
+      }
+
+      .attending-option {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        cursor: pointer;
+        position: relative;
+        color: rgba(255, 248, 231, 0.75);
+        transition: background-color 0.15s ease, color 0.15s ease;
+      }
+
+      .attending-option + .attending-option {
+        border-left: 2px solid hsl(270, 30%, 40%);
+      }
+
+      .attending-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .attending-input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .attending-option:has(input[value="yes"]:checked) {
+        background: #FFB6D9;
+        color: #1a0a2e;
+      }
+
+      .attending-option:has(input[value="no"]:checked) {
+        background: #FF007F;
+        color: #fff;
       }
 
       :global(#rsvp-guest-list) {
