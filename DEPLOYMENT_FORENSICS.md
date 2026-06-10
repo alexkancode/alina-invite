@@ -1,4 +1,4 @@
-# Deployment Forensics - Succinct Song Title
+# Deployment Forensics - Succinct Selected Card
 
 ## Deployment Details
 
@@ -8,28 +8,27 @@
 
 ## Commits Being Deployed
 
-- succinct-song-title implementation
-- succinct-song-title plan
+- succinct-selected-card implementation
+- succinct-selected-card plan
 
 ## Changes Deployed
 
-1. **Succinct card titles** - `succinctSongTitle` strips keyword-gated version qualifiers
-   ("- Remastered 2011", "(2009 Remaster)", "- Radio Edit", stacked qualifiers) from the
-   guest-card display; full titles stay in the DB, data attributes, and the modal picker
+1. **Succinct title on the modal's selected card** via the shared `succinctSongTitle` rule;
+   dropdown rows stay verbose; the hidden field JSON and play button data attributes keep
+   the full title (save and preview lookup unchanged)
 2. **No API or database changes** - front-end display only
 
 ## Pre-Deployment Baseline
 
-- The organic prod entry "testing music" currently displays
-  "♪ Bohemian Rhapsody - Remastered 2011" - it doubles as the live validation target:
-  after cutover it should read "♪ Bohemian Rhapsody" with no data writes needed
 - Cutover signal: hashed asset set changes
+- Validation: select a remastered track in the prod modal (client-side only, no submit) and
+  confirm the card shows the succinct title while the hidden field keeps the full one
 
 ## Risk Assessment
 
-**Low Risk:** pure display function with 25 table-driven unit tests including negative
-cases (legitimate parentheses, keyword-bearing titles without separators, qualifier-only
-titles); renderer covered by unit and e2e suites
+**Low Risk:** a default parameter on the shared row renderer; locked by 18 selected-state
+unit tests (verbose handling describe added), full combobox suites, and 9 e2e tests green
+locally
 
 ## Rollback Plan
 
@@ -37,28 +36,13 @@ titles); renderer covered by unit and e2e suites
 
 ## Success Criteria
 
-- "testing music" card displays "♪ Bohemian Rhapsody"
-- Its preview still plays (full title intact in data-artist/data-title)
-- Clean titles elsewhere unchanged
+- Prod modal: verbose dropdown rows; succinct selected-card title; full title in the
+  hidden field
 
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** COMPLETED
-**Result:** Pushed 5f6f6b9..7d87db6; asset set changed 53 seconds after upload; page 200
-throughout
-**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=3672b501-4fe8-4457-96a2-c561bbdc2b8d&
+**Status:** pending
 
 ### Stage 2: UI Validation
-**Status:** COMPLETED
-**Results (against the organic "testing music" entry, zero test writes):**
-- Card displays "♪ Bohemian Rhapsody"; data-title retains
-  "Bohemian Rhapsody - Remastered 2011"
-- Preview playback from the card works (playing state reached)
-- Screenshot confirms the cleaner card alongside unchanged entries
-
-## Final Status Assessment
-
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE
-**Functionality:** VERIFIED against all success criteria
+**Status:** pending
