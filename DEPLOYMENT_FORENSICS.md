@@ -47,7 +47,23 @@ unaffected (deferred guests have no songs by definition)
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 55b4d3f..bf2a157; content marker (`guest-entry-deferred` in served CSS)
+detected 80 seconds after upload; page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e69d?id=0ed8fa59-b389-4358-9937-bae8360ebd69&
 
 ### Stage 2: UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results:**
+- N=0 state: toggle hidden, all four guests visible (validated before any writes)
+- Reversible flip of "testing music" to not-going without a song: entry hidden (3 of 4
+  visible), purple "Not Going (1)" pill appeared at the dock's top right, clicking revealed
+  all four with the x mark, aria-pressed true; play-all correctly hid while zero songs
+  existed
+- Entry restored: attending yes, Bohemian Rhapsody with album art, guest count 4
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
