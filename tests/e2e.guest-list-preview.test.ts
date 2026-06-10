@@ -34,6 +34,11 @@ test.describe('guest list song preview', () => {
     const background = await entry.evaluate(el => getComputedStyle(el).backgroundImage);
     expect(background).toContain('i.scdn.co');
     expect(background).toContain('linear-gradient');
+
+    const nameSize = await entry.locator('.guest-name').evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    const songSize = await entry.locator('.guest-song-line').evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    expect(nameSize).toBeGreaterThanOrEqual(18);
+    expect(songSize).toBeGreaterThanOrEqual(16);
   });
 
   test('clicking the entry play button leaves the idle state', async ({ page }) => {
