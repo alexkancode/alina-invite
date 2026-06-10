@@ -39,6 +39,9 @@ test.describe('guest list song preview', () => {
     const songSize = await entry.locator('.guest-song-line').evaluate(el => parseFloat(getComputedStyle(el).fontSize));
     expect(nameSize).toBeGreaterThanOrEqual(21);
     expect(songSize).toBeGreaterThanOrEqual(16);
+
+    const listWidth = await page.locator('#rsvp-guest-list').evaluate(el => el.getBoundingClientRect().width);
+    expect(listWidth).toBeGreaterThan(900);
   });
 
   test('clicking the entry play button leaves the idle state', async ({ page }) => {

@@ -440,16 +440,16 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       </div>
 
 
-      <!-- ═══ RSVP Guest List ═══ -->
-      <div id="rsvp-guest-list" class="mt-phi-2xl guest-list-fade-in">
-        <button type="button" id="guest-play-all" class="guest-play-all" hidden>Play all</button>
-        <div id="rsvp-guests" class="flex flex-wrap justify-center gap-phi-md">
-          <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
-        </div>
-      </div>
-
       <!-- ═══ Footer ═══ -->
     </main>
+
+    <!-- ═══ RSVP Guest List ═══ -->
+    <section id="rsvp-guest-list" class="relative z-10 guest-list-fade-in">
+      <button type="button" id="guest-play-all" class="guest-play-all" hidden>Play all</button>
+      <div id="rsvp-guests" class="flex flex-wrap justify-center gap-phi-md">
+        <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
+      </div>
+    </section>
 
     <!-- ═══ RSVP Modal ═══ -->
     <div id="rsvp-modal" class="fixed inset-0 flex items-center justify-center p-phi-lg hidden z-50"
@@ -653,6 +653,11 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       /* Dropdown-friendly modal: allows dropdowns to extend beyond boundaries */
       .dropdown-friendly {
         overflow: visible;
+      }
+
+      :global(#rsvp-guest-list) {
+        padding: 0 1.5rem 3rem;
+        margin-top: 2.5rem;
       }
 
       :global(.guest-entry) {
