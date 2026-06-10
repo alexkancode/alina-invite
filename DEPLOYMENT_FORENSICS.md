@@ -44,7 +44,25 @@ green), behavior by 17 e2e; geometry identical to the proven guest-card rules
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 239926c..dac1935; `preview-icon-button` detected in served CSS 49
+seconds after upload; page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=cb684770-3f23-4974-af8f-494b8ecc2c2d&
 
 ### Stage 2: UI Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results:**
+- A Spotify-side incident (503s/timeouts on search, stalling CDN images) was active during
+  validation on both environments; icon validation used a stubbed search route since the
+  change is CSS-only and track data provenance is irrelevant to it
+- Prod modal at 6x zoom: drawn triangle centered in the dropdown play button; pause bars
+  centered while audio genuinely played (iTunes previews unaffected by the Spotify
+  incident); selected card showing triangle plus the drawn X
+- Locally, after upstream recovered, all 17 search-dependent e2e passed for real
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (the transient search emptiness is the Spotify incident
+plus the known empty-result caching, recovering on its own)
+**Functionality:** VERIFIED against all success criteria
