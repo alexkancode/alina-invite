@@ -8,7 +8,6 @@ describe('Spotify Combobox Accessibility Tests', () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div data-testid="spotify-combobox">
-        <label for="spotify-search">Disco song for the party playlist (optional)</label>
         <select class="spotify-fallback-select" name="favoriteSong">
           <option value="">Select a groovy tune...</option>
           <option value="test1">Test Song 1</option>
@@ -24,7 +23,8 @@ describe('Spotify Combobox Accessibility Tests', () => {
             aria-expanded="false"
             aria-autocomplete="list"
             aria-haspopup="listbox"
-            placeholder="Search for songs, artists, albums..."
+            placeholder="Search Spotify for a fun song for the party playlist"
+            aria-label="Disco song for the party playlist (optional)"
           />
           <ul id="spotify-results" role="listbox" aria-label="Search results" class="hidden"></ul>
           </div>
@@ -303,9 +303,9 @@ describe('Spotify Combobox Accessibility Tests', () => {
   });
 
   describe('Label and Description Association', () => {
-    test('should properly associate label with input', () => {
-      const label = container.querySelector('label');
-      expect(label?.getAttribute('for')).toBe('spotify-search');
+    test('should give the input an accessible name without a visible label', () => {
+      expect(container.querySelector('label')).toBeNull();
+      expect(searchInput.getAttribute('aria-label')).toBe('Disco song for the party playlist (optional)');
       expect(searchInput.id).toBe('spotify-search');
     });
 

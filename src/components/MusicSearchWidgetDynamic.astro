@@ -30,10 +30,6 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 
 {isMusicSearchEnabled ? (
   <div class="spotify-combobox-container" data-testid="spotify-combobox">
-    <label for="spotify-search" class="block text-phi-sm font-medium text-warm-cream mb-2">
-      Disco song for the party playlist (optional)
-    </label>
-
     <!-- Progressive Enhancement: Static fallback (hidden when JS loads) -->
     <select
       name="favoriteSong"
@@ -68,9 +64,10 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
           aria-expanded="false"
           aria-autocomplete="list"
           aria-haspopup="listbox"
-          placeholder="Search for songs, artists, albums..."
+          placeholder="Search Spotify for a fun song for the party playlist"
+          aria-label="Disco song for the party playlist (optional)"
           class="spotify-search-input w-full px-phi-md py-phi-sm rounded-lg text-phi-base text-warm-cream
-                 placeholder-metallic-silver/50 focus:outline-none transition-colors"
+                 focus:outline-none transition-colors"
           style="background: rgba(255,255,255,0.06);
                  border: 2px solid hsl(270, 30%, 40%);"
           onfocus="this.style.borderColor='#FFB6D9'"
@@ -105,6 +102,12 @@ const isMusicSearchEnabled = await isFeatureEnabled('musicSearch');
 
     .spotify-results-dropdown:focus-within {
       border-color: #FFB6D9;
+    }
+
+    .spotify-search-input::placeholder {
+      color: rgba(255, 248, 231, 0.8);
+      opacity: 1;
+      font-size: 0.75em;
     }
 
     .spotify-selected-card {
