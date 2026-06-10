@@ -95,6 +95,35 @@ describe('SpotifyCombobox selected state', () => {
     });
   });
 
+  describe('verbose title handling', () => {
+    const verboseTrack = (): SpotifyTrack => ({
+      ...createTrack(),
+      title: 'Bohemian Rhapsody - Remastered 2011'
+    });
+
+    test('the selected card displays the succinct title', () => {
+      combobox.selectTrack(verboseTrack());
+
+      const card = selectedContainer.querySelector('.spotify-selected-card')!;
+      expect(card.querySelector('.spotify-track-title')?.textContent).toBe('Bohemian Rhapsody');
+    });
+
+    test('the hidden field and card play button keep the full title', () => {
+      combobox.selectTrack(verboseTrack());
+
+      expect(JSON.parse(hiddenInput.value).title).toBe('Bohemian Rhapsody - Remastered 2011');
+      const playButton = selectedContainer.querySelector('.spotify-play-button') as HTMLButtonElement;
+      expect(playButton.dataset.title).toBe('Bohemian Rhapsody - Remastered 2011');
+    });
+
+    test('dropdown rows keep the verbose title', () => {
+      combobox.setState({ results: [verboseTrack()], isOpen: true });
+
+      const rowTitle = container.querySelector('#spotify-results .spotify-track-title');
+      expect(rowTitle?.textContent).toBe('Bohemian Rhapsody - Remastered 2011');
+    });
+  });
+
   describe('clearing the selection', () => {
     beforeEach(() => {
       combobox.selectTrack(createTrack());

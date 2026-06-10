@@ -5,6 +5,7 @@ import type {
   SearchEventHandler,
   SelectionEventHandler
 } from './types.js';
+import { succinctSongTitle } from '../../lib/songTitle.js';
 
 export class SpotifyCombobox {
   private container: HTMLElement;
@@ -310,7 +311,7 @@ export class SpotifyCombobox {
 
     this.selectedContainer.innerHTML = `
       <div class="spotify-selected-card" data-testid="spotify-selected-card">
-        ${this.renderTrackContent(track)}
+        ${this.renderTrackContent(track, succinctSongTitle(track.title))}
         <button
           type="button"
           class="spotify-clear-button"
@@ -349,7 +350,7 @@ export class SpotifyCombobox {
     return li;
   }
 
-  private renderTrackContent(track: SpotifyTrack): string {
+  private renderTrackContent(track: SpotifyTrack, displayTitle: string = track.title): string {
     return `
       <div class="spotify-result-content flex items-center gap-phi-md px-phi-md py-phi-sm cursor-pointer hover:bg-white/5 transition-colors">
         ${track.albumArtUrl ? `
@@ -365,7 +366,7 @@ export class SpotifyCombobox {
 
         <div class="flex-1 min-w-0">
           <div class="spotify-track-title-artist text-warm-cream font-medium">
-            <span class="spotify-track-title">${this.escapeHtml(track.title)}</span>
+            <span class="spotify-track-title">${this.escapeHtml(displayTitle)}</span>
             <span class="spotify-track-separator"> - </span>
             <span class="spotify-track-artist">${this.escapeHtml(track.artist)}</span>
           </div>
