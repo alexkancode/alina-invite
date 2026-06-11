@@ -10,6 +10,33 @@ test.describe('calendar buttons', () => {
     await expect(page.locator('#cal-btn-google')).toBeVisible();
   });
 
+  test('desktop shows full labels on a single line', async ({ page }) => {
+    await expect(page.locator('#cal-btn-apple')).toContainText('Add to Apple Calendar');
+    await expect(page.locator('#cal-btn-google')).toContainText('Add to Google Calendar');
+
+    const lineCheck = await page.locator('#cal-btn-google .cal-label-full').evaluate(el => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return range.getClientRects().length;
+    });
+    expect(lineCheck).toBe(1);
+  });
+
+  test('mobile shows short labels side by side', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await expect(page.locator('#cal-btn-apple')).toContainText('Apple Cal');
+    await expect(page.locator('#cal-btn-google')).toContainText('Google Cal');
+    await expect(page.locator('#cal-btn-apple')).not.toContainText('Add to');
+
+    const [appleBox, googleBox] = await Promise.all([
+      page.locator('#cal-btn-apple').boundingBox(),
+      page.locator('#cal-btn-google').boundingBox()
+    ]);
+    expect(Math.abs(appleBox.y - googleBox.y)).toBeLessThan(2);
+    expect(googleBox.x).toBeGreaterThan(appleBox.x);
+  });
+
   test('the apple button navigates same-tab to the ics with no download attribute', async ({ page }) => {
     const apple = page.locator('#cal-btn-apple');
     await expect(apple).toHaveAttribute('href', '/api/calendar/party.ics');

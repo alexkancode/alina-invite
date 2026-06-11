@@ -411,13 +411,13 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           </div>
 
           <!-- Calendar Links -->
-          <div class="flex flex-col sm:flex-row gap-phi-md w-full">
+          <div class="flex flex-row gap-phi-md w-full">
             <a
               id="cal-btn-apple"
               href="/api/calendar/party.ics"
               aria-label="Add this event to your Apple Calendar"
               class="cal-link inline-flex items-center justify-center gap-phi-sm flex-1 px-phi-xl py-phi-md
-                     rounded-xl text-phi-base font-bold uppercase tracking-widest text-[#483D8B]
+                     rounded-xl font-bold uppercase tracking-widest text-[#483D8B]
                      no-underline transition-all duration-150 cursor-pointer"
               style="font-family: 'Righteous', sans-serif;
                      background: #faf7f2;
@@ -433,7 +433,8 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              Apple Calendar
+              <span class="cal-label-full hidden sm:inline whitespace-nowrap">Add to Apple Calendar</span>
+              <span class="cal-label-short sm:hidden whitespace-nowrap">Apple Cal</span>
             </a>
             <a
               id="cal-btn-google"
@@ -442,7 +443,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
               rel="noopener noreferrer"
               aria-label="Add this event to your Google Calendar"
               class="cal-link inline-flex items-center justify-center gap-phi-sm flex-1 px-phi-xl py-phi-md
-                     rounded-xl text-phi-base font-bold uppercase tracking-widest text-[#483D8B]
+                     rounded-xl font-bold uppercase tracking-widest text-[#483D8B]
                      no-underline transition-all duration-150 cursor-pointer"
               style="font-family: 'Righteous', sans-serif;
                      background: #faf7f2;
@@ -458,7 +459,8 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              Google Calendar
+              <span class="cal-label-full hidden sm:inline whitespace-nowrap">Add to Google Calendar</span>
+              <span class="cal-label-short sm:hidden whitespace-nowrap">Google Cal</span>
             </a>
           </div>
         </section>
@@ -677,6 +679,18 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       /* Dropdown-friendly modal: allows dropdowns to extend beyond boundaries */
       .dropdown-friendly {
         overflow: visible;
+      }
+
+      .cal-link {
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 640px) {
+        .cal-link {
+          font-size: 0.7rem;
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+        }
       }
 
       .attending-toggle {
@@ -1038,8 +1052,12 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
 
         /* Buttons full width on mobile */
-        #rsvp-btn, .cal-link {
+        #rsvp-btn {
           min-width: 250px;
+        }
+
+        .cal-link {
+          min-width: 0;
         }
 
         /* Map matches button styling on mobile */
