@@ -42,6 +42,15 @@ db-pool-resilience. Cutover 42s on the /home 404-to-200 sentinel; prod curl suit
 Railway logs, and Playwright validation all green. Status: SUCCESSFUL. Known issue
 discovered afterward and fixed above: the sail entrance was visually inert.
 
+## Production Validation
+
+- Cutover in 43 seconds (sentinel: new hashed stylesheet containing translate(-48vw))
+- Animation-clock probe on prod at 2.25s: matrix translateX -614px, translateY +22px,
+  scale 1.039 with lean — the envelope is genuinely mid-bay on the down-tack;
+  screenshot reviewed and matches local frames
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
