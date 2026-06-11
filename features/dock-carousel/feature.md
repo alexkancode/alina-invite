@@ -46,6 +46,12 @@ flowchart LR
   replaced by the single-row model at all widths; entries keep their natural size.
 - Play all, previews, art cards, and deferred hiding are unchanged in behavior.
 
+## Third follow-up after field review
+
+State-hidden arrows reserve their footprint (`visibility: hidden` with display preserved)
+so the rail width never jumps as arrows appear and disappear; the mobile media rule keeps
+collapsing them entirely since they never render there.
+
 ## Second follow-up after field review
 
 On mobile the arrows are hidden entirely (swipe is the natural affordance); the

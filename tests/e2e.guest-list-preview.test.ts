@@ -233,6 +233,26 @@ test.describe('guest list song preview', () => {
     await expect(page.locator('#guest-scroll-right')).toBeVisible();
   });
 
+  test('hidden arrows keep their footprint so the rail never jitters', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-entry', { state: 'attached' });
+
+    const scroller = page.locator('#rsvp-guests');
+    const widthAtStart = await scroller.evaluate(el => el.getBoundingClientRect().width);
+    const leftFootprint = await page.locator('#guest-scroll-left').evaluate(el => ({
+      width: el.getBoundingClientRect().width,
+      visibility: getComputedStyle(el).visibility
+    }));
+    expect(leftFootprint.width).toBeGreaterThan(0);
+    expect(leftFootprint.visibility).toBe('hidden');
+
+    await scroller.evaluate(el => { el.scrollLeft = 200; });
+    await expect(page.locator('#guest-scroll-left')).toBeVisible();
+    const widthMidScroll = await scroller.evaluate(el => el.getBoundingClientRect().width);
+
+    expect(Math.abs(widthMidScroll - widthAtStart)).toBeLessThan(1);
+  });
+
   test('mobile hides the arrows entirely and keeps swipe scrolling', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');

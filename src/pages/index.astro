@@ -477,11 +477,11 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         <span id="guest-going-count" class="guest-counter guest-counter-going">Going (0)</span>
         <button type="button" id="guest-notgoing-toggle" class="guest-counter guest-notgoing-toggle" aria-pressed="false" disabled>Not Going (0)</button>
       </div>
-      <button type="button" id="guest-scroll-left" class="guest-scroll-arrow guest-scroll-arrow-left" aria-label="Scroll guests left" hidden></button>
+      <button type="button" id="guest-scroll-left" class="guest-scroll-arrow guest-scroll-arrow-left guest-arrow-idle" aria-label="Scroll guests left"></button>
       <div id="rsvp-guests" class="flex gap-phi-md">
         <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
       </div>
-      <button type="button" id="guest-scroll-right" class="guest-scroll-arrow guest-scroll-arrow-right" aria-label="Scroll guests right" hidden></button>
+      <button type="button" id="guest-scroll-right" class="guest-scroll-arrow guest-scroll-arrow-right guest-arrow-idle" aria-label="Scroll guests right"></button>
     </section>
 
     <!-- ═══ RSVP Modal ═══ -->
@@ -828,7 +828,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
       @media (max-width: 640px) {
         :global(.guest-scroll-arrow) {
-          display: none;
+          display: none !important;
         }
       }
 
@@ -856,8 +856,8 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         transform: translate(-70%, -50%) rotate(45deg);
       }
 
-      :global(.guest-scroll-arrow[hidden]) {
-        display: none;
+      :global(.guest-scroll-arrow.guest-arrow-idle) {
+        visibility: hidden;
       }
 
       :global(main) {
@@ -1470,8 +1470,8 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           guestListContainer.clientWidth,
           guestListContainer.scrollWidth
         );
-        scrollLeftButton.hidden = !left;
-        scrollRightButton.hidden = !right;
+        scrollLeftButton.classList.toggle('guest-arrow-idle', !left);
+        scrollRightButton.classList.toggle('guest-arrow-idle', !right);
       };
       guestListContainer.addEventListener('scroll', updateArrows, { passive: true });
       window.addEventListener('resize', updateArrows);
