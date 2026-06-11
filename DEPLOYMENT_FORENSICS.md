@@ -1,4 +1,4 @@
-# Deployment Forensics - Mobile Top Flow
+# Deployment Forensics - Dock Carousel
 
 ## Deployment Details
 
@@ -8,26 +8,29 @@
 
 ## Commits Being Deployed
 
-- mobile-top-flow implementation
-- mobile-top-flow plan
+- dock-carousel implementation
+- dock-carousel plan
 
 ## Changes Deployed
 
-1. **Mobile flow starts at the screen top** - main's mobile top padding 34px to 0, the
-   stripe panel's 50px mobile margin to 0 (first content measured at 0px, was 84px)
-2. **Dock clearance restored on mobile** - the mobile override that crushed main's bottom
-   padding to 34px now provides 200px, so the map scrolls fully clear of the fixed dock
-   (local measurement: 135px gap even with oversized test data)
-3. **Desktop untouched; CSS only**
+1. **Stacked counters** right of the vertical Play all: "Going (N)" (passive) above
+   "Not Going (N)" (the reveal toggle, relocated from the floating pill; disabled when
+   nothing is hidden); counts single-sourced from a new `summarizeAttendance` helper
+2. **Horizontal card rail** - cards render in one swipeable row (overflow-x auto, touch
+   scrolling) with CSS-chevron arrow buttons at both edges paging by 80% of the visible
+   width; the old wrap/vertical-scroll rules (desktop 30vh cap, mobile 25% entries/140px)
+   are removed
+3. **No API or database changes**
 
 ## Pre-Deployment Baseline
 
-- Cutover signal: changed asset set; validation by live measurements
+- Cutover marker (content-based): `guest-scroll-arrow` in served CSS
 
 ## Risk Assessment
 
-**Low Risk:** three values in existing mobile rules; locked by an e2e measurement (top
-within 10px, bottom padding at least 180px); 7 calendar e2e green
+**Low Risk:** layout restructure locked by 10 guest-list e2e (counter accuracy vs the live
+API, stacked geometry, arrow paging both directions, toggle reveal, previews, play-all)
+plus 21 renderer unit tests
 
 ## Rollback Plan
 
@@ -35,28 +38,13 @@ within 10px, bottom padding at least 180px); 7 calendar e2e green
 
 ## Success Criteria
 
-- Prod mobile: first content at the viewport top; map bottom above the dock top with the
-  real four-guest dock
+- Prod dock: Play all, stacked counters Going (4)/Not Going (0) per current data (toggle
+  disabled at zero), arrows, single-row cards; swipe scrolling on mobile (overflow-x auto)
 
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** COMPLETED
-**Result:** Pushed 9348574..b8ab0a7; asset set changed 125 seconds after upload; page 200
-throughout
-**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=ea8b4752-7a5f-4e03-bcdf-5b09de4d6034&
+**Status:** pending
 
 ### Stage 2: Validation
-**Status:** COMPLETED
-**Results (live mobile measurements at 390x844, zero data writes):**
-- First content at 0px from the viewport top (was 84px)
-- main bottom padding 200px; map bottom 541 vs dock top 704 - the map clears the real
-  four-guest dock by 163px
-- Screenshot: title, subtitle, RSVP, both calendar buttons, and the full map all above the
-  dock in one screen
-
-## Final Status Assessment
-
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE
-**Functionality:** VERIFIED against all success criteria
+**Status:** pending
