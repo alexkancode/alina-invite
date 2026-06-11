@@ -11,4 +11,8 @@ const pool = new pg.Pool({
   idleTimeoutMillis: 30000,
 });
 
+pool.on('error', error => {
+  console.error('Database pool idle client error:', error.message);
+});
+
 export default pool;
