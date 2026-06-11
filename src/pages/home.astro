@@ -1,0 +1,26 @@
+---
+import '../styles/yait.css';
+import HeroBay from '../components/yait/HeroBay.astro';
+import JoinClubCta from '../components/yait/JoinClubCta.astro';
+
+export const prerender = true;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>yait — You Are Invited To</title>
+    <meta name="description" content="Bespoke party and event invitation sites. Join the yait club." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="yait-body">
+    <main class="yait-main">
+      <HeroBay />
+      <JoinClubCta />
+    </main>
+  </body>
+</html>
