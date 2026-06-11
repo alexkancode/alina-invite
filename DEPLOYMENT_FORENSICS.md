@@ -47,7 +47,25 @@ physical iPhone (user validation step)
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 9a7825d..fc40730; corrected dates parameter detected in served HTML 78
+seconds after upload; page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=30262b5f-68fb-4560-9191-a1a39cfb21d9&
 
 ### Stage 2: Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (live prod checks):**
+- /api/calendar/party.ics: text/calendar + inline; body starts with BEGIN:VCALENDAR, zero
+  blank lines, CRLF-only, 0 EMAIL / 2 DISPLAY alarms, TZNAME CST/CDT, 3-6pm Chicago times,
+  max line 75 octets
+- Both buttons server-rendered: Apple same-tab (no target) to the ics; Google target=_blank
+  with dates=20260711T200000Z/20260711T230000Z and no ctz
+- Animation hijack removed: clicking Apple navigates directly (locked by e2e)
+
+**Remaining:** on-device confirmation on a physical iPhone (user validation step)
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all locally-verifiable success criteria
