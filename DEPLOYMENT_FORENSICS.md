@@ -1,4 +1,4 @@
-# Deployment Forensics - Dock Carousel
+# Deployment Forensics - Dock Carousel Arrow Visibility
 
 ## Deployment Details
 
@@ -8,29 +8,23 @@
 
 ## Commits Being Deployed
 
-- dock-carousel implementation
-- dock-carousel plan
+- dock-carousel: state-aware scroll arrows
 
 ## Changes Deployed
 
-1. **Stacked counters** right of the vertical Play all: "Going (N)" (passive) above
-   "Not Going (N)" (the reveal toggle, relocated from the floating pill; disabled when
-   nothing is hidden); counts single-sourced from a new `summarizeAttendance` helper
-2. **Horizontal card rail** - cards render in one swipeable row (overflow-x auto, touch
-   scrolling) with CSS-chevron arrow buttons at both edges paging by 80% of the visible
-   width; the old wrap/vertical-scroll rules (desktop 30vh cap, mobile 25% entries/140px)
-   are removed
-3. **No API or database changes**
+1. **State-aware arrows** - hidden entirely when the rail does not overflow; left hidden
+   at the start, right hidden at the end; recomputed on scroll and resize via a pure
+   exported `arrowVisibility` helper (5 new unit cases) wired to the rail's scroll event
 
 ## Pre-Deployment Baseline
 
-- Cutover marker (content-based): `guest-scroll-arrow` in served CSS
+- Prod has 5 guests: desktop rail likely does not overflow (expect no arrows); a 390px
+  mobile viewport overflows (expect right arrow only at the start)
 
 ## Risk Assessment
 
-**Low Risk:** layout restructure locked by 10 guest-list e2e (counter accuracy vs the live
-API, stacked geometry, arrow paging both directions, toggle reveal, previews, play-all)
-plus 21 renderer unit tests
+**Low Risk:** pure visibility logic; arrow paging mechanics unchanged; locked by unit
+cases and the updated e2e edge-state walk (start, mid, end, back to start)
 
 ## Rollback Plan
 
@@ -38,29 +32,14 @@ plus 21 renderer unit tests
 
 ## Success Criteria
 
-- Prod dock: Play all, stacked counters Going (4)/Not Going (0) per current data (toggle
-  disabled at zero), arrows, single-row cards; swipe scrolling on mobile (overflow-x auto)
+- Prod desktop (wide, 5 guests): both arrows hidden
+- Prod mobile: right arrow only at start; left appears after scrolling; right disappears
+  at the end
 
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** COMPLETED
-**Result:** Pushed 10e4fae..1b977a5; `guest-scroll-arrow` detected in served CSS 95
-seconds after upload; page 200 throughout
-**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=2fe226cc-c016-4a7f-b63c-1318e982ebcc&
+**Status:** pending
 
 ### Stage 2: Validation
-**Status:** COMPLETED
-**Results (zero data writes):**
-- Counters live: "Going (5)" / "Not Going (0)" - a fifth guest ("banana", with Banana
-  Pancakes and album art) RSVP'd organically since the last count, exercising the full
-  pipeline in the wild; toggle correctly disabled at zero hidden
-- overflow-x auto on the rail (mobile swipe), both arrows visible
-- Screenshot: vertical Play all, stacked counter pills, chevrons, art-backed card in the
-  single-row rail
-
-## Final Status Assessment
-
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE
-**Functionality:** VERIFIED against all success criteria
+**Status:** pending
