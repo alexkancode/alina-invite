@@ -410,32 +410,57 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           </button>
           </div>
 
-          <!-- Calendar Link -->
-          <a
-            id="cal-btn"
-            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Alina%27s+Birthday&dates=20260711T220000Z/20260712T030000Z&details=You%27re+invited+to+Alina+Kancewick%27s+first+birthday%21&location=3220+Alabama+CT%2C+Houston%2C+TX+77027&ctz=America/New_York"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Add this event to your Google Calendar"
-            class="inline-flex items-center justify-center gap-phi-sm w-full px-phi-xl py-phi-md
-                   rounded-xl text-phi-base font-bold uppercase tracking-widest text-[#483D8B]
-                   no-underline transition-all duration-150 cursor-pointer"
-            style="font-family: 'Righteous', sans-serif;
-                   background: #faf7f2;
-                   border: 3px solid #483D8B;
-                   box-shadow: 4px 4px 0 #483D8B;
-                   min-height: 55px;"
-            onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #483D8B'"
-            onmouseleave="this.style.boxShadow='4px 4px 0 #483D8B'"
-          >
-            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="#8B2FC9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            Add to Calendar
-          </a>
+          <!-- Calendar Links -->
+          <div class="flex flex-col sm:flex-row gap-phi-md w-full">
+            <a
+              id="cal-btn-apple"
+              href="/api/calendar/party.ics"
+              aria-label="Add this event to your Apple Calendar"
+              class="cal-link inline-flex items-center justify-center gap-phi-sm flex-1 px-phi-xl py-phi-md
+                     rounded-xl text-phi-base font-bold uppercase tracking-widest text-[#483D8B]
+                     no-underline transition-all duration-150 cursor-pointer"
+              style="font-family: 'Righteous', sans-serif;
+                     background: #faf7f2;
+                     border: 3px solid #483D8B;
+                     box-shadow: 4px 4px 0 #483D8B;
+                     min-height: 55px;"
+              onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #483D8B'"
+              onmouseleave="this.style.boxShadow='4px 4px 0 #483D8B'"
+            >
+              <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="#8B2FC9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Apple Calendar
+            </a>
+            <a
+              id="cal-btn-google"
+              href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Alina%27s+Birthday&dates=20260711T200000Z/20260711T230000Z&details=You%27re+invited+to+Alina+Kancewick%27s+first+birthday%21&location=3220+Alabama+CT%2C+Houston%2C+TX+77027"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Add this event to your Google Calendar"
+              class="cal-link inline-flex items-center justify-center gap-phi-sm flex-1 px-phi-xl py-phi-md
+                     rounded-xl text-phi-base font-bold uppercase tracking-widest text-[#483D8B]
+                     no-underline transition-all duration-150 cursor-pointer"
+              style="font-family: 'Righteous', sans-serif;
+                     background: #faf7f2;
+                     border: 3px solid #483D8B;
+                     box-shadow: 4px 4px 0 #483D8B;
+                     min-height: 55px;"
+              onmouseenter="this.style.boxShadow='var(--glow-dual), 4px 4px 0 #483D8B'"
+              onmouseleave="this.style.boxShadow='4px 4px 0 #483D8B'"
+            >
+              <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="#8B2FC9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Google Calendar
+            </a>
+          </div>
         </section>
       </div>
 
@@ -1013,7 +1038,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
 
         /* Buttons full width on mobile */
-        #rsvp-btn, #cal-btn {
+        #rsvp-btn, .cal-link {
           min-width: 250px;
         }
 
@@ -1868,83 +1893,6 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           cancelAnimationFrame(gameState.timerRaf);
           gameState.phase = 'idle';
         }
-      });
-
-      // ── Calendar transition ──
-      const calBtn = document.getElementById('cal-btn')!;
-      const calUrl = calBtn.getAttribute('href')!;
-
-      // Restore everything on back-navigation (bfcache)
-      window.addEventListener('pageshow', (e) => {
-        if (e.persisted) {
-          const s = document.getElementById('sunburst-svg');
-          const sp = document.getElementById('sparkle-field');
-          const m = document.querySelector('main');
-          const st = document.querySelector('.stripe-panel');
-          if (s) { s.style.width = '400vmax'; s.style.height = '400vmax'; }
-          if (sp) (sp as HTMLElement).style.transform = '';
-          if (m) m.classList.remove('cal-transition-hide');
-          if (st) st.classList.remove('cal-transition-hide');
-          document.querySelectorAll('.cal-big-icon').forEach(el => el.remove());
-        }
-      });
-
-      calBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        // Create big calendar icon on click
-        const bigIcon = document.createElement('div');
-        bigIcon.setAttribute('style',
-          `position:fixed;top:0;left:0;width:${window.innerWidth}px;height:${window.innerHeight}px;` +
-          `display:flex;align-items:center;justify-content:center;z-index:99999;pointer-events:none;` +
-          `opacity:0;transition:opacity 0.6s ease;`
-        );
-        bigIcon.innerHTML = `<svg viewBox="0 0 24 24" width="120" height="120" fill="none" stroke="#483D8B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>`;
-        document.body.appendChild(bigIcon);
-
-        // Hide everything except rays, sparkles, clouds, and the big icon
-        const main = document.querySelector('main')!;
-        const stripePanel = document.querySelector('.stripe-panel')!;
-        const sunburst = document.getElementById('sunburst-svg')!;
-        const sparkles = document.getElementById('sparkle-field')!;
-        const clouds = document.getElementById('clouds-container')!;
-
-        main.classList.add('cal-transition-hide');
-        stripePanel.classList.add('cal-transition-hide');
-
-        // Shrink rays and stars to icon size
-        sunburst.style.width = '120px';
-        sunburst.style.height = '120px';
-        sparkles.style.transform = 'scale(0.03)';
-
-        // Show big calendar icon
-        setTimeout(() => { bigIcon.style.opacity = '1'; }, 400);
-
-        // Flip the icon in the last 0.5s
-        setTimeout(() => {
-          const svg = bigIcon.querySelector('svg')!;
-          (svg as HTMLElement).style.animation = 'cal-flip 0.5s ease-in-out';
-        }, 1000);
-
-        // Open calendar after 1.5s
-        setTimeout(() => {
-          window.open(calUrl, '_blank', 'noopener,noreferrer');
-          // Restore everything
-          bigIcon.style.opacity = '0';
-          sunburst.style.width = '400vmax';
-          sunburst.style.height = '400vmax';
-          sparkles.style.transform = '';
-          setTimeout(() => {
-            main.classList.remove('cal-transition-hide');
-            stripePanel.classList.remove('cal-transition-hide');
-            bigIcon.remove();
-          }, 500);
-        }, 1500);
       });
 
     </script>

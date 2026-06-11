@@ -57,7 +57,7 @@ export const GET: APIRoute = async ({ params, request }) => {
       status: 200,
       headers: {
         'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': `attachment; filename="alina-birthday-party-${rsvp.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.ics"`,
+        'Content-Disposition': `inline; filename="alina-birthday-party-${rsvp.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.ics"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'

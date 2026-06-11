@@ -23,7 +23,7 @@ export const GET: APIRoute = async ({ request }) => {
       status: 200,
       headers: {
         'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="alina-birthday-party.ics"',
+        'Content-Disposition': 'inline; filename="alina-birthday-party.ics"',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour since content is static
         'Pragma': 'public'
       }

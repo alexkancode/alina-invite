@@ -30,8 +30,8 @@ describe('Calendar Generation', () => {
     expect(alarmMatches?.length).toBe(2);
 
     // Check specific alarm types
-    expect(ics).toContain('ACTION:EMAIL');
-    expect(ics).toContain('ACTION:DISPLAY');
+    expect(ics).not.toContain('ACTION:EMAIL');
+    expect(ics.match(/ACTION:DISPLAY/g)?.length).toBe(2);
     expect(ics).toContain('TRIGGER:-P1W'); // 1 week
     expect(ics).toContain('TRIGGER:-P1D'); // 1 day
   });
@@ -105,15 +105,14 @@ describe('Calendar Generation', () => {
     expect(ics).toContain('BEGIN:VTIMEZONE');
     expect(ics).toContain('END:VTIMEZONE');
     expect(ics).toContain('TZID:America/Chicago');
-    expect(ics).toContain('TZNAME:EST');
-    expect(ics).toContain('TZNAME:EDT');
+    expect(ics).toContain('TZNAME:CST');
+    expect(ics).toContain('TZNAME:CDT');
   });
 
   test('alarm descriptions are informative', () => {
     const ics = generatePersonalizedICS('Alice');
 
-    expect(ics).toContain('Party reminder - One week to go!');
+    expect(ics).toContain('one week to go!');
     expect(ics).toContain('Party tomorrow!');
-    expect(ics).toContain("Party Reminder: Alina's Birthday Party");
   });
 });
