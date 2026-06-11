@@ -233,6 +233,21 @@ test.describe('guest list song preview', () => {
     await expect(page.locator('#guest-scroll-right')).toBeVisible();
   });
 
+  test('mobile hides the arrows entirely and keeps swipe scrolling', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-entry', { state: 'attached' });
+
+    const state = await page.evaluate(() => ({
+      leftDisplay: getComputedStyle(document.getElementById('guest-scroll-left')).display,
+      rightDisplay: getComputedStyle(document.getElementById('guest-scroll-right')).display,
+      overflowX: getComputedStyle(document.getElementById('rsvp-guests')).overflowX
+    }));
+    expect(state.leftDisplay).toBe('none');
+    expect(state.rightDisplay).toBe('none');
+    expect(state.overflowX).toBe('auto');
+  });
+
   test('a guest name containing HTML renders as text, not elements', async ({ page, request }) => {
     const stamp = `${Date.now() % 100000}`;
     const xssName = `<b data-xss-probe>Bold ${stamp}</b>`;

@@ -46,6 +46,11 @@ flowchart LR
   replaced by the single-row model at all widths; entries keep their natural size.
 - Play all, previews, art cards, and deferred hiding are unchanged in behavior.
 
+## Second follow-up after field review
+
+On mobile the arrows are hidden entirely (swipe is the natural affordance); the
+state-aware arrows remain a desktop-only control.
+
 ## Follow-up after field review
 
 Arrows become state-aware: rendered only when the rail actually overflows, with the left

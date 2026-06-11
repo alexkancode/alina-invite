@@ -826,6 +826,12 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         transition: background-color 0.15s ease;
       }
 
+      @media (max-width: 640px) {
+        :global(.guest-scroll-arrow) {
+          display: none;
+        }
+      }
+
       :global(.guest-scroll-arrow:hover) {
         background: rgba(72, 61, 139, 0.3);
       }
