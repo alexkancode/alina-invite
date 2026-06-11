@@ -1,4 +1,4 @@
-# Deployment Forensics - Calendar Button Label Trim
+# Deployment Forensics - Counter Text Styling
 
 ## Deployment Details
 
@@ -7,18 +7,20 @@
 
 ## Commits Being Deployed
 
-- calendar-button-labels: trim desktop labels
+- dock-carousel: counters as plain text
 
 ## Changes Deployed
 
-1. Desktop labels trimmed to "Apple Calendar" / "Google Calendar"; mobile "Apple Cal" /
-   "Google Cal" unchanged; text only
+1. Going/Not Going counters lose all pill chrome (background, radius, padding) and render
+   as plain colored text; the Not Going toggle keeps its click behavior with a color shift
+   plus underline as the active cue and dimming when disabled; CSS only
 
 ## Validation
 
-- 8 calendar e2e green locally; desktop screenshot single-line labels
-- Cutover detected 47 seconds after upload (old "Add to" text gone from served HTML)
-- Prod HTML serves exactly the four expected label spans; hrefs and behavior untouched
+- 12 guest-list e2e green locally; screenshots reviewed
+- Cutover 47 seconds after upload; prod computed styles confirm transparent backgrounds,
+  zero radius, magenta Going / purple Not Going text; labels Going (5) / Not Going (0)
+- Screenshot shows the dock with all five live guests including two art cards
 
 ## Final Status Assessment
 
