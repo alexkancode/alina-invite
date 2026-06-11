@@ -22,6 +22,22 @@ test.describe('calendar buttons', () => {
     expect(lineCheck).toBe(1);
   });
 
+  test('mobile flow starts at the top with dock clearance below', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+
+    const layout = await page.evaluate(() => {
+      const main = document.querySelector('main')!;
+      const first = Array.from(main.children).find(c => c.getBoundingClientRect().height > 0)!;
+      return {
+        firstTop: first.getBoundingClientRect().top,
+        bottomPadding: parseFloat(getComputedStyle(main).paddingBottom)
+      };
+    });
+    expect(layout.firstTop).toBeLessThanOrEqual(10);
+    expect(layout.bottomPadding).toBeGreaterThanOrEqual(180);
+  });
+
   test('mobile shows short labels side by side', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
 
