@@ -46,6 +46,11 @@ flowchart LR
   replaced by the single-row model at all widths; entries keep their natural size.
 - Play all, previews, art cards, and deferred hiding are unchanged in behavior.
 
+## Fourth follow-up after field review
+
+The counters render as plain colored text (no pill backgrounds or button chrome); the Not
+Going toggle keeps its click behavior with a color shift plus underline as its active cue.
+
 ## Third follow-up after field review
 
 State-hidden arrows reserve their footprint (`visibility: hidden` with display preserved)

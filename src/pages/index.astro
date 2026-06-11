@@ -785,29 +785,30 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       }
 
       :global(.guest-counter) {
-        padding: 0.2rem 0.85rem;
-        border-radius: 9999px;
-        font-size: 0.7rem;
+        padding: 0;
+        background: none;
+        border: 0;
+        font-size: 0.75rem;
+        font-weight: 600;
         line-height: 1.4;
         white-space: nowrap;
-        text-align: center;
+        text-align: left;
       }
 
       :global(.guest-counter-going) {
-        background: rgba(139, 47, 201, 0.12);
         color: #8B2FC9;
       }
 
       :global(.guest-notgoing-toggle) {
-        background: rgba(72, 61, 139, 0.75);
-        color: #fff;
-        backdrop-filter: blur(4px);
-        transition: background-color 0.15s ease;
+        color: #483D8B;
+        cursor: pointer;
+        transition: color 0.15s ease;
       }
 
       :global(.guest-notgoing-toggle:hover:not(:disabled)),
       :global(.guest-notgoing-toggle[aria-pressed="true"]) {
-        background: #8B2FC9;
+        color: #8B2FC9;
+        text-decoration: underline;
       }
 
       :global(.guest-notgoing-toggle:disabled) {
