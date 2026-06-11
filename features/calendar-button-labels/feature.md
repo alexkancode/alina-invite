@@ -31,3 +31,8 @@ flowchart LR
 - Hrefs, same-tab Apple semantics, and the corrected Google times are untouched.
 - E2E locks the visible label text per viewport and the side-by-side mobile geometry.
 - Deployed to production once verified locally.
+
+## Follow-up after field review
+
+Desktop labels trimmed to "Apple Calendar" / "Google Calendar" (the "Add to" prefix
+dropped); mobile short labels unchanged.

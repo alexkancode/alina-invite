@@ -11,8 +11,8 @@ test.describe('calendar buttons', () => {
   });
 
   test('desktop shows full labels on a single line', async ({ page }) => {
-    await expect(page.locator('#cal-btn-apple')).toContainText('Add to Apple Calendar');
-    await expect(page.locator('#cal-btn-google')).toContainText('Add to Google Calendar');
+    await expect(page.locator('#cal-btn-apple')).toContainText('Apple Calendar');
+    await expect(page.locator('#cal-btn-google')).toContainText('Google Calendar');
 
     const lineCheck = await page.locator('#cal-btn-google .cal-label-full').evaluate(el => {
       const range = document.createRange();
