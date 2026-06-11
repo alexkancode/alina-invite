@@ -39,6 +39,17 @@ GET https://yait.social/home transitions 404 (BEFORE, verified) to 200 containin
 - DB-stopped proof: /home 200 and process alive with Postgres stopped, health 503
   during outage, 200 after restart, pool error logged once
 
+## Production Validation
+
+- Cutover in 42 seconds (sentinel: /home 404 to 200 with "join the yait club")
+- Prod curl suite: all headline words, tagline, CTA, Shrikhand present; 9 fries;
+  /homex and /HOME 404; / 200 with the RSVP form intact; /api/health ok
+- Railway logs: clean boot, server listening, all migrations skip (none new)
+- Playwright against prod: headline "You Are Invited To" rendered, 9 fries, CTA
+  visible; docked screenshot reviewed — envelope alongside the dock, fries up,
+  coral CTA over the teal bay
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
