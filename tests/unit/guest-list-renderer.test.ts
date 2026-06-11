@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { isDeferredGuest, renderGuestEntries, type GuestRsvp } from '../../src/components/guest-list/GuestListRenderer';
+import { isDeferredGuest, renderGuestEntries, summarizeAttendance, type GuestRsvp } from '../../src/components/guest-list/GuestListRenderer';
 
 const render = (rsvps: GuestRsvp[]): HTMLElement => {
   const host = document.createElement('div');
@@ -155,6 +155,24 @@ describe('renderGuestEntries', () => {
       const deferred = Array.from(host.querySelectorAll('.guest-entry-deferred .guest-name'))
         .map(n => n.textContent);
       expect(deferred).toEqual(['NotGoing Plain']);
+    });
+  });
+
+  describe('attendance summary', () => {
+    test('counts going, not going, and the deferred subset', () => {
+      const summary = summarizeAttendance([
+        { name: 'A', attending: 'yes' },
+        guestWithSong({ name: 'B' }),
+        guestWithSong({ name: 'C', attending: 'no' }),
+        { name: 'D', attending: 'no' },
+        { name: 'E', attending: 'no' }
+      ]);
+
+      expect(summary).toEqual({ going: 2, notGoing: 3, deferred: 2 });
+    });
+
+    test('an empty list summarizes to zeros', () => {
+      expect(summarizeAttendance([])).toEqual({ going: 0, notGoing: 0, deferred: 0 });
     });
   });
 

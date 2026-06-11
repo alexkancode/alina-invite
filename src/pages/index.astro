@@ -473,10 +473,15 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
     <!-- ═══ RSVP Guest List ═══ -->
     <section id="rsvp-guest-list" class="relative z-10 guest-list-fade-in">
       <button type="button" id="guest-play-all" class="guest-play-all" hidden>Play all</button>
-      <button type="button" id="guest-notgoing-toggle" class="guest-notgoing-toggle" aria-pressed="false" hidden></button>
-      <div id="rsvp-guests" class="flex flex-wrap justify-center gap-phi-md">
+      <div class="guest-counters">
+        <span id="guest-going-count" class="guest-counter guest-counter-going">Going (0)</span>
+        <button type="button" id="guest-notgoing-toggle" class="guest-counter guest-notgoing-toggle" aria-pressed="false" disabled>Not Going (0)</button>
+      </div>
+      <button type="button" id="guest-scroll-left" class="guest-scroll-arrow guest-scroll-arrow-left" aria-label="Scroll guests left" hidden></button>
+      <div id="rsvp-guests" class="flex gap-phi-md">
         <p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Loading...</p>
       </div>
+      <button type="button" id="guest-scroll-right" class="guest-scroll-arrow guest-scroll-arrow-right" aria-label="Scroll guests right" hidden></button>
     </section>
 
     <!-- ═══ RSVP Modal ═══ -->
@@ -759,8 +764,94 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
       :global(#rsvp-guests) {
         flex: 1;
-        max-height: 30vh;
-        overflow-y: auto;
+        flex-wrap: nowrap;
+        align-items: center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        min-width: 0;
+      }
+
+      :global(#rsvp-guests .guest-entry) {
+        flex: 0 0 auto;
+      }
+
+      :global(.guest-counters) {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.4rem;
+        flex-shrink: 0;
+      }
+
+      :global(.guest-counter) {
+        padding: 0.2rem 0.85rem;
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        line-height: 1.4;
+        white-space: nowrap;
+        text-align: center;
+      }
+
+      :global(.guest-counter-going) {
+        background: rgba(139, 47, 201, 0.12);
+        color: #8B2FC9;
+      }
+
+      :global(.guest-notgoing-toggle) {
+        background: rgba(72, 61, 139, 0.75);
+        color: #fff;
+        backdrop-filter: blur(4px);
+        transition: background-color 0.15s ease;
+      }
+
+      :global(.guest-notgoing-toggle:hover:not(:disabled)),
+      :global(.guest-notgoing-toggle[aria-pressed="true"]) {
+        background: #8B2FC9;
+      }
+
+      :global(.guest-notgoing-toggle:disabled) {
+        opacity: 0.55;
+        cursor: default;
+      }
+
+      :global(.guest-scroll-arrow) {
+        flex-shrink: 0;
+        align-self: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 9999px;
+        background: rgba(72, 61, 139, 0.15);
+        position: relative;
+        transition: background-color 0.15s ease;
+      }
+
+      :global(.guest-scroll-arrow:hover) {
+        background: rgba(72, 61, 139, 0.3);
+      }
+
+      :global(.guest-scroll-arrow::before) {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0.5rem;
+        height: 0.5rem;
+        border-top: 2.5px solid #483D8B;
+        border-right: 2.5px solid #483D8B;
+        border-radius: 1px;
+      }
+
+      :global(.guest-scroll-arrow-left::before) {
+        transform: translate(-30%, -50%) rotate(-135deg);
+      }
+
+      :global(.guest-scroll-arrow-right::before) {
+        transform: translate(-70%, -50%) rotate(45deg);
+      }
+
+      :global(.guest-scroll-arrow[hidden]) {
+        display: none;
       }
 
       :global(main) {
@@ -777,29 +868,6 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
 
       :global(#rsvp-guest-list.show-deferred .guest-entry-deferred) {
         display: flex;
-      }
-
-      :global(.guest-notgoing-toggle) {
-        position: absolute;
-        top: -0.85rem;
-        right: 1.5rem;
-        padding: 0.2rem 0.85rem;
-        border-radius: 9999px;
-        background: rgba(72, 61, 139, 0.75);
-        color: #fff;
-        font-size: 0.7rem;
-        line-height: 1.4;
-        backdrop-filter: blur(4px);
-        transition: background-color 0.15s ease;
-      }
-
-      :global(.guest-notgoing-toggle:hover),
-      :global(.guest-notgoing-toggle[aria-pressed="true"]) {
-        background: #8B2FC9;
-      }
-
-      :global(.guest-notgoing-toggle[hidden]) {
-        display: none;
       }
 
       :global(.guest-entry-art) {
@@ -987,18 +1055,10 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
         /* RSVP guest list: horizontal layout on mobile */
         :global(#rsvp-guests) {
           gap: 8px !important;
-          justify-content: flex-start !important;
-          padding: 0 13px !important;
-          max-height: 140px !important;
-          overflow-y: auto !important;
         }
 
-        /* RSVP guest entries: 25% width max, compact layout */
         :global(#rsvp-guests > div) {
-          flex: 0 0 calc(25% - 6px) !important;
-          min-width: 0 !important;
-          max-width: calc(25% - 6px) !important;
-          padding: 8px 4px !important;
+          padding: 8px 10px !important;
           font-size: 12px !important;
           line-height: 1.2 !important;
         }
@@ -1087,7 +1147,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
     </style>
 
     <script>
-      import { isDeferredGuest, renderGuestEntries } from '../components/guest-list/GuestListRenderer.js';
+      import { renderGuestEntries, summarizeAttendance } from '../components/guest-list/GuestListRenderer.js';
       import { PlayAllController } from '../components/guest-list/PlayAllController.js';
       import { audioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
       import { PreviewResolver } from '../components/spotify-combobox/PreviewResolver.js';
@@ -1385,11 +1445,19 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       const guestListContainer = document.getElementById('rsvp-guests')!;
       const playAllButton = document.getElementById('guest-play-all') as HTMLButtonElement;
       const notGoingToggle = document.getElementById('guest-notgoing-toggle') as HTMLButtonElement;
+      const goingCount = document.getElementById('guest-going-count')!;
+      const scrollLeftButton = document.getElementById('guest-scroll-left') as HTMLButtonElement;
+      const scrollRightButton = document.getElementById('guest-scroll-right') as HTMLButtonElement;
       const guestListSection = document.getElementById('rsvp-guest-list')!;
       notGoingToggle.addEventListener('click', () => {
         const shown = guestListSection.classList.toggle('show-deferred');
         notGoingToggle.setAttribute('aria-pressed', String(shown));
       });
+      const scrollGuests = (direction: number) => {
+        guestListContainer.scrollBy({ left: direction * guestListContainer.clientWidth * 0.8, behavior: 'smooth' });
+      };
+      scrollLeftButton.addEventListener('click', () => scrollGuests(-1));
+      scrollRightButton.addEventListener('click', () => scrollGuests(1));
       const guestPreviewController = new PreviewPlaybackController(new PreviewResolver(), audioPreviewManager);
       const playAllController = new PlayAllController(guestListContainer, playAllButton, guestPreviewController);
       playAllButton.addEventListener('click', () => playAllController.toggle());
@@ -1414,9 +1482,13 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           }
           container.innerHTML = renderGuestEntries(data.rsvps);
           playAllButton.hidden = container.querySelectorAll('.guest-song-play').length === 0;
-          const deferredCount = data.rsvps.filter(isDeferredGuest).length;
-          notGoingToggle.textContent = `Not Going (${deferredCount})`;
-          notGoingToggle.hidden = deferredCount === 0;
+          const summary = summarizeAttendance(data.rsvps);
+          goingCount.textContent = `Going (${summary.going})`;
+          notGoingToggle.textContent = `Not Going (${summary.notGoing})`;
+          notGoingToggle.disabled = summary.deferred === 0;
+          const hasEntries = data.rsvps.length > 0;
+          scrollLeftButton.hidden = !hasEntries;
+          scrollRightButton.hidden = !hasEntries;
         } catch {
           container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Could not load guest list</p>';
         }

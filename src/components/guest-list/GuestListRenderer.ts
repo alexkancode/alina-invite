@@ -58,6 +58,20 @@ export function isDeferredGuest(guest: GuestRsvp): boolean {
   return guest.attending !== 'yes' && !(guest.song_title && guest.song_artist);
 }
 
+export interface AttendanceSummary {
+  going: number;
+  notGoing: number;
+  deferred: number;
+}
+
+export function summarizeAttendance(rsvps: GuestRsvp[]): AttendanceSummary {
+  return {
+    going: rsvps.filter(g => g.attending === 'yes').length,
+    notGoing: rsvps.filter(g => g.attending !== 'yes').length,
+    deferred: rsvps.filter(isDeferredGuest).length
+  };
+}
+
 function entryArt(guest: GuestRsvp): { className: string; styleAttribute: string } {
   if (!guest.song_album_art_url) {
     return { className: '', styleAttribute: '' };

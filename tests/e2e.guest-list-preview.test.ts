@@ -181,6 +181,51 @@ test.describe('guest list song preview', () => {
     await expect(page.locator('.guest-song-play[data-preview-state="playing"]')).toHaveCount(0);
   });
 
+  test('stacked counters reflect the live attendance split', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-entry', { state: 'attached' });
+
+    const api = await (await page.request.get('/api/rsvp')).json();
+    const going = api.rsvps.filter((r: { attending: string }) => r.attending === 'yes').length;
+    const notGoing = api.count - going;
+
+    await expect(page.locator('#guest-going-count')).toHaveText(`Going (${going})`);
+    await expect(page.locator('#guest-notgoing-toggle')).toHaveText(`Not Going (${notGoing})`);
+
+    const stacked = await page.evaluate(() => {
+      const g = document.getElementById('guest-going-count').getBoundingClientRect();
+      const n = document.getElementById('guest-notgoing-toggle').getBoundingClientRect();
+      return { vertical: n.top >= g.bottom - 1, sameLeft: Math.abs(g.left - n.left) < 12 };
+    });
+    expect(stacked.vertical).toBe(true);
+    expect(stacked.sameLeft).toBe(true);
+  });
+
+  test('the card rail scrolls horizontally via the arrows', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#rsvp-guests .guest-entry', { state: 'attached' });
+
+    const scroller = page.locator('#rsvp-guests');
+    const metrics = await scroller.evaluate(el => ({
+      overflowX: getComputedStyle(el).overflowX,
+      scrollable: el.scrollWidth > el.clientWidth,
+      scrollLeft: el.scrollLeft
+    }));
+    expect(metrics.overflowX).toBe('auto');
+    expect(metrics.scrollable).toBe(true);
+    expect(metrics.scrollLeft).toBe(0);
+
+    await page.click('#guest-scroll-right');
+    await expect(async () => {
+      expect(await scroller.evaluate(el => el.scrollLeft)).toBeGreaterThan(50);
+    }).toPass({ timeout: 3000 });
+
+    await page.click('#guest-scroll-left');
+    await expect(async () => {
+      expect(await scroller.evaluate(el => el.scrollLeft)).toBeLessThan(50);
+    }).toPass({ timeout: 3000 });
+  });
+
   test('a guest name containing HTML renders as text, not elements', async ({ page, request }) => {
     const stamp = `${Date.now() % 100000}`;
     const xssName = `<b data-xss-probe>Bold ${stamp}</b>`;
