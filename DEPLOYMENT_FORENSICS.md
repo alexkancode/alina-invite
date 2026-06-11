@@ -36,7 +36,21 @@ keeps overflow-x auto (11 e2e green)
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 2556cc3..568640c; asset set changed 125 seconds after upload; page 200
+throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=e170a25e-9ae6-46be-affc-26a565e70990&
 
 ### Stage 2: Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (zero data writes):**
+- Prod mobile (390px): both arrows computed display none while the rail stays
+  swipe-scrollable (overflow-x auto, scrollWidth exceeds clientWidth)
+- Screenshot: clean dock with Play all, stacked counters, and the card rail bleeding into
+  the next card - the natural swipe cue
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
