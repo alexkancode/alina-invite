@@ -38,7 +38,20 @@ footprint and the rail width varies under 1px across state changes (12 e2e green
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed a4c9863..1140bb4; asset set changed 63 seconds after upload; page 200
+throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=b9b3c8cc-2d7e-428c-bf4d-585178c5e41c&
 
 ### Stage 2: Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (zero data writes):**
+- Desktop: idle arrow occupies its full 28px footprint with visibility hidden
+- Mobile: arrows fully collapsed (display none); rail width identical before and after
+  scrolling (186px both reads)
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
