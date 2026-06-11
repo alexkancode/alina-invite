@@ -64,6 +64,22 @@ export interface AttendanceSummary {
   deferred: number;
 }
 
+export interface ArrowVisibility {
+  left: boolean;
+  right: boolean;
+}
+
+export function arrowVisibility(scrollLeft: number, clientWidth: number, scrollWidth: number): ArrowVisibility {
+  const tolerance = 1;
+  if (scrollWidth <= clientWidth + tolerance) {
+    return { left: false, right: false };
+  }
+  return {
+    left: scrollLeft > tolerance,
+    right: scrollLeft < scrollWidth - clientWidth - tolerance
+  };
+}
+
 export function summarizeAttendance(rsvps: GuestRsvp[]): AttendanceSummary {
   return {
     going: rsvps.filter(g => g.attending === 'yes').length,

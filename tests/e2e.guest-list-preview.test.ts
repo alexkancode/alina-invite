@@ -215,15 +215,22 @@ test.describe('guest list song preview', () => {
     expect(metrics.scrollable).toBe(true);
     expect(metrics.scrollLeft).toBe(0);
 
+    await expect(page.locator('#guest-scroll-left')).toBeHidden();
+    await expect(page.locator('#guest-scroll-right')).toBeVisible();
+
     await page.click('#guest-scroll-right');
     await expect(async () => {
       expect(await scroller.evaluate(el => el.scrollLeft)).toBeGreaterThan(50);
     }).toPass({ timeout: 3000 });
+    await expect(page.locator('#guest-scroll-left')).toBeVisible();
 
-    await page.click('#guest-scroll-left');
-    await expect(async () => {
-      expect(await scroller.evaluate(el => el.scrollLeft)).toBeLessThan(50);
-    }).toPass({ timeout: 3000 });
+    await scroller.evaluate(el => { el.scrollLeft = el.scrollWidth; });
+    await expect(page.locator('#guest-scroll-right')).toBeHidden();
+    await expect(page.locator('#guest-scroll-left')).toBeVisible();
+
+    await scroller.evaluate(el => { el.scrollLeft = 0; });
+    await expect(page.locator('#guest-scroll-left')).toBeHidden();
+    await expect(page.locator('#guest-scroll-right')).toBeVisible();
   });
 
   test('a guest name containing HTML renders as text, not elements', async ({ page, request }) => {

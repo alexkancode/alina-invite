@@ -1147,7 +1147,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
     </style>
 
     <script>
-      import { renderGuestEntries, summarizeAttendance } from '../components/guest-list/GuestListRenderer.js';
+      import { arrowVisibility, renderGuestEntries, summarizeAttendance } from '../components/guest-list/GuestListRenderer.js';
       import { PlayAllController } from '../components/guest-list/PlayAllController.js';
       import { audioPreviewManager } from '../components/spotify-combobox/AudioPreviewManager.js';
       import { PreviewResolver } from '../components/spotify-combobox/PreviewResolver.js';
@@ -1458,6 +1458,17 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
       };
       scrollLeftButton.addEventListener('click', () => scrollGuests(-1));
       scrollRightButton.addEventListener('click', () => scrollGuests(1));
+      const updateArrows = () => {
+        const { left, right } = arrowVisibility(
+          guestListContainer.scrollLeft,
+          guestListContainer.clientWidth,
+          guestListContainer.scrollWidth
+        );
+        scrollLeftButton.hidden = !left;
+        scrollRightButton.hidden = !right;
+      };
+      guestListContainer.addEventListener('scroll', updateArrows, { passive: true });
+      window.addEventListener('resize', updateArrows);
       const guestPreviewController = new PreviewPlaybackController(new PreviewResolver(), audioPreviewManager);
       const playAllController = new PlayAllController(guestListContainer, playAllButton, guestPreviewController);
       playAllButton.addEventListener('click', () => playAllController.toggle());
@@ -1486,9 +1497,7 @@ import MusicSearchWidget from '../components/MusicSearchWidgetDynamic.astro'
           goingCount.textContent = `Going (${summary.going})`;
           notGoingToggle.textContent = `Not Going (${summary.notGoing})`;
           notGoingToggle.disabled = summary.deferred === 0;
-          const hasEntries = data.rsvps.length > 0;
-          scrollLeftButton.hidden = !hasEntries;
-          scrollRightButton.hidden = !hasEntries;
+          updateArrows();
         } catch {
           container.innerHTML = '<p class="text-phi-sm" style="color: rgba(72, 61, 139, 0.4);">Could not load guest list</p>';
         }

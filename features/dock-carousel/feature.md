@@ -46,6 +46,14 @@ flowchart LR
   replaced by the single-row model at all widths; entries keep their natural size.
 - Play all, previews, art cards, and deferred hiding are unchanged in behavior.
 
+## Follow-up after field review
+
+Arrows become state-aware: rendered only when the rail actually overflows, with the left
+arrow hidden while the rail sits at its start and the right arrow hidden at the end —
+recomputed live on scroll and resize. The visibility decision is a pure exported
+`arrowVisibility(scrollLeft, clientWidth, scrollWidth)` helper beside the renderer so it
+is unit-testable, with a small rounding tolerance at the edges.
+
 ## Outcome
 
 - One glanceable dock row: playlist control, attendance tallies, and a swipeable card rail

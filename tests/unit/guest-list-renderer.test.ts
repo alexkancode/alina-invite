@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { isDeferredGuest, renderGuestEntries, summarizeAttendance, type GuestRsvp } from '../../src/components/guest-list/GuestListRenderer';
+import { arrowVisibility, isDeferredGuest, renderGuestEntries, summarizeAttendance, type GuestRsvp } from '../../src/components/guest-list/GuestListRenderer';
 
 const render = (rsvps: GuestRsvp[]): HTMLElement => {
   const host = document.createElement('div');
@@ -173,6 +173,30 @@ describe('renderGuestEntries', () => {
 
     test('an empty list summarizes to zeros', () => {
       expect(summarizeAttendance([])).toEqual({ going: 0, notGoing: 0, deferred: 0 });
+    });
+  });
+
+  describe('arrow visibility', () => {
+    test('no overflow hides both arrows', () => {
+      expect(arrowVisibility(0, 500, 500)).toEqual({ left: false, right: false });
+      expect(arrowVisibility(0, 500, 400)).toEqual({ left: false, right: false });
+    });
+
+    test('at the start only the right arrow shows', () => {
+      expect(arrowVisibility(0, 500, 1500)).toEqual({ left: false, right: true });
+    });
+
+    test('mid-scroll shows both arrows', () => {
+      expect(arrowVisibility(400, 500, 1500)).toEqual({ left: true, right: true });
+    });
+
+    test('at the end only the left arrow shows', () => {
+      expect(arrowVisibility(1000, 500, 1500)).toEqual({ left: true, right: false });
+    });
+
+    test('subpixel rounding at the edges is tolerated', () => {
+      expect(arrowVisibility(0.6, 500, 1500).left).toBe(false);
+      expect(arrowVisibility(999.4, 500, 1500).right).toBe(false);
     });
   });
 
