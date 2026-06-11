@@ -1,4 +1,4 @@
-# Deployment Forensics - Calendar Button Labels
+# Deployment Forensics - Mobile Top Flow
 
 ## Deployment Details
 
@@ -8,27 +8,26 @@
 
 ## Commits Being Deployed
 
-- calendar-button-labels implementation
-- calendar-button-labels plan
+- mobile-top-flow implementation
+- mobile-top-flow plan
 
 ## Changes Deployed
 
-1. **Desktop labels** - "Add to Apple Calendar" / "Add to Google Calendar" at 0.85rem,
-   single line each (responsive label spans)
-2. **Mobile** - buttons side by side with "Apple Cal" / "Google Cal" at 0.7rem; the legacy
-   250px min-width rule rescoped to the RSVP button only (it was forcing the pair past the
-   viewport edge)
-3. **No behavior changes** - hrefs, same-tab Apple navigation, corrected Google times all
-   untouched and still e2e-locked
+1. **Mobile flow starts at the screen top** - main's mobile top padding 34px to 0, the
+   stripe panel's 50px mobile margin to 0 (first content measured at 0px, was 84px)
+2. **Dock clearance restored on mobile** - the mobile override that crushed main's bottom
+   padding to 34px now provides 200px, so the map scrolls fully clear of the fixed dock
+   (local measurement: 135px gap even with oversized test data)
+3. **Desktop untouched; CSS only**
 
 ## Pre-Deployment Baseline
 
-- Cutover marker: "Add to Apple Calendar" server-rendered in the page HTML
+- Cutover signal: changed asset set; validation by live measurements
 
 ## Risk Assessment
 
-**Low Risk:** label spans and two style rules; 6 calendar e2e green including single-line
-and side-by-side geometry assertions; screenshots verified at both widths
+**Low Risk:** three values in existing mobile rules; locked by an e2e measurement (top
+within 10px, bottom padding at least 180px); 7 calendar e2e green
 
 ## Rollback Plan
 
@@ -36,26 +35,13 @@ and side-by-side geometry assertions; screenshots verified at both widths
 
 ## Success Criteria
 
-- Prod HTML carries both label variants; desktop one-line full labels; mobile side-by-side
-  short labels within the column
+- Prod mobile: first content at the viewport top; map bottom above the dock top with the
+  real four-guest dock
 
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** COMPLETED
-**Result:** Pushed e7aa704..ecb33b4; new label text detected in served HTML 78 seconds
-after upload; page 200 throughout
-**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=19963b9f-8625-493a-acd2-715f74d57904&
+**Status:** pending
 
 ### Stage 2: Validation
-**Status:** COMPLETED
-**Results (zero data writes):**
-- Desktop: full "Add to ..." labels visible, single line each, side by side (screenshot)
-- Mobile (390px): short "Apple Cal" / "Google Cal" labels, side by side, fully within the
-  viewport alongside RSVP, map, and the live dock (screenshot)
-
-## Final Status Assessment
-
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE
-**Functionality:** VERIFIED against all success criteria
+**Status:** pending
