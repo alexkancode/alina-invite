@@ -39,10 +39,10 @@ test.describe('yait home hero', () => {
   test('the entrance tacks across the waterline', async ({ page }) => {
     await page.goto('/home');
     const transforms = await page.evaluate(() => {
-      const envelope = document.querySelector('[data-testid="envelope"]');
-      if (!envelope) return [];
-      const sail = envelope.getAnimations().find(a => 'animationName' in a && a.animationName === 'sail');
-      const effect = sail?.effect as KeyframeEffect | undefined;
+      const weave = document
+        .getAnimations({ subtree: true })
+        .find(a => 'animationName' in a && a.animationName === 'sail-weave');
+      const effect = weave?.effect as KeyframeEffect | undefined;
       return (effect?.getKeyframes() ?? []).map(k => String(k.transform));
     });
     expect(transforms.length).toBeGreaterThanOrEqual(4);

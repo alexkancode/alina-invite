@@ -88,24 +88,34 @@
   to { transform: translateY(0); }
 }
 
-.envelope {
+.envelope-track {
   position: absolute;
   left: 61%;
   top: 44%;
   width: clamp(190px, 24vw, 310px);
+  animation: sail-x 5s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+.envelope {
+  position: relative;
   animation:
-    sail 5s ease-in-out both,
+    sail-weave 5s cubic-bezier(0.37, 0, 0.63, 1) both,
     dock-settle 1s 5s ease-in-out forwards,
     bob 3.4s 6s ease-in-out infinite;
 }
 
-@keyframes sail {
-  from { transform: translateX(-92vw) translateY(-14px) rotate(2deg) scale(0.96); }
-  22% { transform: translateX(-70vw) translateY(12px) rotate(3deg) scale(1.02); }
-  45% { transform: translateX(-48vw) translateY(22px) rotate(2deg) scale(1.04); }
-  68% { transform: translateX(-27vw) translateY(0px) rotate(-3deg) scale(1); }
-  86% { transform: translateX(-10vw) translateY(-10px) rotate(-2deg) scale(0.97); }
-  to { transform: translateX(0vw) translateY(0px) rotate(0deg) scale(1); }
+@keyframes sail-x {
+  from { transform: translateX(-92vw); }
+  40% { transform: translateX(-52vw); }
+  75% { transform: translateX(-16vw); }
+  to { transform: translateX(0vw); }
+}
+
+@keyframes sail-weave {
+  from { transform: translateY(-14px) rotate(2deg) scale(0.96); }
+  40% { transform: translateY(22px) rotate(3deg) scale(1.04); }
+  75% { transform: translateY(-10px) rotate(-2.5deg) scale(0.97); }
+  to { transform: translateY(0px) rotate(0deg) scale(1); }
 }
 
 @keyframes dock-settle {
@@ -277,7 +287,7 @@
     top: 11%;
   }
 
-  .envelope {
+  .envelope-track {
     left: 46%;
     width: clamp(170px, 52vw, 230px);
   }
@@ -298,6 +308,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .envelope-track,
   .envelope,
   .word-inner,
   .fry,

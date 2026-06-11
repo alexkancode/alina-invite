@@ -10,21 +10,30 @@ export interface FryConfig {
   leanDelayMs: number;
 }
 
-export interface SailWaypoint {
+export interface TrackWaypoint {
   offset: number;
   xVw: number;
+}
+
+export interface WeaveWaypoint {
+  offset: number;
   yPx: number;
   rotateDeg: number;
   scale: number;
 }
 
-export const SAIL_PATH: SailWaypoint[] = [
-  { offset: 0, xVw: -92, yPx: -14, rotateDeg: 2, scale: 0.96 },
-  { offset: 0.22, xVw: -70, yPx: 12, rotateDeg: 3, scale: 1.02 },
-  { offset: 0.45, xVw: -48, yPx: 22, rotateDeg: 2, scale: 1.04 },
-  { offset: 0.68, xVw: -27, yPx: 0, rotateDeg: -3, scale: 1 },
-  { offset: 0.86, xVw: -10, yPx: -10, rotateDeg: -2, scale: 0.97 },
-  { offset: 1, xVw: 0, yPx: 0, rotateDeg: 0, scale: 1 }
+export const SAIL_TRACK: TrackWaypoint[] = [
+  { offset: 0, xVw: -92 },
+  { offset: 0.4, xVw: -52 },
+  { offset: 0.75, xVw: -16 },
+  { offset: 1, xVw: 0 }
+];
+
+export const SAIL_WEAVE: WeaveWaypoint[] = [
+  { offset: 0, yPx: -14, rotateDeg: 2, scale: 0.96 },
+  { offset: 0.4, yPx: 22, rotateDeg: 3, scale: 1.04 },
+  { offset: 0.75, yPx: -10, rotateDeg: -2.5, scale: 0.97 },
+  { offset: 1, yPx: 0, rotateDeg: 0, scale: 1 }
 ];
 
 export interface SceneTimeline {
