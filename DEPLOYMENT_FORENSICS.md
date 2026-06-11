@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Home Landing
+# Deployment Forensics - yait S-Curve Sail-In
 
 ## Deployment Details
 
@@ -7,49 +7,41 @@
 
 ## Commits Being Deployed
 
-- yait-home-landing plan
-- yait-home-landing implementation
-- db-pool-resilience: survive idle connection loss without crashing
+- s-curve-sail-in plan
+- s-curve-sail-in implementation
 
 ## Changes Deployed
 
-1. New prerendered route /home: yait brand landing with the riviera bay hero —
-   envelope sails in revealing "You Are Invited To" in Shrikhand, nine fry people
-   bounce on docking, "join the yait club" tagline and CTA. Pure-CSS, transform and
-   opacity only, prefers-reduced-motion fallback. No database dependency.
-2. pg pool error listener in src/lib/db.ts: idle connection terminations no longer
-   crash the Node process (previously an unhandled 'error' event was fatal —
-   reproduced locally by stopping Postgres with a warm pool, fixed and re-proven).
-3. No migrations. No changes to the live invite page or its APIs.
+1. The envelope's entrance is now an S course (seen from above) rendered as a gentle
+   zig-zag from our side view: down-tack toward the viewer, up-tack away, straighten
+   into the dock, with matching heading leans and a 4 percent near/far scale swell.
+   Path lives as typed SAIL_PATH data in heroScene.ts; a canary locks the stylesheet
+   keyframes to that spec.
+2. Fix shipped inside this change: the v1 entrance never visibly ran in production —
+   dock-settle's backwards fill (animation-fill-mode: both during its 5s delay)
+   overrode the sail transform from t=0, so the envelope sat docked while the words
+   revealed. dock-settle now fills forwards only. A new e2e test pins the animation
+   clock mid-sail and asserts real displacement, so this cannot silently regress.
 
 ## Cutover Sentinel
 
-GET https://yait.social/home transitions 404 (BEFORE, verified) to 200 containing
-"join the yait club".
+The stylesheet referenced by https://yait.social/home contains "translate(-48vw)"
+(the 45 percent waypoint; absent from the v1 build).
 
 ## Pre-Deploy Validation
 
-- 29 unit/canary/integration tests green (yait scene, contract canary, /home
-  integration with live-site regression guards, pool resilience)
-- 4 e2e green including the compositor guard (transform/opacity-only animations)
-- Full-suite pre-existing failures confirmed unrelated (identical at HEAD with
-  changes stashed: 26 vitest sample failures, 26 e2e in disco/game suites)
-- Curl suite locally: /home 200 with all content markers, 9 fries; route edges
-  /homex /HOME /home/nope all 404; / 200 with RSVP form; health ok
-- DB-stopped proof: /home 200 and process alive with Postgres stopped, health 503
-  during outage, 200 after restart, pool error logged once
+- 39 unit/canary/integration green (10 new path invariants, 3 stylesheet-spec
+  canaries) plus 6 e2e (new: tack keyframes present; mid-sail displacement)
+- Deterministic animation-clock screenshots reviewed at enter / down-tack / up-tack
+- Local compiled CSS contains the sentinel marker
 
-## Production Validation
+## Previous deployment (same day): yait Home Landing
 
-- Cutover in 42 seconds (sentinel: /home 404 to 200 with "join the yait club")
-- Prod curl suite: all headline words, tagline, CTA, Shrikhand present; 9 fries;
-  /homex and /HOME 404; / 200 with the RSVP form intact; /api/health ok
-- Railway logs: clean boot, server listening, all migrations skip (none new)
-- Playwright against prod: headline "You Are Invited To" rendered, 9 fries, CTA
-  visible; docked screenshot reviewed — envelope alongside the dock, fries up,
-  coral CTA over the teal bay
+Commits: yait-home-landing plan, yait-home-landing implementation,
+db-pool-resilience. Cutover 42s on the /home 404-to-200 sentinel; prod curl suite,
+Railway logs, and Playwright validation all green. Status: SUCCESSFUL. Known issue
+discovered afterward and fixed above: the sail entrance was visually inert.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
