@@ -44,7 +44,23 @@ plus 21 renderer unit tests
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed 10e4fae..1b977a5; `guest-scroll-arrow` detected in served CSS 95
+seconds after upload; page 200 throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=2fe226cc-c016-4a7f-b63c-1318e982ebcc&
 
 ### Stage 2: Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (zero data writes):**
+- Counters live: "Going (5)" / "Not Going (0)" - a fifth guest ("banana", with Banana
+  Pancakes and album art) RSVP'd organically since the last count, exercising the full
+  pipeline in the wild; toggle correctly disabled at zero hidden
+- overflow-x auto on the rail (mobile swipe), both arrows visible
+- Screenshot: vertical Play all, stacked counter pills, chevrons, art-backed card in the
+  single-row rail
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
