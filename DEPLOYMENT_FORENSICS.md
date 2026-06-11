@@ -46,6 +46,15 @@ The stylesheet referenced by https://yait.social/home contains "translate(-52vw)
   probe confirmed mid-bay displacement (translateX -614px, translateY +22px at
   2.25s). Superseded by the three-beat restructure above.
 
+## Production Validation
+
+- Cutover in 42 seconds (sentinel: new hashed stylesheet containing translate(-52vw))
+- Animation-clock probe on prod at 2.0s (beat 1): track matrix translateX -665.6px,
+  exactly -52vw at 1280 wide; weave matrix translateY 22px, scale 1.039 with lean —
+  the two layers are split and live; screenshot reviewed
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
