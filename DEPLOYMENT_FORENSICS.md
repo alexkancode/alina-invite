@@ -1,4 +1,4 @@
-# Deployment Forensics - yait S-Curve Sail-In
+# Deployment Forensics - yait Three-Beat Sail
 
 ## Deployment Details
 
@@ -7,50 +7,45 @@
 
 ## Commits Being Deployed
 
-- s-curve-sail-in plan
-- s-curve-sail-in implementation
+- three-beat-sail plan
+- three-beat-sail implementation
 
 ## Changes Deployed
 
-1. The envelope's entrance is now an S course (seen from above) rendered as a gentle
-   zig-zag from our side view: down-tack toward the viewer, up-tack away, straighten
-   into the dock, with matching heading leans and a 4 percent near/far scale swell.
-   Path lives as typed SAIL_PATH data in heroScene.ts; a canary locks the stylesheet
-   keyframes to that spec.
-2. Fix shipped inside this change: the v1 entrance never visibly ran in production —
-   dock-settle's backwards fill (animation-fill-mode: both during its 5s delay)
-   overrode the sail transform from t=0, so the envelope sat docked while the words
-   revealed. dock-settle now fills forwards only. A new e2e test pins the animation
-   clock mid-sail and asserts real displacement, so this cannot silently regress.
+1. The entrance now has exactly three felt slow-points (down-tack turn at 40
+   percent, up-tack turn at 75 percent, final ease into the dock) instead of five
+   per-keyframe hesitations, and the motion is smoother overall: forward travel
+   (sail-x on a new .envelope-track wrapper) and the weave (sail-weave: y, lean,
+   scale on the envelope) are split onto separate elements so the side-to-side
+   drift never stalls forward progress. Both layers ride easeInOutSine.
+2. Path spec is now SAIL_TRACK (4 waypoints = 3 segments, locked by a unit test)
+   plus SAIL_WEAVE (apexes aligned to track beats, locked by an alignment test);
+   the stylesheet canary parses both keyframe blocks and the easing declarations.
 
 ## Cutover Sentinel
 
-The stylesheet referenced by https://yait.social/home contains "translate(-48vw)"
-(the 45 percent waypoint; absent from the v1 build).
+The stylesheet referenced by https://yait.social/home contains "translate(-52vw)"
+(the 40 percent track waypoint; verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 39 unit/canary/integration green (10 new path invariants, 3 stylesheet-spec
-  canaries) plus 6 e2e (new: tack keyframes present; mid-sail displacement)
-- Deterministic animation-clock screenshots reviewed at enter / down-tack / up-tack
-- Local compiled CSS contains the sentinel marker
+- 64 unit/canary green including the new track/weave invariants and stylesheet
+  canary; 8 integration; 6 e2e (mid-bay clock-pinned displacement now reads the
+  track wrapper; weave keyframes found in the subtree; compositor guard intact)
+- Deterministic frames reviewed at all three beats: down-tack apex as "You" lands,
+  up-tack apex on approach, level at the dock
 
-## Previous deployment (same day): yait Home Landing
+## Earlier deployments today
 
-Commits: yait-home-landing plan, yait-home-landing implementation,
-db-pool-resilience. Cutover 42s on the /home 404-to-200 sentinel; prod curl suite,
-Railway logs, and Playwright validation all green. Status: SUCCESSFUL. Known issue
-discovered afterward and fixed above: the sail entrance was visually inert.
-
-## Production Validation
-
-- Cutover in 43 seconds (sentinel: new hashed stylesheet containing translate(-48vw))
-- Animation-clock probe on prod at 2.25s: matrix translateX -614px, translateY +22px,
-  scale 1.039 with lean — the envelope is genuinely mid-bay on the down-tack;
-  screenshot reviewed and matches local frames
-- Live invite page 200 and /api/health ok throughout
+- yait Home Landing: cutover 42s on the /home 404-to-200 sentinel, fully validated.
+  Includes db-pool-resilience (idle pg connection loss no longer crashes the
+  process). Known issue found after: the sail entrance was visually inert
+  (dock-settle backwards fill override).
+- yait S-Curve Sail-In: cutover 43s on the translate(-48vw) sentinel. Fixed the
+  inert entrance (fill-mode forwards) and shipped the S course; prod animation-clock
+  probe confirmed mid-bay displacement (translateX -614px, translateY +22px at
+  2.25s). Superseded by the three-beat restructure above.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
