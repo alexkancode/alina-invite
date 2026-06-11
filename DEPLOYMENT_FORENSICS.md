@@ -39,7 +39,22 @@ cases and the updated e2e edge-state walk (start, mid, end, back to start)
 ## Deployment Process Tracking
 
 ### Stage 1: Push and Cutover
-**Status:** pending
+**Status:** COMPLETED
+**Result:** Pushed ce98e0e..1b188bf; asset set changed 94 seconds after upload; page 200
+throughout
+**Build Logs:** https://railway.com/project/e036295e-4dd3-4b68-8f61-eefca2c61714/service/67696074-f389-4fcb-8581-8263f347e66d?id=a6b19cf0-5262-4712-b6b7-5882219d5b33&
 
 ### Stage 2: Validation
-**Status:** pending
+**Status:** COMPLETED
+**Results (zero data writes):**
+- Desktop (5 guests, no overflow): both arrows hidden
+- Mobile at start: left hidden, right visible; scrolled to the end: right hidden, left
+  visible - exactly the contract
+- Screenshots show the rail at both edges, including another organic guest ("Jason" with
+  "Be Sweet" and album art) exercising the live pipeline
+
+## Final Status Assessment
+
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE
+**Functionality:** VERIFIED against all success criteria
