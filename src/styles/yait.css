@@ -94,15 +94,18 @@
   top: 44%;
   width: clamp(190px, 24vw, 310px);
   animation:
-    sail 5s cubic-bezier(0.33, 1, 0.68, 1) both,
-    dock-settle 1s 5s ease-in-out both,
+    sail 5s ease-in-out both,
+    dock-settle 1s 5s ease-in-out forwards,
     bob 3.4s 6s ease-in-out infinite;
 }
 
 @keyframes sail {
-  from { transform: translateX(-92vw) rotate(-2deg); }
-  60% { transform: translateX(-30vw) rotate(1.4deg); }
-  to { transform: translateX(0) rotate(0deg); }
+  from { transform: translateX(-92vw) translateY(-14px) rotate(2deg) scale(0.96); }
+  22% { transform: translateX(-70vw) translateY(12px) rotate(3deg) scale(1.02); }
+  45% { transform: translateX(-48vw) translateY(22px) rotate(2deg) scale(1.04); }
+  68% { transform: translateX(-27vw) translateY(0px) rotate(-3deg) scale(1); }
+  86% { transform: translateX(-10vw) translateY(-10px) rotate(-2deg) scale(0.97); }
+  to { transform: translateX(0vw) translateY(0px) rotate(0deg) scale(1); }
 }
 
 @keyframes dock-settle {

@@ -10,6 +10,23 @@ export interface FryConfig {
   leanDelayMs: number;
 }
 
+export interface SailWaypoint {
+  offset: number;
+  xVw: number;
+  yPx: number;
+  rotateDeg: number;
+  scale: number;
+}
+
+export const SAIL_PATH: SailWaypoint[] = [
+  { offset: 0, xVw: -92, yPx: -14, rotateDeg: 2, scale: 0.96 },
+  { offset: 0.22, xVw: -70, yPx: 12, rotateDeg: 3, scale: 1.02 },
+  { offset: 0.45, xVw: -48, yPx: 22, rotateDeg: 2, scale: 1.04 },
+  { offset: 0.68, xVw: -27, yPx: 0, rotateDeg: -3, scale: 1 },
+  { offset: 0.86, xVw: -10, yPx: -10, rotateDeg: -2, scale: 0.97 },
+  { offset: 1, xVw: 0, yPx: 0, rotateDeg: 0, scale: 1 }
+];
+
 export interface SceneTimeline {
   sailDurationMs: number;
   wordRevealStartsMs: number[];
