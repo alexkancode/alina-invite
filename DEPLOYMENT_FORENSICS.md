@@ -59,6 +59,15 @@ BEFORE check).
 - yait Larger Headline: cutover 32s; prod computed 136px at 1280; accepted
   boat-fronts-the-To decision recorded.
 
+## Production Validation
+
+- Cutover in 41 seconds (sentinel: envelope-flap in prod /home HTML)
+- Prod probe: flap bounding top above the fries, exactly one seal; close-up
+  screenshot reviewed — flap skyward behind the crowd, seal at its tip, fries
+  inside the mouth
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
