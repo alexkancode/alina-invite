@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Staggered Line Reveal
+# Deployment Forensics - yait Independent Line Reveals
 
 ## Deployment Details
 
@@ -7,34 +7,35 @@
 
 ## Commits Being Deployed
 
-- staggered-line-reveal plan
-- staggered-line-reveal implementation
+- independent-line-reveals plan
+- independent-line-reveals implementation
 
 ## Changes Deployed
 
-1. Each headline line now has its own wavy 45-degree reveal edge: lines wrap in
-   per-line clip masks sharing one clipPath whose geometry rescaled to the line
-   box (143/143, 4 periods, 12.5px — same angle and wavelength as before). The
-   bottom line keeps the stern lock exactly; the top line's keyframes derive via
-   staggerRevealEdge (every sweeping waypoint shifted left by 50px = 3.90625
-   percent, final waypoint untouched so both lines converge at the settle).
-2. Mobile variants derived from the same stagger fraction (about 15px on phones).
+1. The two headline lines are now fully independent revealing entities (user
+   refinement: no convergence). The top line runs the identical sweep as the
+   bottom, delayed 537ms — the time equivalent of a 150px average trail
+   (revealDelayMs over the 1676.8px / 6s reference sweep). It starts later, trails
+   throughout (gap breathes with the eased speed), is still behind when the boat
+   docks, and completes its own sweep about half a second after the bottom.
+2. The superseded position-shifted top keyframes (which converged at the settle)
+   are deleted: four keyframe blocks and the staggerRevealEdge derivation removed;
+   the top now shares the bottom's keyframes with only animation-delay rules.
 
 ## Cutover Sentinel
 
-The stylesheet referenced by https://yait.social/home contains "reveal-mask-top"
-(verified absent in the BEFORE check).
+The stylesheet referenced by https://yait.social/home contains
+"animation-delay:537ms" (verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 104 unit/canary/integration green (stagger derivation invariants for both
-  viewports, convergence and advance-only locks, rescaled wave geometry with
-  45-degree and matched-wavelength invariants; canary covers all eight reveal
-  keyframe blocks and the four animation-name swaps)
-- 10 e2e green (new: bottom mask leads top by 42-58px at a pinned mid-sail clock
-  and converges to under 2px at settle; clip and stern-lock probes retargeted to
-  the per-line masks)
-- Frames reviewed at both viewports
+- 106 unit/canary/integration green (delay derivation exact and linear; canary
+  asserts the -top keyframes stay gone and the two delay rules exist)
+- 10 e2e green (independence probe: gap 100-260px mid-sail, over 100px at dock —
+  no convergence — and under 2px at 7.0s when both have finished)
+- TDD note: one test expectation had an arithmetic slip (1074 vs the correct
+  1073 for the doubled trail) — the test was corrected, not the code
+- Frames reviewed: the top line's cut clearly behind the bottom's
 
 ## Earlier deployments today
 
@@ -57,18 +58,10 @@ The stylesheet referenced by https://yait.social/home contains "reveal-mask-top"
 - yait Wave Reveal Edge eight-period retune: cutover 41s; prod-verified at 25px.
 - yait Wave Reveal Edge 12.5px amplitude retune: cutover 122s; prod-verified.
 - yait Bezier Wave Edge: cutover 41s; 64 cubics, zero kinks prod-verified.
-- yait Symmetric Wave Crests: cutover 71s; perpendicular displacement, worst apex
-  offset 0.0px prod-verified.
-
-## Production Validation
-
-- Cutover in 32 seconds (sentinel: reveal-mask-top in the new hashed stylesheet)
-- Prod stagger probe: bottom edge leads the top by 48.7px at the 3.0s pinned
-  clock (50px spec, sub-2px from rounding and the eased frame), converging to a
-  0px gap at settle; screenshot reviewed with the full lockup landed
-- Live invite page 200 and /api/health ok throughout
+- yait Symmetric Wave Crests: cutover 71s; worst apex offset 0.0px prod-verified.
+- yait Staggered Line Reveal: cutover 32s; per-line edges, 48.7px gap converging
+  to 0 prod-verified. Convergence superseded by the independent model above.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
