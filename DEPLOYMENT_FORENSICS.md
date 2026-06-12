@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Independent Line Reveals
+# Deployment Forensics - yait Larger Headline
 
 ## Deployment Details
 
@@ -7,35 +7,32 @@
 
 ## Commits Being Deployed
 
-- independent-line-reveals plan
-- independent-line-reveals implementation
+- larger-headline plan
+- larger-headline implementation
 
 ## Changes Deployed
 
-1. The two headline lines are now fully independent revealing entities (user
-   refinement: no convergence). The top line runs the identical sweep as the
-   bottom, delayed 537ms — the time equivalent of a 150px average trail
-   (revealDelayMs over the 1676.8px / 6s reference sweep). It starts later, trails
-   throughout (gap breathes with the eased speed), is still behind when the boat
-   docks, and completes its own sweep about half a second after the bottom.
-2. The superseded position-shifted top keyframes (which converged at the settle)
-   are deleted: four keyframe blocks and the staggerRevealEdge derivation removed;
-   the top now shares the bottom's keyframes with only animation-delay rules.
+1. Headline grows ~30 percent on desktop: --headline-fs clamp(2.8rem, 11vw,
+   8.5rem) (about 106px to 136px at 1280); mobile floor up slightly (2.6 to
+   2.8rem), measured fitting at 385px of 390 with the 100px indent.
+2. Wave-clip geometry rederived for the taller line box: 185/185 (45 degrees
+   held), 5 periods (wavelength stays ~52px), amplitude and the 537ms independent
+   delay unchanged.
+3. Confirmed design decision: at the new size the docked envelope fronts most of
+   the second line's "To" at rest on desktop; options (move boat, shrink, accept)
+   were presented and the user chose to accept — boat as foreground scenery.
 
 ## Cutover Sentinel
 
 The stylesheet referenced by https://yait.social/home contains
-"animation-delay:537ms" (verified absent in the BEFORE check).
+"clamp(2.8rem, 11vw, 8.5rem)" (verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 106 unit/canary/integration green (delay derivation exact and linear; canary
-  asserts the -top keyframes stay gone and the two delay rules exist)
-- 10 e2e green (independence probe: gap 100-260px mid-sail, over 100px at dock —
-  no convergence — and under 2px at 7.0s when both have finished)
-- TDD note: one test expectation had an arithmetic slip (1074 vs the correct
-  1073 for the doubled trail) — the test was corrected, not the code
-- Frames reviewed: the top line's cut clearly behind the bottom's
+- 97 unit/canary/integration green (geometry round-trip, 45-degree invariant,
+  wavelength band, single-clamp canary on the new token)
+- 10 e2e green; font-ready final frames reviewed at both viewports (an earlier
+  thin-font frame was the screenshot tool racing the webfont, not the site)
 
 ## Earlier deployments today
 
@@ -59,20 +56,10 @@ The stylesheet referenced by https://yait.social/home contains
 - yait Wave Reveal Edge 12.5px amplitude retune: cutover 122s; prod-verified.
 - yait Bezier Wave Edge: cutover 41s; 64 cubics, zero kinks prod-verified.
 - yait Symmetric Wave Crests: cutover 71s; worst apex offset 0.0px prod-verified.
-- yait Staggered Line Reveal: cutover 32s; per-line edges, 48.7px gap converging
-  to 0 prod-verified. Convergence superseded by the independent model above.
-
-## Production Validation
-
-- Cutover in 32 seconds (sentinel: animation-delay:537ms in the new hashed
-  stylesheet)
-- Prod independence probe (after waiting for animations to register; a first
-  racing probe read stale identical values and was discarded): gap 202px at the
-  3.0s pinned clock, 271px when the boat docks — no convergence — and 0px at 7.0s
-  with both sweeps complete; screenshot shows "Invi" leading "Y" mid-sail
-- Live invite page 200 and /api/health ok throughout
+- yait Staggered Line Reveal: cutover 32s; superseded by the independent model.
+- yait Independent Line Reveals: cutover 32s; 537ms delayed top line, prod gaps
+  202px mid-sail / 271px at dock / 0 after both, no convergence.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
