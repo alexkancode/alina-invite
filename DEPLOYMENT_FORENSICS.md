@@ -49,6 +49,15 @@ The stylesheet referenced by https://yait.social/home contains
   edge moved to the stern, prod probe showed edge and stern both at 115px at
   beat 1.
 
+## Production Validation
+
+- Cutover in 53 seconds (sentinel: new hashed stylesheet containing
+  headline-line-indent)
+- Prod geometry probe after the intro: line lefts 34px and 134px — the indent is
+  exactly 100px; screenshot reviewed (lockup top-left, boat docked, full headline)
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
