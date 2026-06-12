@@ -62,6 +62,17 @@ The stylesheet referenced by https://yait.social/home contains
 - yait Staggered Line Reveal: cutover 32s; per-line edges, 48.7px gap converging
   to 0 prod-verified. Convergence superseded by the independent model above.
 
+## Production Validation
+
+- Cutover in 32 seconds (sentinel: animation-delay:537ms in the new hashed
+  stylesheet)
+- Prod independence probe (after waiting for animations to register; a first
+  racing probe read stale identical values and was discarded): gap 202px at the
+  3.0s pinned clock, 271px when the boat docks — no convergence — and 0px at 7.0s
+  with both sweeps complete; screenshot shows "Invi" leading "Y" mid-sail
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
