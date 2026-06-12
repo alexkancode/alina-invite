@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Wake Reveal
+# Deployment Forensics - yait Hull-Locked Reveal
 
 ## Deployment Details
 
@@ -7,32 +7,36 @@
 
 ## Commits Being Deployed
 
-- wake-reveal plan
-- wake-reveal implementation
+- hull-locked-reveal plan
+- hull-locked-reveal implementation
 
 ## Changes Deployed
 
-1. The boat now reveals the headline: the per-word timers are retired and the text
-   sits inside a clipping mask whose edge sweeps with the envelope. Mask and inner
-   text counter-translate on keyframes derived from SAIL_TRACK (buildRevealEdge:
-   same offsets, proportional percents -100 / -56.52 / -17.39 / 0) riding the same
-   easeInOutSine curve, so the wipe slows through both tacks with the boat and
-   completes exactly at docking. Transform-only; reduced motion shows full text.
-2. SCENE_TIMELINE drops the retired word-timer fields; a unit test keeps them
-   retired and canaries lock reveal-mask / reveal-text keyframes to REVEAL_EDGE.
+1. The reveal edge is now locked to the envelope's bow instead of running ahead
+   proportionally: buildRevealEdge takes hull geometry (left percent + width vw,
+   desktop 61/24 and mobile 46/52) and emits maskPercent = xVw + left + width - 100
+   per track waypoint. The reveal runs 6s (track offsets rescaled by 5/6) so the
+   final sliver sweeps out during the dock settle, completing as the boat rests.
+   Mobile gets its own keyframe pair swapped in via animation-name in the existing
+   media query.
+2. New e2e asserts geometrically that the mask's bounding right edge equals the
+   envelope track's bounding right edge (within 40px) at three pinned clock times —
+   the edge IS the bow by construction, since both layers ride identical segment
+   timing and 1 mask percent = 1vw.
 
 ## Cutover Sentinel
 
-The stylesheet referenced by https://yait.social/home contains "reveal-mask"
-(verified absent in the BEFORE check; present in the local build).
+The stylesheet referenced by https://yait.social/home contains "reveal-mask-mobile"
+(verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 69 unit/canary green (reveal-edge derivation invariants, retired-timer guard,
-  reveal keyframe canaries); 8 integration; 7 e2e (new: clock-pinned mask ratio at
-  beat 1 equals the -56.52 percent waypoint within tolerance)
-- Beat frames reviewed: reveal edge tracks the hull through both tacks and slices
-  glyphs mid-wipe as a true wipe should
+- 87 unit/canary/integration green (hull-geometry derivation invariants for both
+  viewports, keyframe canaries for all four reveal blocks, mobile animation-name
+  swap); 7 e2e including the bow-edge geometric lock
+- Frames reviewed desktop and mobile at beat 1 / beat 2 / settle: text ends at the
+  bow throughout; known inherent quirk: on wrapped mobile lines the wipe reveals
+  both lines at the same horizontal edge, so partial glyphs appear mid-sweep
 
 ## Earlier deployments today
 
@@ -42,20 +46,11 @@ The stylesheet referenced by https://yait.social/home contains "reveal-mask"
   (dock-settle backwards fill override).
 - yait S-Curve Sail-In: cutover 43s; fixed the inert entrance and shipped the S
   course. Superseded by three-beat-sail.
-- yait Three-Beat Sail: cutover 42s on the translate(-52vw) sentinel; split travel
-  from weave for exactly three felt beats; prod probe confirmed both layers live
-  (track at -665.6px = -52vw at beat 1). Headline timers superseded by the wake
-  reveal above.
-
-## Production Validation
-
-- Cutover in 32 seconds (sentinel: new hashed stylesheet containing reveal-mask)
-- Animation-clock probe on prod at 2.0s (beat 1): mask ratio exactly -0.5652 (the
-  derived -56.52 percent waypoint) while the boat track reads -665.6px (-52vw) —
-  wipe and hull in lockstep; screenshot reviewed and matches local frames
-- Live invite page 200 and /api/health ok throughout
+- yait Three-Beat Sail: cutover 42s; split travel from weave for three felt beats.
+- yait Wake Reveal: cutover 32s on the reveal-mask sentinel; boat-synced wipe
+  replaced word timers; prod probe showed mask ratio -0.5652 in lockstep with the
+  hull at -52vw. Proportional mapping superseded by the hull lock above.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
