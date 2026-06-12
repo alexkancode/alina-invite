@@ -55,6 +55,16 @@ perpendicular-displacement curve (verified absent in the BEFORE check).
 - yait Wave Reveal Edge 12.5px amplitude retune: cutover 122s; prod-verified.
 - yait Bezier Wave Edge: cutover 41s; 64 cubics, zero tangent kinks prod-verified.
 
+## Production Validation
+
+- Cutover in 71 seconds (sentinel: perpendicular-curve control-point snippet in
+  prod /home HTML)
+- Prod symmetry probe: perpendicular crest +12.5px and trough -12.5px exactly;
+  worst apex offset from its crossings midpoint 0.0px against a 25px
+  half-wavelength — the lean is fully eliminated; screenshot reviewed
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
