@@ -62,6 +62,16 @@ The stylesheet referenced by https://yait.social/home no longer contains
 - yait Taller Tucked Fries: cutover 82s; 78-126px crowd, feet tucked with bounce
   headroom, mobile 0.8 scale, prod close-up verified.
 
+## Production Validation
+
+- Cutover in 42 seconds (sentinel: wave-roll absent and reveal-mask present in the
+  new hashed stylesheet)
+- LIVE rendering validation (no clock pinning — the new standard after this
+  regression): mid-reveal screenshot shows the wavy slanted edge restored; two
+  settled-state screenshots one second apart are byte-identical (no jitter)
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL (rollback)
+**Service Availability:** STABLE (live invite page 200 throughout)
