@@ -47,6 +47,15 @@ The stylesheet referenced by https://yait.social/home contains "translate(-91%)"
   sentinel; bow-locked edge with mobile keyframe pair; prod probe showed edge and
   bow both at 422px at beat 1. Bow lock superseded by the stern lock above.
 
+## Production Validation
+
+- Cutover in 42 seconds (sentinel: new hashed stylesheet containing translate(-91%))
+- Animation-clock probe on prod at 2.0s (beat 1): mask bounding right edge 115px,
+  envelope track bounding left edge 115px — the reveal edge sits exactly at the
+  stern; screenshot reviewed
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
