@@ -118,9 +118,12 @@ test.describe('yait home hero', () => {
       const wave = document.querySelector('#yait-wave-clip path');
       if (!mask || !wave) return null;
       const rect = mask.getBoundingClientRect();
-      const pts = [...(wave.getAttribute('d') ?? '').matchAll(/L (-?[\d.]+) (-?[\d.]+)/g)]
-        .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
-        .filter(p => !(p.x === 0 && (p.y === 0 || p.y === 1)));
+      const d = wave.getAttribute('d') ?? '';
+      const startAnchor = d.match(/^M 0 0 L ([\d.]+) 0 /);
+      const pts = [
+        ...(startAnchor ? [{ x: Number(startAnchor[1]), y: 0 }] : []),
+        ...[...d.matchAll(/C (?:-?[\d.]+ ){4}(-?[\d.]+) (-?[\d.]+)/g)].map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
+      ];
       const x0 = pts[0].x;
       const slantFrac = pts[pts.length - 1].x - x0;
       const deviations = pts.map(p => (p.x - (x0 + slantFrac * p.y)));

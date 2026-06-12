@@ -1,32 +1,47 @@
 import { describe, expect, test } from 'vitest';
 import { buildWaveEdgePath, WAVE_EDGE_PATH, WAVE_REFERENCE, WAVE_SPEC } from '../../../src/lib/yait/heroScene';
 
-const wavePoints = (path: string) =>
-  [...path.matchAll(/L (-?[\d.]+) (-?[\d.]+)/g)]
-    .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
-    .filter(p => !(p.x === 0 && (p.y === 0 || p.y === 1)));
+interface Cubic {
+  c1: { x: number; y: number };
+  c2: { x: number; y: number };
+  to: { x: number; y: number };
+}
+
+const parseWave = (path: string) => {
+  const start = path.match(/^M 0 0 L ([\d.]+) 0 /);
+  const cubics: Cubic[] = [...path.matchAll(/C (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)/g)].map(m => ({
+    c1: { x: Number(m[1]), y: Number(m[2]) },
+    c2: { x: Number(m[3]), y: Number(m[4]) },
+    to: { x: Number(m[5]), y: Number(m[6]) }
+  }));
+  const anchors = start
+    ? [{ x: Number(start[1]), y: 0 }, ...cubics.map(c => c.to)]
+    : cubics.map(c => c.to);
+  return { anchors, cubics };
+};
 
 describe('buildWaveEdgePath', () => {
   const path = buildWaveEdgePath(WAVE_SPEC);
-  const pts = wavePoints(path);
+  const { anchors, cubics } = parseWave(path);
   const x0 = 1 - WAVE_SPEC.slantFracX;
-  const deviations = pts.map(p => p.x - (x0 + WAVE_SPEC.slantFracX * p.y));
+  const deviations = anchors.map(p => p.x - (x0 + WAVE_SPEC.slantFracX * p.y));
 
   test('is a closed clip region covering the revealed side', () => {
     expect(path.startsWith('M 0 0 ')).toBe(true);
     expect(path.endsWith('L 0 1 Z')).toBe(true);
   });
 
-  test('the wave is anchored exactly on the slant ends', () => {
-    expect(pts[0].x).toBeCloseTo(x0, 4);
-    expect(pts[0].y).toBe(0);
-    expect(pts[pts.length - 1].x).toBeCloseTo(1, 4);
-    expect(pts[pts.length - 1].y).toBe(1);
+  test('the wave is drawn with cubic segments anchored on the slant ends', () => {
+    expect(cubics.length).toBeGreaterThan(0);
+    expect(anchors[0].x).toBeCloseTo(x0, 4);
+    expect(anchors[0].y).toBe(0);
+    expect(anchors[anchors.length - 1].x).toBeCloseTo(1, 4);
+    expect(anchors[anchors.length - 1].y).toBe(1);
   });
 
   test('the edge descends monotonically', () => {
-    for (let i = 1; i < pts.length; i++) {
-      expect(pts[i].y).toBeGreaterThan(pts[i - 1].y);
+    for (let i = 1; i < anchors.length; i++) {
+      expect(anchors[i].y).toBeGreaterThan(anchors[i - 1].y);
     }
   });
 
@@ -35,7 +50,7 @@ describe('buildWaveEdgePath', () => {
     expect(Math.min(...deviations)).toBeCloseTo(-WAVE_SPEC.ampFracX, 3);
   });
 
-  test('two periods produce two crests and two troughs', () => {
+  test('eight periods produce eight crests and eight troughs', () => {
     const extrema = [];
     for (let i = 1; i < deviations.length - 1; i++) {
       const rising = deviations[i] - deviations[i - 1] > 0;
@@ -46,9 +61,18 @@ describe('buildWaveEdgePath', () => {
     expect(extrema.filter(e => e === 'trough')).toHaveLength(WAVE_SPEC.periods);
   });
 
-  test('sampling density is high enough to render smooth', () => {
-    expect(pts.length).toBeGreaterThanOrEqual(WAVE_SPEC.samples);
-    expect(WAVE_SPEC.samples / WAVE_SPEC.periods).toBeGreaterThanOrEqual(24);
+  test('every joint is C1-continuous (no corners anywhere on the curve)', () => {
+    for (let i = 1; i < cubics.length; i++) {
+      const joint = cubics[i - 1].to;
+      const incoming = { x: joint.x - cubics[i - 1].c2.x, y: joint.y - cubics[i - 1].c2.y };
+      const outgoing = { x: cubics[i].c1.x - joint.x, y: cubics[i].c1.y - joint.y };
+      expect(outgoing.x).toBeCloseTo(incoming.x, 4);
+      expect(outgoing.y).toBeCloseTo(incoming.y, 4);
+    }
+  });
+
+  test('sampling density holds at least eight cubics per period', () => {
+    expect(cubics.length / WAVE_SPEC.periods).toBeGreaterThanOrEqual(8);
   });
 });
 
@@ -59,7 +83,7 @@ describe('WAVE_EDGE_PATH constant', () => {
       slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
       ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,
       periods: 8,
-      samples: 256
+      samples: 64
     });
     expect(WAVE_EDGE_PATH).toBe(buildWaveEdgePath(WAVE_SPEC));
   });

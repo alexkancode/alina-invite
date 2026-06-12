@@ -84,19 +84,27 @@ const frac = (n: number) => Math.round(n * 100000) / 100000;
 
 export function buildWaveEdgePath(spec: WaveEdgeSpec): string {
   const x0 = 1 - spec.slantFracX;
-  const wave = Array.from({ length: spec.samples + 1 }, (_, i) => {
-    const t = i / spec.samples;
-    const x = x0 + spec.slantFracX * t + spec.ampFracX * Math.sin(2 * Math.PI * spec.periods * t);
-    return `L ${frac(x)} ${frac(t)}`;
+  const omega = 2 * Math.PI * spec.periods;
+  const xAt = (t: number) => x0 + spec.slantFracX * t + spec.ampFracX * Math.sin(omega * t);
+  const dxAt = (t: number) => spec.slantFracX + spec.ampFracX * omega * Math.cos(omega * t);
+  const dt = 1 / spec.samples;
+  const cubics = Array.from({ length: spec.samples }, (_, i) => {
+    const t0 = i * dt;
+    const t1 = (i + 1) * dt;
+    const c1x = xAt(t0) + (dt / 3) * dxAt(t0);
+    const c1y = t0 + dt / 3;
+    const c2x = xAt(t1) - (dt / 3) * dxAt(t1);
+    const c2y = t1 - dt / 3;
+    return `C ${frac(c1x)} ${frac(c1y)} ${frac(c2x)} ${frac(c2y)} ${frac(xAt(t1))} ${frac(t1)}`;
   });
-  return `M 0 0 ${wave.join(' ')} L 0 1 Z`;
+  return `M 0 0 L ${frac(x0)} 0 ${cubics.join(' ')} L 0 1 Z`;
 }
 
 export const WAVE_SPEC: WaveEdgeSpec = {
   slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
   ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,
   periods: 8,
-  samples: 256
+  samples: 64
 };
 
 export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_SPEC);
