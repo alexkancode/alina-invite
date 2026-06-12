@@ -48,6 +48,16 @@ BEFORE check, present locally).
 - yait Wave Reveal Edge: cutover 52s on the yait-wave-clip sentinel; prod probe
   resolved crest +50px / trough -50px / 285px slant over 287px mask.
 
+## Production Validation
+
+- Cutover in 51 seconds (sentinel: mid-path coordinate snippet of the two-period
+  wave in prod /home HTML)
+- Prod geometry probe mid-reveal: crest +25px, trough -25px, slant 285px over the
+  287px mask — the retuned spec exactly; screenshot shows the tighter double
+  ripple slicing the lockup
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
