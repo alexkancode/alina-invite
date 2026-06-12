@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Wave Reveal Edge (eight-period retune)
+# Deployment Forensics - yait Wave Reveal Edge (12.5px amplitude retune)
 
 ## Deployment Details
 
@@ -7,24 +7,23 @@
 
 ## Commits Being Deployed
 
-- wave-reveal-edge: eight periods
+- wave-reveal-edge: halve amplitude to 12.5px
 
 ## Changes Deployed
 
-1. Wave retuned to eight sine periods at the unchanged 25px amplitude; samples
-   256 (32 per period). Flagged to and accepted by the user: at this density the
-   edge reads as scalloped texture rather than distinct waves.
+1. Wave amplitude halved to 12.5px crest/trough; eight periods unchanged. One
+   number in WAVE_REFERENCE; e2e amplitude band retuned to 8-18px both signs.
 
 ## Cutover Sentinel
 
-Prod /home HTML contains a mid-path coordinate snippet unique to the eight-period
-wave (verified absent in the BEFORE check, present locally).
+Prod /home HTML contains a mid-path coordinate snippet unique to the 12.5px
+eight-period wave (verified absent in the BEFORE check, present locally).
 
 ## Pre-Deploy Validation
 
-- 89 unit/canary/integration green (extrema test asserts eight crests and eight
-  troughs); 9 e2e green
-- Frames reviewed: tight squiggle texture through the glyphs
+- 89 unit/canary/integration green; 9 e2e green
+- Frames reviewed: eight delicate undulations along the cut, much more refined
+  than the 25px squiggle
 
 ## Earlier deployments today
 
@@ -44,16 +43,8 @@ wave (verified absent in the BEFORE check, present locally).
 - yait Wave Reveal Edge: cutover 52s; one period at 50px, prod-verified.
 - yait Wave Reveal Edge two-period retune: cutover 51s; prod-verified.
 - yait Wave Reveal Edge four-period retune: cutover 62s; prod-verified.
-
-## Production Validation
-
-- Cutover in 41 seconds (sentinel: eight-period mid-path coordinate snippet in
-  prod /home HTML)
-- Prod geometry probe mid-reveal: crest +25px, trough -25px over the unchanged
-  285px/287px slant on the served eight-period path
-- Live invite page 200 and /api/health ok throughout
+- yait Wave Reveal Edge eight-period retune: cutover 41s; prod-verified at 25px.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
