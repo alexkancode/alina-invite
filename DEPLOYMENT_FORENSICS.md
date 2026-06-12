@@ -70,6 +70,17 @@ BEFORE check).
 - yait Rolling Waves (carrier approach): REGRESSED prod (straight edge, text
   jitter) and was ROLLED BACK in 42s; root causes and the validation gap recorded.
 
+## Production Validation
+
+- Cutover in 41 seconds (sentinel: animateTransform in prod /home HTML)
+- LIVE-PIXEL prod probe (CSS animations pinned at 3.0s, SMIL running free):
+  edge-region pixels changed across one real second AND a fully-revealed word
+  region was byte-identical — the wave rolls, the text does not jitter, asserted
+  in rendered pixels on production
+- Screenshot reviewed: wavy cuts through the glyphs mid-reveal
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
