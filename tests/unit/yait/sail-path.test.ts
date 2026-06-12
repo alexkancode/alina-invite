@@ -5,14 +5,14 @@ import {
   ENVELOPE_LEFT_PERCENT_MOBILE,
   ENVELOPE_WIDTH_VW,
   ENVELOPE_WIDTH_VW_MOBILE,
+  REVEAL_DURATION_MS,
   REVEAL_EDGE,
   REVEAL_EDGE_MOBILE,
-  REVEAL_EDGE_TOP,
-  REVEAL_EDGE_TOP_MOBILE,
   REVEAL_LOCK_VW,
   REVEAL_SAIL_SHARE,
   REVEAL_STAGGER_PX,
-  staggerRevealEdge,
+  REVEAL_TOP_DELAY_MS,
+  revealDelayMs,
   SAIL_TRACK,
   SAIL_WEAVE
 } from '../../../src/lib/yait/heroScene';
@@ -126,36 +126,22 @@ describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }
   });
 });
 
-describe('staggered top-line reveal edge', () => {
-  const staggerPercent = (REVEAL_STAGGER_PX / 1280) * 100;
-  const pairs = [
-    { label: 'desktop', base: REVEAL_EDGE, top: REVEAL_EDGE_TOP },
-    { label: 'mobile', base: REVEAL_EDGE_MOBILE, top: REVEAL_EDGE_TOP_MOBILE }
-  ];
-
-  test('the stagger is 50px at the reference viewport', () => {
-    expect(REVEAL_STAGGER_PX).toBe(50);
-    expect(staggerPercent).toBe(3.90625);
+describe('independent top-line reveal delay', () => {
+  test('the trail is 150px expressed as time over the reference sweep', () => {
+    expect(REVEAL_STAGGER_PX).toBe(150);
+    expect(REVEAL_DURATION_MS).toBe(6000);
+    expect(REVEAL_TOP_DELAY_MS).toBe(537);
+    expect(REVEAL_TOP_DELAY_MS).toBe(revealDelayMs(REVEAL_EDGE, REVEAL_STAGGER_PX, 1280, REVEAL_DURATION_MS));
   });
 
-  test.each(pairs)('$label: every sweeping waypoint trails by exactly the stagger', ({ base, top }) => {
-    expect(top).toEqual(staggerRevealEdge(base, REVEAL_STAGGER_PX, 1280));
-    expect(top).toHaveLength(base.length);
-    for (let i = 0; i < base.length - 1; i++) {
-      expect(top[i].offset).toBe(base[i].offset);
-      expect(top[i].percent).toBeCloseTo(base[i].percent - staggerPercent, 5);
-    }
+  test('the delay scales linearly with the trail distance', () => {
+    expect(revealDelayMs(REVEAL_EDGE, 300, 1280, 6000)).toBe(1073);
+    expect(revealDelayMs(REVEAL_EDGE, 0, 1280, 6000)).toBe(0);
   });
 
-  test.each(pairs)('$label: both lines converge fully revealed at the end', ({ base, top }) => {
-    expect(top[top.length - 1]).toEqual({ offset: 1, percent: 0 });
-    expect(base[base.length - 1]).toEqual({ offset: 1, percent: 0 });
-  });
-
-  test.each(pairs)('$label: the trailing edge still only ever advances', ({ top }) => {
-    for (let i = 1; i < top.length; i++) {
-      expect(top[i].percent).toBeGreaterThan(top[i - 1].percent);
-    }
+  test('the delay derives from the full sweep length', () => {
+    const sweepPx = (-REVEAL_EDGE[0].percent / 100) * 1280;
+    expect(revealDelayMs(REVEAL_EDGE, 150, 1280, 6000)).toBe(Math.round((6000 * 150) / sweepPx));
   });
 });
 

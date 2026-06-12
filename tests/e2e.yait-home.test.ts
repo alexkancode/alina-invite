@@ -146,7 +146,7 @@ test.describe('yait home hero', () => {
     expect(probe!.minDevPx).toBeGreaterThan(-18);
   });
 
-  test('the bottom line reveals about 50px ahead of the top line', async ({ page }) => {
+  test('the lines reveal as independent entities, top trailing without convergence', async ({ page }) => {
     await page.goto('/home');
     const gaps = await page.evaluate(() => {
       const top = document.querySelector('.line-mask-top');
@@ -159,12 +159,13 @@ test.describe('yait home hero', () => {
         }
         return bottom.getBoundingClientRect().right - top.getBoundingClientRect().right;
       };
-      return { midSail: sample(3000), settled: sample(6000) };
+      return { midSail: sample(3000), atDock: sample(6000), afterBoth: sample(7000) };
     });
     expect(gaps).not.toBeNull();
-    expect(gaps!.midSail).toBeGreaterThan(42);
-    expect(gaps!.midSail).toBeLessThan(58);
-    expect(Math.abs(gaps!.settled)).toBeLessThan(2);
+    expect(gaps!.midSail).toBeGreaterThan(100);
+    expect(gaps!.midSail).toBeLessThan(260);
+    expect(gaps!.atDock).toBeGreaterThan(100);
+    expect(Math.abs(gaps!.afterBoth)).toBeLessThan(2);
   });
 
   test('the intro animates transform and opacity only', async ({ page }) => {

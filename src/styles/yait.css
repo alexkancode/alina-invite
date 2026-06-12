@@ -84,11 +84,11 @@
 }
 
 .line-mask-top {
-  animation-name: reveal-mask-top;
+  animation-delay: 537ms;
 }
 
 .line-mask-top .headline-line {
-  animation-name: reveal-text-top;
+  animation-delay: 537ms;
 }
 
 @keyframes reveal-mask {
@@ -120,38 +120,6 @@
   33.33% { transform: translateX(106%); }
   62.5% { transform: translateX(70%); }
   83.33% { transform: translateX(54%); }
-  to { transform: translateX(0%); }
-}
-
-@keyframes reveal-mask-top {
-  from { transform: translateX(-134.90625%); }
-  33.33% { transform: translateX(-94.90625%); }
-  62.5% { transform: translateX(-58.90625%); }
-  83.33% { transform: translateX(-42.90625%); }
-  to { transform: translateX(0%); }
-}
-
-@keyframes reveal-text-top {
-  from { transform: translateX(134.90625%); }
-  33.33% { transform: translateX(94.90625%); }
-  62.5% { transform: translateX(58.90625%); }
-  83.33% { transform: translateX(42.90625%); }
-  to { transform: translateX(0%); }
-}
-
-@keyframes reveal-mask-top-mobile {
-  from { transform: translateX(-149.90625%); }
-  33.33% { transform: translateX(-109.90625%); }
-  62.5% { transform: translateX(-73.90625%); }
-  83.33% { transform: translateX(-57.90625%); }
-  to { transform: translateX(0%); }
-}
-
-@keyframes reveal-text-top-mobile {
-  from { transform: translateX(149.90625%); }
-  33.33% { transform: translateX(109.90625%); }
-  62.5% { transform: translateX(73.90625%); }
-  83.33% { transform: translateX(57.90625%); }
   to { transform: translateX(0%); }
 }
 
@@ -372,16 +340,8 @@
     animation-name: reveal-mask-mobile;
   }
 
-  .line-mask-top {
-    animation-name: reveal-mask-top-mobile;
-  }
-
   .headline-line {
     animation-name: reveal-text-mobile;
-  }
-
-  .line-mask-top .headline-line {
-    animation-name: reveal-text-top-mobile;
   }
 
   .envelope-track {

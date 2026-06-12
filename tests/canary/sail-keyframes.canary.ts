@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, test } from 'vitest';
-import { REVEAL_EDGE, REVEAL_EDGE_MOBILE, REVEAL_EDGE_TOP, REVEAL_EDGE_TOP_MOBILE, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
+import { REVEAL_EDGE, REVEAL_EDGE_MOBILE, REVEAL_TOP_DELAY_MS, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
 
 const css = readFileSync(resolve(__dirname, '../../src/styles/yait.css'), 'utf8');
 
@@ -41,9 +41,7 @@ describe('sail keyframes match the three-beat spec', () => {
 
   const revealPairs = [
     { mask: 'reveal-mask', text: 'reveal-text', edge: REVEAL_EDGE },
-    { mask: 'reveal-mask-mobile', text: 'reveal-text-mobile', edge: REVEAL_EDGE_MOBILE },
-    { mask: 'reveal-mask-top', text: 'reveal-text-top', edge: REVEAL_EDGE_TOP },
-    { mask: 'reveal-mask-top-mobile', text: 'reveal-text-top-mobile', edge: REVEAL_EDGE_TOP_MOBILE }
+    { mask: 'reveal-mask-mobile', text: 'reveal-text-mobile', edge: REVEAL_EDGE_MOBILE }
   ];
 
   test.each(revealPairs)('$mask sweeps with the hull-locked edge', ({ mask, edge }) => {
@@ -69,10 +67,14 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/reveal-text 6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
     expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
     expect(css).toMatch(/animation-name: reveal-text-mobile;/);
-    expect(css).toMatch(/animation-name: reveal-mask-top;/);
-    expect(css).toMatch(/animation-name: reveal-text-top;/);
-    expect(css).toMatch(/animation-name: reveal-mask-top-mobile;/);
-    expect(css).toMatch(/animation-name: reveal-text-top-mobile;/);
+    expect(css).not.toMatch(/reveal-mask-top|reveal-text-top/);
+  });
+
+  test('the top line is an independent entity trailing purely by delay', () => {
+    const delay = new RegExp(`animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`, 'g');
+    expect(css.match(delay)).toHaveLength(2);
+    expect(css).toMatch(new RegExp(`\\.line-mask-top \\{\\s*animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`));
+    expect(css).toMatch(new RegExp(`\\.line-mask-top \\.headline-line \\{\\s*animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`));
   });
 
   test('the second headline line is indented exactly 100px by rule', () => {
