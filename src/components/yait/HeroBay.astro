@@ -1,5 +1,5 @@
 ---
-import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, SCENE_TIMELINE, WAVE_EDGE_PATH } from '../../lib/yait/heroScene';
+import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, SCENE_TIMELINE, WAVE_EDGE_PATH, WAVE_ROLL } from '../../lib/yait/heroScene';
 
 const fries = buildFryCrowd(FRY_COUNT, CROWD_SEED);
 
@@ -16,7 +16,15 @@ const fryStyle = (fry: (typeof fries)[number]) =>
         <stop offset="100%" stop-color="#FBE3BC"></stop>
       </linearGradient>
       <clipPath id="yait-wave-clip" clipPathUnits="objectBoundingBox">
-        <path d={WAVE_EDGE_PATH}></path>
+        <path d={WAVE_EDGE_PATH}>
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            from="0 0"
+            to={`${WAVE_ROLL.xBox} ${WAVE_ROLL.yBox}`}
+            dur={`${WAVE_ROLL.durationMs / 1000}s`}
+            repeatCount="indefinite"></animateTransform>
+        </path>
       </clipPath>
     </defs>
     <rect x="0" y="0" width="1200" height="420" fill="url(#yait-sky-grad)"></rect>

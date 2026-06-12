@@ -22,5 +22,8 @@ export const prerender = true;
       <HeroBay />
       <JoinClubCta />
     </main>
+    <script is:inline>
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelectorAll('animateTransform').forEach(el => el.remove());
+    </script>
   </body>
 </html>

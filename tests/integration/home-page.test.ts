@@ -47,6 +47,19 @@ describe('GET /home', () => {
     expect(homeHtml).toContain(WAVE_EDGE_PATH.slice(0, 60));
   });
 
+  test('the clip path carries the SMIL roll with the derived vector', () => {
+    expect(homeHtml).toContain('<animateTransform');
+    expect(homeHtml).toContain('attributeName="transform"');
+    expect(homeHtml).toContain('to="0.02891 0.2"');
+    expect(homeHtml).toContain('dur="4s"');
+    expect(homeHtml).toContain('repeatCount="indefinite"');
+  });
+
+  test('reduced-motion users get the roll removed by the inline script', () => {
+    expect(homeHtml).toContain('prefers-reduced-motion');
+    expect(homeHtml).toContain('animateTransform');
+  });
+
   test('the envelope is open with one broken seal on the flap', () => {
     expect(homeHtml).toContain('class="envelope-flap"');
     expect(homeHtml.match(/class="seal"/g)).toHaveLength(1);

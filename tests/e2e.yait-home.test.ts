@@ -119,11 +119,9 @@ test.describe('yait home hero', () => {
       if (!mask || !wave) return null;
       const rect = mask.getBoundingClientRect();
       const d = wave.getAttribute('d') ?? '';
-      const startAnchor = d.match(/^M 0 0 L ([\d.]+) 0 /);
-      const pts = [
-        ...(startAnchor ? [{ x: Number(startAnchor[1]), y: 0 }] : []),
-        ...[...d.matchAll(/C (?:-?[\d.]+ ){4}(-?[\d.]+) (-?[\d.]+)/g)].map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
-      ];
+      const pts = [...d.matchAll(/C (?:-?[\d.]+ ){4}(-?[\d.]+) (-?[\d.]+)/g)]
+        .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
+        .filter(p => p.y >= -0.001 && p.y <= 1.001);
       const x0 = pts[0].x;
       const slantFrac = pts[pts.length - 1].x - x0;
       const deviations = pts.map(p => (p.x - (x0 + slantFrac * p.y)));
@@ -204,6 +202,32 @@ test.describe('yait home hero', () => {
     });
     expect(probe).not.toBeNull();
     expect(probe!.feetBaseline - 16).toBeGreaterThan(probe!.vDip);
+  });
+
+  test('the wave rolls in rendered pixels while revealed text stays byte-stable', async ({ page }) => {
+    await page.goto('/home');
+    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(() => {
+      for (const a of document.getAnimations({ subtree: true })) {
+        a.pause();
+        a.currentTime = 3000;
+      }
+    });
+    const edgeRegion = { x: 250, y: 280, width: 220, height: 160 };
+    const wordRegion = { x: 140, y: 300, width: 70, height: 120 };
+    const edgeA = await page.screenshot({ clip: edgeRegion });
+    const wordA = await page.screenshot({ clip: wordRegion });
+    await page.waitForTimeout(1000);
+    const edgeB = await page.screenshot({ clip: edgeRegion });
+    const wordB = await page.screenshot({ clip: wordRegion });
+    expect(Buffer.compare(edgeA, edgeB)).not.toBe(0);
+    expect(Buffer.compare(wordA, wordB)).toBe(0);
+  });
+
+  test('reduced motion removes the rolling clip animation entirely', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/home');
+    await expect(page.locator('animateTransform')).toHaveCount(0);
   });
 
   test('the intro animates transform and opacity only', async ({ page }) => {
