@@ -52,6 +52,16 @@ The stylesheet referenced by https://yait.social/home contains "clip-path:polygo
 - yait Staggered Headline: cutover 53s on the headline-line-indent sentinel;
   left-aligned two-line lockup, prod indent measured exactly 100px.
 
+## Production Validation
+
+- Cutover in 42 seconds (sentinel: new hashed stylesheet containing
+  clip-path:polygon)
+- Prod geometry probe at beat 2: computed slant 285.12px against a 287px rendered
+  mask height — arctan resolves to 45 degrees; screenshot shows the diagonal
+  boundary slicing the lockup with the lower line leading
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
