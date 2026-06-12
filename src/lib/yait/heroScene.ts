@@ -71,43 +71,55 @@ export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, 
   lockVw: REVEAL_LOCK_VW
 });
 
-export interface WaveEdgeSpec {
-  slantFracX: number;
-  ampFracX: number;
+export interface WaveGeometry {
+  viewportW: number;
+  maskH: number;
+  slantPx: number;
+  amplitudePx: number;
   periods: number;
   samples: number;
 }
 
-export const WAVE_REFERENCE = { viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 12.5 };
-
-const frac = (n: number) => Math.round(n * 100000) / 100000;
-
-export function buildWaveEdgePath(spec: WaveEdgeSpec): string {
-  const x0 = 1 - spec.slantFracX;
-  const omega = 2 * Math.PI * spec.periods;
-  const xAt = (t: number) => x0 + spec.slantFracX * t + spec.ampFracX * Math.sin(omega * t);
-  const dxAt = (t: number) => spec.slantFracX + spec.ampFracX * omega * Math.cos(omega * t);
-  const dt = 1 / spec.samples;
-  const cubics = Array.from({ length: spec.samples }, (_, i) => {
-    const t0 = i * dt;
-    const t1 = (i + 1) * dt;
-    const c1x = xAt(t0) + (dt / 3) * dxAt(t0);
-    const c1y = t0 + dt / 3;
-    const c2x = xAt(t1) - (dt / 3) * dxAt(t1);
-    const c2y = t1 - dt / 3;
-    return `C ${frac(c1x)} ${frac(c1y)} ${frac(c2x)} ${frac(c2y)} ${frac(xAt(t1))} ${frac(t1)}`;
-  });
-  return `M 0 0 L ${frac(x0)} 0 ${cubics.join(' ')} L 0 1 Z`;
-}
-
-export const WAVE_SPEC: WaveEdgeSpec = {
-  slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
-  ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,
+export const WAVE_GEOMETRY: WaveGeometry = {
+  viewportW: 1280,
+  maskH: 287,
+  slantPx: 285,
+  amplitudePx: 12.5,
   periods: 8,
   samples: 64
 };
 
-export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_SPEC);
+const frac = (n: number) => Math.round(n * 100000) / 100000;
+
+export function buildWaveEdgePath(g: WaveGeometry): string {
+  const edgeLen = Math.hypot(g.slantPx, g.maskH);
+  const normal = { x: -g.maskH / edgeLen, y: g.slantPx / edgeLen };
+  const omega = 2 * Math.PI * g.periods;
+  const x0Px = g.viewportW - g.slantPx;
+  const pointAt = (s: number) => ({
+    x: (x0Px + g.slantPx * s + g.amplitudePx * Math.sin(omega * s) * normal.x) / g.viewportW,
+    y: (g.maskH * s + g.amplitudePx * Math.sin(omega * s) * normal.y) / g.maskH
+  });
+  const tangentAt = (s: number) => ({
+    x: (g.slantPx + g.amplitudePx * omega * Math.cos(omega * s) * normal.x) / g.viewportW,
+    y: (g.maskH + g.amplitudePx * omega * Math.cos(omega * s) * normal.y) / g.maskH
+  });
+  const ds = 1 / g.samples;
+  const cubics = Array.from({ length: g.samples }, (_, i) => {
+    const s0 = i * ds;
+    const s1 = (i + 1) * ds;
+    const p0 = pointAt(s0);
+    const p1 = pointAt(s1);
+    const d0 = tangentAt(s0);
+    const d1 = tangentAt(s1);
+    const c1 = { x: p0.x + (ds / 3) * d0.x, y: p0.y + (ds / 3) * d0.y };
+    const c2 = { x: p1.x - (ds / 3) * d1.x, y: p1.y - (ds / 3) * d1.y };
+    return `C ${frac(c1.x)} ${frac(c1.y)} ${frac(c2.x)} ${frac(c2.y)} ${frac(p1.x)} ${frac(p1.y)}`;
+  });
+  return `M 0 0 L ${frac(x0Px / g.viewportW)} 0 ${cubics.join(' ')} L 0 1 Z`;
+}
+
+export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_GEOMETRY);
 
 export interface SceneTimeline {
   sailDurationMs: number;
