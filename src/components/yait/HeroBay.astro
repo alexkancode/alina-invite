@@ -49,10 +49,14 @@ const fryStyle = (fry: (typeof fries)[number]) =>
     <h1 class="headline">
       {HEADLINE_LINES.map((line, index) => (
         <span class={index === 0 ? 'line-mask line-mask-top' : 'line-mask'}>
-          <span class={index === 0 ? 'headline-line' : 'headline-line headline-line-indent'}>
-            {line.map(word => (
-              <span class="word">{word}</span>
-            ))}
+          <span class="wave-carrier">
+            <span class="line-counter">
+              <span class={index === 0 ? 'headline-line' : 'headline-line headline-line-indent'}>
+                {line.map(word => (
+                  <span class="word">{word}</span>
+                ))}
+              </span>
+            </span>
           </span>
         </span>
       ))}

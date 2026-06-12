@@ -119,16 +119,14 @@ test.describe('yait home hero', () => {
       if (!mask || !wave) return null;
       const rect = mask.getBoundingClientRect();
       const d = wave.getAttribute('d') ?? '';
-      const startAnchor = d.match(/^M 0 0 L ([\d.]+) 0 /);
-      const pts = [
-        ...(startAnchor ? [{ x: Number(startAnchor[1]), y: 0 }] : []),
-        ...[...d.matchAll(/C (?:-?[\d.]+ ){4}(-?[\d.]+) (-?[\d.]+)/g)].map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
-      ];
+      const pts = [...d.matchAll(/C (?:-?[\d.]+ ){4}(-?[\d.]+) (-?[\d.]+)/g)]
+        .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
+        .filter(p => p.y >= -0.001 && p.y <= 1.001);
       const x0 = pts[0].x;
       const slantFrac = pts[pts.length - 1].x - x0;
       const deviations = pts.map(p => (p.x - (x0 + slantFrac * p.y)));
       return {
-        clip: getComputedStyle(mask).clipPath,
+        clip: getComputedStyle(document.querySelector('.wave-carrier')!).clipPath,
         slantPx: slantFrac * rect.width,
         heightPx: rect.height,
         maxDevPx: Math.max(...deviations) * rect.width,
@@ -204,6 +202,28 @@ test.describe('yait home hero', () => {
     });
     expect(probe).not.toBeNull();
     expect(probe!.feetBaseline - 16).toBeGreaterThan(probe!.vDip);
+  });
+
+  test('the waves roll while the text holds perfectly still', async ({ page }) => {
+    await page.goto('/home');
+    const probe = await page.evaluate(() => {
+      const carrier = document.querySelector('.wave-carrier');
+      const word = document.querySelector('.word');
+      if (!carrier || !word) return null;
+      const sample = (t: number) => {
+        for (const a of document.getAnimations({ subtree: true })) {
+          a.pause();
+          a.currentTime = t;
+        }
+        const r = word.getBoundingClientRect();
+        return { carrier: getComputedStyle(carrier).transform, wordX: r.x, wordY: r.y };
+      };
+      return { a: sample(8000), b: sample(10000) };
+    });
+    expect(probe).not.toBeNull();
+    expect(probe!.a.carrier).not.toBe(probe!.b.carrier);
+    expect(Math.abs(probe!.a.wordX - probe!.b.wordX)).toBeLessThan(0.5);
+    expect(Math.abs(probe!.a.wordY - probe!.b.wordY)).toBeLessThan(0.5);
   });
 
   test('the intro animates transform and opacity only', async ({ page }) => {

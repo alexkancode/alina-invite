@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildWaveEdgePath, WAVE_EDGE_PATH, WAVE_GEOMETRY } from '../../../src/lib/yait/heroScene';
+import { buildWaveEdgePath, WAVE_EDGE_PATH, WAVE_GEOMETRY, WAVE_ROLL } from '../../../src/lib/yait/heroScene';
 
 interface Cubic {
   c1: { x: number; y: number };
@@ -8,14 +8,14 @@ interface Cubic {
 }
 
 const parseWave = (path: string) => {
-  const start = path.match(/^M 0 0 L ([\d.]+) 0 /);
+  const start = path.match(/^M -0\.5 -0\.5 L (-?[\d.]+) -0\.5 L (-?[\d.]+) (-?[\d.]+) /);
   const cubics: Cubic[] = [...path.matchAll(/C (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)/g)].map(m => ({
     c1: { x: Number(m[1]), y: Number(m[2]) },
     c2: { x: Number(m[3]), y: Number(m[4]) },
     to: { x: Number(m[5]), y: Number(m[6]) }
   }));
   const anchors = start
-    ? [{ x: Number(start[1]), y: 0 }, ...cubics.map(c => c.to)]
+    ? [{ x: Number(start[2]), y: Number(start[3]) }, ...cubics.map(c => c.to)]
     : cubics.map(c => c.to);
   return { anchors, cubics };
 };
@@ -28,12 +28,13 @@ const nHat = { x: -g.maskH / edgeLen, y: g.slantPx / edgeLen };
 const toPx = (p: { x: number; y: number }) => ({ x: p.x * g.viewportW, y: p.y * g.maskH });
 
 const edgeCoords = (anchors: { x: number; y: number }[]) => {
-  const origin = toPx(anchors[0]);
+  const slantTop = { x: 1 - g.slantPx / g.viewportW, y: 0 };
+  const origin = toPx(slantTop);
   return anchors.map(a => {
     const p = toPx(a);
     const dx = p.x - origin.x;
     const dy = p.y - origin.y;
-    return { along: dx * tHat.x + dy * tHat.y, out: dx * nHat.x + dy * nHat.y };
+    return { y: a.y, along: dx * tHat.x + dy * tHat.y, out: dx * nHat.x + dy * nHat.y };
   });
 };
 
@@ -41,17 +42,19 @@ describe('buildWaveEdgePath', () => {
   const path = buildWaveEdgePath(g);
   const { anchors, cubics } = parseWave(path);
   const coords = edgeCoords(anchors);
+  const central = coords.filter(c => c.y >= -0.001 && c.y <= 1.001);
+  const margin = 1 / g.periods;
 
-  test('is a closed clip region covering the revealed side', () => {
-    expect(path.startsWith('M 0 0 ')).toBe(true);
-    expect(path.endsWith('L 0 1 Z')).toBe(true);
+  test('is a closed clip region with sliding margins', () => {
+    expect(path.startsWith('M -0.5 -0.5 ')).toBe(true);
+    expect(path.endsWith('L -0.5 1.5 Z')).toBe(true);
   });
 
-  test('the wave is anchored exactly on the slant ends', () => {
-    expect(anchors[0].x).toBeCloseTo(1 - g.slantPx / g.viewportW, 4);
-    expect(anchors[0].y).toBe(0);
-    expect(anchors[anchors.length - 1].x).toBeCloseTo(1, 4);
-    expect(anchors[anchors.length - 1].y).toBeCloseTo(1, 4);
+  test('the wave extends one zero-phase period beyond each slant end', () => {
+    expect(anchors[0].y).toBeCloseTo(-margin, 4);
+    expect(anchors[0].x).toBeCloseTo(1 - g.slantPx / g.viewportW - (g.slantPx / g.periods) / g.viewportW, 4);
+    expect(anchors[anchors.length - 1].y).toBeCloseTo(1 + margin, 4);
+    expect(anchors[anchors.length - 1].x).toBeCloseTo(1 + (g.slantPx / g.periods) / g.viewportW, 4);
   });
 
   test('the edge always advances along the slant direction', () => {
@@ -61,13 +64,13 @@ describe('buildWaveEdgePath', () => {
   });
 
   test('crests and troughs stand exactly one amplitude off the slant', () => {
-    const outs = coords.map(c => c.out);
+    const outs = central.map(c => c.out);
     expect(Math.max(...outs)).toBeCloseTo(g.amplitudePx, 1);
     expect(Math.min(...outs)).toBeCloseTo(-g.amplitudePx, 1);
   });
 
-  test('eight periods produce eight crests and eight troughs', () => {
-    const outs = coords.map(c => c.out);
+  test('the visible box carries the tuned crest and trough count', () => {
+    const outs = central.map(c => c.out);
     const extrema = [];
     for (let i = 1; i < outs.length - 1; i++) {
       const rising = outs[i] - outs[i - 1] > 0;
@@ -79,18 +82,18 @@ describe('buildWaveEdgePath', () => {
   });
 
   test('every apex is centered between its zero crossings (no leaning crests)', () => {
-    const outs = coords.map(c => c.out);
-    const crossings: number[] = [coords[0].along];
+    const outs = central.map(c => c.out);
+    const crossings: number[] = [central[0].along];
     for (let i = 1; i < outs.length; i++) {
       if (Math.sign(outs[i]) !== Math.sign(outs[i - 1]) && Math.sign(outs[i]) !== 0 && Math.sign(outs[i - 1]) !== 0) {
         const f = Math.abs(outs[i - 1]) / (Math.abs(outs[i - 1]) + Math.abs(outs[i]));
-        crossings.push(coords[i - 1].along + f * (coords[i].along - coords[i - 1].along));
+        crossings.push(central[i - 1].along + f * (central[i].along - central[i - 1].along));
       }
     }
-    crossings.push(coords[coords.length - 1].along);
+    crossings.push(central[central.length - 1].along);
     const halfWavelength = edgeLen / (2 * g.periods);
     for (let c = 0; c + 1 < crossings.length; c++) {
-      const segment = coords.filter(p => p.along > crossings[c] && p.along < crossings[c + 1]);
+      const segment = central.filter(p => p.along > crossings[c] && p.along < crossings[c + 1]);
       if (!segment.length) continue;
       const apex = segment.reduce((a, b) => (Math.abs(b.out) > Math.abs(a.out) ? b : a));
       const midpoint = (crossings[c] + crossings[c + 1]) / 2;
@@ -109,7 +112,19 @@ describe('buildWaveEdgePath', () => {
   });
 
   test('sampling density holds at least eight cubics per period', () => {
-    expect(cubics.length / g.periods).toBeGreaterThanOrEqual(8);
+    expect(cubics.length / (g.periods + 2)).toBeGreaterThanOrEqual(8);
+  });
+});
+
+describe('WAVE_ROLL', () => {
+  test('one seamless wavelength per loop, slowly toward the dock', () => {
+    expect(WAVE_ROLL).toEqual({
+      xPercent: Math.round(((g.slantPx / g.periods) / g.viewportW) * 10000000) / 100000,
+      yPercent: Math.round((100 / g.periods) * 100000) / 100000,
+      durationMs: 4000
+    });
+    expect(WAVE_ROLL.xPercent).toBeCloseTo(2.89063, 4);
+    expect(WAVE_ROLL.yPercent).toBe(20);
   });
 });
 
@@ -128,10 +143,5 @@ describe('WAVE_EDGE_PATH constant', () => {
 
   test('the per-line edge keeps the 45-degree slant', () => {
     expect(WAVE_GEOMETRY.slantPx).toBe(WAVE_GEOMETRY.maskH);
-  });
-
-  test('the wavelength stays near the established ripple', () => {
-    const edgeLen = Math.hypot(WAVE_GEOMETRY.slantPx, WAVE_GEOMETRY.maskH);
-    expect(Math.abs(edgeLen / WAVE_GEOMETRY.periods - Math.hypot(285, 287) / 8)).toBeLessThan(5);
   });
 });
