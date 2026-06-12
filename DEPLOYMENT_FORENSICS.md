@@ -58,6 +58,15 @@ GET https://yait.social/home contains the V-mouth path fragment
 - yait Open Envelope: cutover 41s; raised flap, fries inside, prod close-up
   verified.
 
+## Production Validation
+
+- Cutover in 52 seconds (sentinel: V-mouth path fragment in prod /home HTML)
+- Prod probe: flap above the fries, exactly one seal; close-up screenshot
+  reviewed — V mouth open, crowd seated inside over the interior band, seal
+  shoulder peeking above the flap apex
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
