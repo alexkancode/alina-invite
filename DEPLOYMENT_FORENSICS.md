@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Open Envelope
+# Deployment Forensics - yait Open Front V
 
 ## Deployment Details
 
@@ -7,30 +7,28 @@
 
 ## Commits Being Deployed
 
-- open-envelope plan
-- open-envelope implementation
+- open-front-v plan
+- open-front-v implementation
 
 ## Changes Deployed
 
-1. The envelope is now open: a raised back flap points skyward (darker sand inner
-   face, the coral wax seal relocated to its tip as a broken seal), the fry people
-   stand inside the mouth — layered between the flap (z 0) and the front panel
-   (z 2) — and the front panel keeps its seams but drops the center seal. Pure
-   markup and style rules; no animation changes (the flap rides the existing bob
-   and settle).
+1. The wax seal tucks behind the flap and rises by half its height (cy 26 to 16,
+   drawn before the triangle), peeking over the apex.
+2. The front closure seam is removed; the front panel is one path whose top edge
+   dips from the corners into a center V (the opened-envelope mouth). An interior
+   band (the flap's darker sand) backs the mouth so it never sees through to the
+   sky, and the fries seat deeper (bottom 48 percent).
 
 ## Cutover Sentinel
 
-GET https://yait.social/home contains "envelope-flap" (verified absent in the
-BEFORE check).
+GET https://yait.social/home contains the V-mouth path fragment
+"M 4 38 L 100 80 L 196 38" (verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 97 unit/canary green; 10 integration (new: flap present, exactly one seal, DOM
-  layering order flap-fries-art); 11 e2e (new: flap top above the fries, flap base
-  overlapping the front art, z-index ordering)
-- Close-up frame reviewed: flap triangle and tip seal clearly read above the
-  crowd; full-page frames at both viewports reviewed
+- 109 unit/canary/integration green (new: seal drawn behind the flap path at
+  cy 16; old seam absent; V path and interior band present); 11 e2e green
+- Close-up frame reviewed: V mouth, crowd inside, seal shoulder above the apex
 
 ## Earlier deployments today
 
@@ -56,18 +54,10 @@ BEFORE check).
 - yait Symmetric Wave Crests: cutover 71s; worst apex offset 0.0px prod-verified.
 - yait Staggered Line Reveal: cutover 32s; superseded by the independent model.
 - yait Independent Line Reveals: cutover 32s; prod gaps 202/271/0, no convergence.
-- yait Larger Headline: cutover 32s; prod computed 136px at 1280; accepted
-  boat-fronts-the-To decision recorded.
-
-## Production Validation
-
-- Cutover in 41 seconds (sentinel: envelope-flap in prod /home HTML)
-- Prod probe: flap bounding top above the fries, exactly one seal; close-up
-  screenshot reviewed — flap skyward behind the crowd, seal at its tip, fries
-  inside the mouth
-- Live invite page 200 and /api/health ok throughout
+- yait Larger Headline: cutover 32s; prod 136px, accepted overlap decision.
+- yait Open Envelope: cutover 41s; raised flap, fries inside, prod close-up
+  verified.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
