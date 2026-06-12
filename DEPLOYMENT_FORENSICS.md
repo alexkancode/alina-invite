@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Rolling Waves ROLLBACK
+# Deployment Forensics - yait SMIL Rolling Waves
 
 ## Deployment Details
 
@@ -7,30 +7,37 @@
 
 ## Commits Being Deployed
 
-- Revert "rolling-waves implementation"
+- smil-rolling-waves plan
+- smil-rolling-waves implementation
 
 ## Changes Deployed
 
-1. ROLLBACK: the rolling-waves change regressed production — the user reported the
-   reveal edge rendering as a straight line (the clip not applying in live
-   rendering) and the settled text jittering (the carrier/counter pair keeps the
-   text layer in perpetual subpixel motion; net-zero mathematically but each layer
-   resamples per frame). The clock-pinned validation probes checked attributes and
-   computed transforms, not live rendered pixels — the gap this slipped through.
-2. The revert restores the static wave exactly as deployed in taller-tucked-fries:
-   clip on .line-mask, no carrier or counter layers, no wave-roll keyframes.
+1. Second attempt at rolling waves, opposite mechanism from the reverted one: a
+   SMIL animateTransform inside the shared clipPath translates the clip shape
+   itself one wavelength along the edge (0.02891, 0.2 box units per 4s, seamless
+   loop). No carrier, no counter-translation — the text elements are never
+   transformed, so the jitter that sank the first attempt is impossible by
+   construction. The clip path regained its sliding margins. CSS untouched.
+2. Accepted trades (confirmed): bounded per-frame repaint of the two clipped line
+   layers, and the page's first runtime JavaScript — one inline statement removing
+   the animation node under prefers-reduced-motion (SMIL ignores the media query).
 
 ## Cutover Sentinel
 
-The stylesheet referenced by https://yait.social/home no longer contains
-"wave-roll" (present in the broken build; count 0 locally after revert).
+GET https://yait.social/home contains "animateTransform" (verified absent in the
+BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 111 unit/canary/integration and 12 e2e green on the reverted tree
-- Investigation of a correct rolling implementation (animating the clip path
-  itself, no counter-translation) to follow separately with live-rendering
-  validation before any redeploy
+- 112 unit/canary/integration green (margin generator invariants restored, box-unit
+  WAVE_ROLL derivation, HTML contract for the SMIL node and reduced-motion script)
+- 14 e2e green, including the live-pixel test built from the regression's lesson:
+  CSS animations pinned at 3.0s with SMIL running free — edge-region pixels change
+  across one real second while a fully-revealed word region is byte-identical (the
+  exact two failure modes of the reverted attempt, now both asserted in rendered
+  pixels); reduced-motion run asserts the animation node is removed
+- Live unpinned capture keyed to the animation clock reviewed: wavy cuts rolling
+  through the glyphs mid-reveal
 
 ## Earlier deployments today
 
@@ -59,19 +66,10 @@ The stylesheet referenced by https://yait.social/home no longer contains
 - yait Larger Headline: cutover 32s; prod 136px, accepted overlap decision.
 - yait Open Envelope: cutover 41s; raised flap, fries inside, prod-verified.
 - yait Open Front V: cutover 52s; V mouth and seal-behind-flap prod-verified.
-- yait Taller Tucked Fries: cutover 82s; 78-126px crowd, feet tucked with bounce
-  headroom, mobile 0.8 scale, prod close-up verified.
-
-## Production Validation
-
-- Cutover in 42 seconds (sentinel: wave-roll absent and reveal-mask present in the
-  new hashed stylesheet)
-- LIVE rendering validation (no clock pinning — the new standard after this
-  regression): mid-reveal screenshot shows the wavy slanted edge restored; two
-  settled-state screenshots one second apart are byte-identical (no jitter)
-- Live invite page 200 and /api/health ok throughout
+- yait Taller Tucked Fries: cutover 82s; prod close-up verified.
+- yait Rolling Waves (carrier approach): REGRESSED prod (straight edge, text
+  jitter) and was ROLLED BACK in 42s; root causes and the validation gap recorded.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL (rollback)
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
