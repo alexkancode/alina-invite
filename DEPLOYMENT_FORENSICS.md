@@ -51,6 +51,16 @@ The stylesheet referenced by https://yait.social/home contains "reveal-mask-mobi
   replaced word timers; prod probe showed mask ratio -0.5652 in lockstep with the
   hull at -52vw. Proportional mapping superseded by the hull lock above.
 
+## Production Validation
+
+- Cutover in 53 seconds (sentinel: new hashed stylesheet containing
+  reveal-mask-mobile)
+- Animation-clock probe on prod at 2.0s (beat 1): mask bounding right edge 422px,
+  envelope track bounding right edge 422px — the reveal edge sits exactly at the
+  bow; screenshot reviewed
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
