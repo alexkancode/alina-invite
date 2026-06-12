@@ -58,8 +58,8 @@ describe('WAVE_EDGE_PATH constant', () => {
     expect(WAVE_SPEC).toEqual({
       slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
       ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,
-      periods: 2,
-      samples: 64
+      periods: 4,
+      samples: 128
     });
     expect(WAVE_EDGE_PATH).toBe(buildWaveEdgePath(WAVE_SPEC));
   });

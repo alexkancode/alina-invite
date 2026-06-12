@@ -95,8 +95,8 @@ export function buildWaveEdgePath(spec: WaveEdgeSpec): string {
 export const WAVE_SPEC: WaveEdgeSpec = {
   slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
   ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,
-  periods: 2,
-  samples: 64
+  periods: 4,
+  samples: 128
 };
 
 export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_SPEC);
