@@ -72,4 +72,12 @@ describe('sail keyframes match the three-beat spec', () => {
   test('the second headline line is indented exactly 100px by rule', () => {
     expect(css).toMatch(/\.headline-line-indent \{\s*padding-left: 100px;/);
   });
+
+  test('the reveal edge is a slanted clip derived from the shared font size', () => {
+    expect(css).toMatch(/--headline-fs: clamp\(2\.6rem, 8\.5vw, 6\.6rem\);/);
+    expect(css).toMatch(/--headline-slant: calc\(var\(--headline-fs\) \* 2\.7\);/);
+    expect(css).toMatch(/clip-path: polygon\(0 0, calc\(100% - var\(--headline-slant\)\) 0, 100% 100%, 0 100%\);/);
+    expect(css).toMatch(/font-size: var\(--headline-fs\);/);
+    expect(css.match(/clamp\(2\.6rem, 8\.5vw, 6\.6rem\)/g)).toHaveLength(1);
+  });
 });

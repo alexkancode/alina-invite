@@ -111,6 +111,27 @@ test.describe('yait home hero', () => {
     expect(lines[0].left).toBeLessThan(200);
   });
 
+  test('the reveal edge slants close to 45 degrees, top leaning left', async ({ page }) => {
+    await page.goto('/home');
+    const probe = await page.evaluate(() => {
+      const mask = document.querySelector('.headline-mask');
+      if (!mask) return null;
+      const clip = getComputedStyle(mask).clipPath;
+      const slantMatch = clip.match(/calc\(100% - ([\d.]+)px\)/);
+      return {
+        clip,
+        slantPx: slantMatch ? Number(slantMatch[1]) : null,
+        heightPx: mask.getBoundingClientRect().height
+      };
+    });
+    expect(probe).not.toBeNull();
+    expect(probe!.clip).toContain('polygon');
+    expect(probe!.slantPx).not.toBeNull();
+    const ratio = probe!.slantPx! / probe!.heightPx;
+    expect(ratio).toBeGreaterThan(0.75);
+    expect(ratio).toBeLessThan(1.25);
+  });
+
   test('the intro animates transform and opacity only', async ({ page }) => {
     await page.goto('/home');
     const animated = await page.evaluate(() =>

@@ -58,10 +58,13 @@
 }
 
 .headline-mask {
+  --headline-fs: clamp(2.6rem, 8.5vw, 6.6rem);
+  --headline-slant: calc(var(--headline-fs) * 2.7);
   position: absolute;
   top: 11%;
   width: 100%;
   overflow: hidden;
+  clip-path: polygon(0 0, calc(100% - var(--headline-slant)) 0, 100% 100%, 0 100%);
   animation: reveal-mask 6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
@@ -71,7 +74,7 @@
   text-align: left;
   font-family: 'Shrikhand', cursive;
   font-weight: 400;
-  font-size: clamp(2.6rem, 8.5vw, 6.6rem);
+  font-size: var(--headline-fs);
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
