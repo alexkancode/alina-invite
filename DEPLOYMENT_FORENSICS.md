@@ -47,6 +47,15 @@ The stylesheet referenced by https://yait.social/home contains "reveal-mask"
   (track at -665.6px = -52vw at beat 1). Headline timers superseded by the wake
   reveal above.
 
+## Production Validation
+
+- Cutover in 32 seconds (sentinel: new hashed stylesheet containing reveal-mask)
+- Animation-clock probe on prod at 2.0s (beat 1): mask ratio exactly -0.5652 (the
+  derived -56.52 percent waypoint) while the boat track reads -665.6px (-52vw) —
+  wipe and hull in lockstep; screenshot reviewed and matches local frames
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
