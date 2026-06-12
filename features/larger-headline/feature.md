@@ -27,6 +27,14 @@ the ~50px wavelength, amplitude and the 537ms independent delay unchanged.
    "clamp(2.8rem,11vw,8.5rem)" (minified form verified locally), forensics
    pre/post.
 
+## Design decision (confirmed 2026-06-12)
+
+At the new size the second line ends at 897px while the docked envelope starts at
+781px, so the boat permanently fronts most of the "To" at rest on desktop. Options
+presented: move the boat's rest to 68 percent, cap the size at ~7.1rem, or accept.
+User chose to accept the overlap — the boat reads as foreground scenery. Mobile is
+unaffected (line ends 385px of 390, above the envelope).
+
 ### PR checklist pass
 
 One token plus one geometry constant; no duplication (the single-clamp canary

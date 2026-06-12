@@ -82,10 +82,10 @@ describe('sail keyframes match the three-beat spec', () => {
   });
 
   test('the reveal edge clips through the generated wave path', () => {
-    expect(css).toMatch(/--headline-fs: clamp\(2\.6rem, 8\.5vw, 6\.6rem\);/);
+    expect(css).toMatch(/--headline-fs: clamp\(2\.8rem, 11vw, 8\.5rem\);/);
     expect(css).toMatch(/clip-path: url\(#yait-wave-clip\);/);
     expect(css).not.toMatch(/--headline-slant/);
     expect(css).toMatch(/font-size: var\(--headline-fs\);/);
-    expect(css.match(/clamp\(2\.6rem, 8\.5vw, 6\.6rem\)/g)).toHaveLength(1);
+    expect(css.match(/clamp\(2\.8rem, 11vw, 8\.5rem\)/g)).toHaveLength(1);
   });
 });

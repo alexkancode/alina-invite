@@ -58,7 +58,7 @@
 }
 
 .headline-mask {
-  --headline-fs: clamp(2.6rem, 8.5vw, 6.6rem);
+  --headline-fs: clamp(2.8rem, 11vw, 8.5rem);
   position: absolute;
   top: 11%;
   width: 100%;

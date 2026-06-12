@@ -92,11 +92,11 @@ export interface WaveGeometry {
 
 export const WAVE_GEOMETRY: WaveGeometry = {
   viewportW: 1280,
-  maskH: 143,
-  slantPx: 143,
+  maskH: 185,
+  slantPx: 185,
   amplitudePx: 12.5,
-  periods: 4,
-  samples: 32
+  periods: 5,
+  samples: 40
 };
 
 const frac = (n: number) => Math.round(n * 100000) / 100000;
