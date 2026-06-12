@@ -67,7 +67,7 @@ test.describe('yait home hero', () => {
     expect(translateX).toBeLessThan(-300);
   });
 
-  test('the reveal edge sits at the bow, never ahead of it', async ({ page }) => {
+  test('the reveal edge sits at the stern, never ahead of it', async ({ page }) => {
     await page.goto('/home');
     const probes = await page.evaluate(() => {
       const mask = document.querySelector('.headline-mask');
@@ -80,14 +80,14 @@ test.describe('yait home hero', () => {
         }
         return {
           edge: mask.getBoundingClientRect().right,
-          bow: track.getBoundingClientRect().right
+          stern: track.getBoundingClientRect().left
         };
       };
       return [sample(1200), sample(2000), sample(3750)];
     });
     expect(probes).not.toBeNull();
-    for (const { edge, bow } of probes!) {
-      expect(Math.abs(edge - bow)).toBeLessThan(40);
+    for (const { edge, stern } of probes!) {
+      expect(Math.abs(edge - stern)).toBeLessThan(40);
     }
   });
 

@@ -43,31 +43,32 @@ export interface RevealWaypoint {
 
 export interface HullGeometry {
   leftPercent: number;
-  widthVw: number;
+  lockVw: number;
 }
 
 export const ENVELOPE_LEFT_PERCENT = 61;
 export const ENVELOPE_WIDTH_VW = 24;
 export const ENVELOPE_LEFT_PERCENT_MOBILE = 46;
 export const ENVELOPE_WIDTH_VW_MOBILE = 52;
+export const REVEAL_LOCK_VW = 0;
 export const REVEAL_SAIL_SHARE = 5 / 6;
 
 export function buildRevealEdge(track: TrackWaypoint[], hull: HullGeometry): RevealWaypoint[] {
   const sailing = track.map(wp => ({
     offset: Math.round(wp.offset * REVEAL_SAIL_SHARE * 10000) / 10000,
-    percent: wp.xVw + hull.leftPercent + hull.widthVw - 100
+    percent: wp.xVw + hull.leftPercent + hull.lockVw - 100
   }));
   return [...sailing, { offset: 1, percent: 0 }];
 }
 
 export const REVEAL_EDGE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
   leftPercent: ENVELOPE_LEFT_PERCENT,
-  widthVw: ENVELOPE_WIDTH_VW
+  lockVw: REVEAL_LOCK_VW
 });
 
 export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
   leftPercent: ENVELOPE_LEFT_PERCENT_MOBILE,
-  widthVw: ENVELOPE_WIDTH_VW_MOBILE
+  lockVw: REVEAL_LOCK_VW
 });
 
 export interface SceneTimeline {

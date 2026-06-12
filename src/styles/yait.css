@@ -78,34 +78,34 @@
 }
 
 @keyframes reveal-mask {
-  from { transform: translateX(-107%); }
-  33.33% { transform: translateX(-67%); }
-  62.5% { transform: translateX(-31%); }
-  83.33% { transform: translateX(-15%); }
+  from { transform: translateX(-131%); }
+  33.33% { transform: translateX(-91%); }
+  62.5% { transform: translateX(-55%); }
+  83.33% { transform: translateX(-39%); }
   to { transform: translateX(0%); }
 }
 
 @keyframes reveal-text {
-  from { transform: translateX(107%); }
-  33.33% { transform: translateX(67%); }
-  62.5% { transform: translateX(31%); }
-  83.33% { transform: translateX(15%); }
+  from { transform: translateX(131%); }
+  33.33% { transform: translateX(91%); }
+  62.5% { transform: translateX(55%); }
+  83.33% { transform: translateX(39%); }
   to { transform: translateX(0%); }
 }
 
 @keyframes reveal-mask-mobile {
-  from { transform: translateX(-94%); }
-  33.33% { transform: translateX(-54%); }
-  62.5% { transform: translateX(-18%); }
-  83.33% { transform: translateX(-2%); }
+  from { transform: translateX(-146%); }
+  33.33% { transform: translateX(-106%); }
+  62.5% { transform: translateX(-70%); }
+  83.33% { transform: translateX(-54%); }
   to { transform: translateX(0%); }
 }
 
 @keyframes reveal-text-mobile {
-  from { transform: translateX(94%); }
-  33.33% { transform: translateX(54%); }
-  62.5% { transform: translateX(18%); }
-  83.33% { transform: translateX(2%); }
+  from { transform: translateX(146%); }
+  33.33% { transform: translateX(106%); }
+  62.5% { transform: translateX(70%); }
+  83.33% { transform: translateX(54%); }
   to { transform: translateX(0%); }
 }
 

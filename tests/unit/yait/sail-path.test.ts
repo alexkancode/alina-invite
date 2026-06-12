@@ -7,6 +7,7 @@ import {
   ENVELOPE_WIDTH_VW_MOBILE,
   REVEAL_EDGE,
   REVEAL_EDGE_MOBILE,
+  REVEAL_LOCK_VW,
   REVEAL_SAIL_SHARE,
   SAIL_TRACK,
   SAIL_WEAVE
@@ -88,9 +89,10 @@ const hulls = [
   { label: 'mobile', edge: REVEAL_EDGE_MOBILE, left: ENVELOPE_LEFT_PERCENT_MOBILE, width: ENVELOPE_WIDTH_VW_MOBILE }
 ];
 
-describe.each(hulls)('REVEAL_EDGE hull-locked reveal ($label)', ({ edge, left, width }) => {
-  test('derives from the track and hull geometry', () => {
-    expect(edge).toEqual(buildRevealEdge(SAIL_TRACK, { leftPercent: left, widthVw: width }));
+describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }) => {
+  test('derives from the track and the stern lock', () => {
+    expect(REVEAL_LOCK_VW).toBe(0);
+    expect(edge).toEqual(buildRevealEdge(SAIL_TRACK, { leftPercent: left, lockVw: REVEAL_LOCK_VW }));
   });
 
   test('track offsets are rescaled into the sail share, then the settle finishes', () => {
@@ -98,8 +100,8 @@ describe.each(hulls)('REVEAL_EDGE hull-locked reveal ($label)', ({ edge, left, w
     expect(edge.map(wp => wp.offset)).toEqual([...expected, 1]);
   });
 
-  test('starts fully hidden and ends fully revealed', () => {
-    expect(edge[0].percent).toBeLessThanOrEqual(-94);
+  test('nothing reveals until the stern enters the screen', () => {
+    expect(edge[0].percent).toBeLessThanOrEqual(-100);
     expect(edge[edge.length - 1].percent).toBe(0);
   });
 
@@ -109,14 +111,14 @@ describe.each(hulls)('REVEAL_EDGE hull-locked reveal ($label)', ({ edge, left, w
     }
   });
 
-  test('each sailing waypoint sits exactly at the bow', () => {
+  test('each sailing waypoint sits exactly at the stern', () => {
     for (let i = 0; i < SAIL_TRACK.length; i++) {
-      expect(edge[i].percent).toBe(SAIL_TRACK[i].xVw + left + width - 100);
+      expect(edge[i].percent).toBe(SAIL_TRACK[i].xVw + left + REVEAL_LOCK_VW - 100);
     }
   });
 
-  test('the settle tail is a modest final sweep', () => {
-    expect(Math.abs(edge[edge.length - 2].percent)).toBeLessThanOrEqual(20);
+  test('the settle finishes exactly the docked remainder', () => {
+    expect(edge[edge.length - 2].percent).toBe(left + REVEAL_LOCK_VW - 100);
   });
 });
 
