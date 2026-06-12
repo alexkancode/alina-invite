@@ -61,6 +61,14 @@ Prod /home HTML contains a three-digit --fry-h value (impossible under the old
 - yait Open Front V: cutover 52s; V mouth, seal behind the flap tip, interior
   band, prod close-up verified.
 
+## Production Validation
+
+- Cutover in 82 seconds (sentinel: three-digit --fry-h in prod /home HTML)
+- Prod probe: flap above the fries, one seal; close-up screenshot reviewed —
+  taller crowd seated deep with no feet visible below the V
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
