@@ -96,20 +96,6 @@ describe('buildFryCrowd', () => {
 });
 
 describe('SCENE_TIMELINE invariants', () => {
-  test('four headline words with strictly increasing reveal starts', () => {
-    expect(SCENE_TIMELINE.wordRevealStartsMs).toHaveLength(4);
-    for (let i = 1; i < SCENE_TIMELINE.wordRevealStartsMs.length; i++) {
-      expect(SCENE_TIMELINE.wordRevealStartsMs[i]).toBeGreaterThan(SCENE_TIMELINE.wordRevealStartsMs[i - 1]);
-    }
-  });
-
-  test('the last word finishes revealing before the dock settle ends', () => {
-    const lastWordEnd =
-      SCENE_TIMELINE.wordRevealStartsMs[SCENE_TIMELINE.wordRevealStartsMs.length - 1] +
-      SCENE_TIMELINE.wordRevealDurationMs;
-    expect(lastWordEnd).toBeLessThanOrEqual(SCENE_TIMELINE.sailDurationMs + SCENE_TIMELINE.dockSettleDurationMs);
-  });
-
   test('the bounce ripple and CTA rise start exactly when docking completes', () => {
     const docked = SCENE_TIMELINE.sailDurationMs + SCENE_TIMELINE.dockSettleDurationMs;
     expect(SCENE_TIMELINE.bounceStartMs).toBe(docked);
@@ -118,7 +104,11 @@ describe('SCENE_TIMELINE invariants', () => {
 
   test('all durations are positive', () => {
     expect(SCENE_TIMELINE.sailDurationMs).toBeGreaterThan(0);
-    expect(SCENE_TIMELINE.wordRevealDurationMs).toBeGreaterThan(0);
     expect(SCENE_TIMELINE.dockSettleDurationMs).toBeGreaterThan(0);
+  });
+
+  test('the retired word timers stay retired (the wake reveal owns the headline)', () => {
+    expect(SCENE_TIMELINE).not.toHaveProperty('wordRevealStartsMs');
+    expect(SCENE_TIMELINE).not.toHaveProperty('wordRevealDurationMs');
   });
 });

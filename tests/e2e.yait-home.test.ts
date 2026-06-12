@@ -67,6 +67,24 @@ test.describe('yait home hero', () => {
     expect(translateX).toBeLessThan(-300);
   });
 
+  test('the wake reveal edge tracks the boat through beat 1', async ({ page }) => {
+    await page.goto('/home');
+    const probe = await page.evaluate(() => {
+      const mask = document.querySelector('.headline-mask');
+      if (!mask) return null;
+      for (const a of document.getAnimations({ subtree: true })) {
+        a.pause();
+        a.currentTime = 2000;
+      }
+      const width = mask.getBoundingClientRect().width;
+      const tx = new DOMMatrix(getComputedStyle(mask).transform).e;
+      return { ratio: tx / width };
+    });
+    expect(probe).not.toBeNull();
+    expect(probe!.ratio).toBeGreaterThan(-0.6);
+    expect(probe!.ratio).toBeLessThan(-0.53);
+  });
+
   test('the intro animates transform and opacity only', async ({ page }) => {
     await page.goto('/home');
     const animated = await page.evaluate(() =>

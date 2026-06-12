@@ -57,10 +57,15 @@
   opacity: 0.7;
 }
 
-.headline {
+.headline-mask {
   position: absolute;
   top: 11%;
   width: 100%;
+  overflow: hidden;
+  animation: reveal-mask 5s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+.headline {
   margin: 0;
   text-align: center;
   font-family: 'Shrikhand', cursive;
@@ -69,23 +74,26 @@
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
+  animation: reveal-text 5s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+@keyframes reveal-mask {
+  from { transform: translateX(-100%); }
+  40% { transform: translateX(-56.52%); }
+  75% { transform: translateX(-17.39%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes reveal-text {
+  from { transform: translateX(100%); }
+  40% { transform: translateX(56.52%); }
+  75% { transform: translateX(17.39%); }
+  to { transform: translateX(0%); }
 }
 
 .word {
   display: inline-block;
-  overflow: hidden;
   padding: 0.08em 0.12em 0.18em;
-  vertical-align: bottom;
-}
-
-.word-inner {
-  display: inline-block;
-  animation: word-rise var(--word-duration) var(--word-delay) cubic-bezier(0.33, 1, 0.68, 1) both;
-}
-
-@keyframes word-rise {
-  from { transform: translateY(118%); }
-  to { transform: translateY(0); }
 }
 
 .envelope-track {
@@ -283,7 +291,7 @@
 }
 
 @media (max-width: 640px) {
-  .headline {
+  .headline-mask {
     top: 11%;
   }
 
@@ -310,7 +318,8 @@
 @media (prefers-reduced-motion: reduce) {
   .envelope-track,
   .envelope,
-  .word-inner,
+  .headline-mask,
+  .headline,
   .fry,
   .club {
     animation: none;

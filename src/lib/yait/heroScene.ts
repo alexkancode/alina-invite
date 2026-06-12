@@ -36,10 +36,22 @@ export const SAIL_WEAVE: WeaveWaypoint[] = [
   { offset: 1, yPx: 0, rotateDeg: 0, scale: 1 }
 ];
 
+export interface RevealWaypoint {
+  offset: number;
+  percent: number;
+}
+
+export function buildRevealEdge(track: TrackWaypoint[]): RevealWaypoint[] {
+  return track.map(wp => ({
+    offset: wp.offset,
+    percent: Math.round((wp.xVw / track[0].xVw) * -10000) / 100
+  }));
+}
+
+export const REVEAL_EDGE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK);
+
 export interface SceneTimeline {
   sailDurationMs: number;
-  wordRevealStartsMs: number[];
-  wordRevealDurationMs: number;
   dockSettleDurationMs: number;
   bounceStartMs: number;
   ctaRiseStartMs: number;
@@ -58,8 +70,6 @@ const SETTLE_MS = 1000;
 
 export const SCENE_TIMELINE: SceneTimeline = {
   sailDurationMs: SAIL_MS,
-  wordRevealStartsMs: [1000, 2000, 3000, 4000],
-  wordRevealDurationMs: 1000,
   dockSettleDurationMs: SETTLE_MS,
   bounceStartMs: SAIL_MS + SETTLE_MS,
   ctaRiseStartMs: SAIL_MS + SETTLE_MS

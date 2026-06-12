@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, test } from 'vitest';
-import { SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
+import { REVEAL_EDGE, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
 
 const css = readFileSync(resolve(__dirname, '../../src/styles/yait.css'), 'utf8');
 
@@ -39,8 +39,26 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(block.match(/[\d.]+%|from|to/g) ?? []).toHaveLength(SAIL_WEAVE.length);
   });
 
-  test('both layers ride the easeInOutSine curve', () => {
+  test('reveal-mask sweeps with the track-derived edge', () => {
+    const block = keyframeBlock('reveal-mask');
+    expect(block.length).toBeGreaterThan(0);
+    for (const wp of REVEAL_EDGE) {
+      expectFrame(block, wp.offset, `translateX(${wp.percent}%)`);
+    }
+  });
+
+  test('reveal-text counter-translates by the same magnitudes', () => {
+    const block = keyframeBlock('reveal-text');
+    expect(block.length).toBeGreaterThan(0);
+    for (const wp of REVEAL_EDGE) {
+      expectFrame(block, wp.offset, `translateX(${-wp.percent}%)`);
+    }
+  });
+
+  test('all four layers ride the easeInOutSine curve', () => {
     expect(css).toMatch(/sail-x 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
     expect(css).toMatch(/sail-weave 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-mask 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-text 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
   });
 });

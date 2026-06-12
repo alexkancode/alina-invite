@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { SAIL_TRACK, SAIL_WEAVE } from '../../../src/lib/yait/heroScene';
+import { buildRevealEdge, REVEAL_EDGE, SAIL_TRACK, SAIL_WEAVE } from '../../../src/lib/yait/heroScene';
 
 const lastTrack = SAIL_TRACK[SAIL_TRACK.length - 1];
 const lastWeave = SAIL_WEAVE[SAIL_WEAVE.length - 1];
@@ -69,6 +69,31 @@ describe('SAIL_WEAVE side-to-side course', () => {
     const nearest = SAIL_WEAVE.reduce((a, b) => (b.yPx > a.yPx ? b : a));
     const farthest = SAIL_WEAVE.reduce((a, b) => (b.yPx < a.yPx ? b : a));
     expect(nearest.scale).toBeGreaterThan(farthest.scale);
+  });
+});
+
+describe('REVEAL_EDGE wake reveal', () => {
+  test('derives from the track with identical offsets', () => {
+    expect(REVEAL_EDGE).toEqual(buildRevealEdge(SAIL_TRACK));
+    expect(REVEAL_EDGE.map(wp => wp.offset)).toEqual(SAIL_TRACK.map(wp => wp.offset));
+  });
+
+  test('sweeps from fully hidden to fully revealed', () => {
+    expect(REVEAL_EDGE[0].percent).toBe(-100);
+    expect(REVEAL_EDGE[REVEAL_EDGE.length - 1].percent).toBe(0);
+  });
+
+  test('the edge only ever advances', () => {
+    for (let i = 1; i < REVEAL_EDGE.length; i++) {
+      expect(REVEAL_EDGE[i].percent).toBeGreaterThan(REVEAL_EDGE[i - 1].percent);
+    }
+  });
+
+  test('each edge position is exactly proportional to the boat position', () => {
+    for (let i = 0; i < REVEAL_EDGE.length; i++) {
+      const expected = Math.round((SAIL_TRACK[i].xVw / SAIL_TRACK[0].xVw) * -10000) / 100;
+      expect(REVEAL_EDGE[i].percent).toBe(expected);
+    }
   });
 });
 

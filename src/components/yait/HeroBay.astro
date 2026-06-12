@@ -7,9 +7,6 @@ const words = ['You', 'Are', 'Invited', 'To'];
 const fryStyle = (fry: (typeof fries)[number]) =>
   `--fry-h: ${fry.heightPx}px; --fry-hue: ${fry.hue}; --fry-amp: ${fry.bounceAmplitudePx}px; ` +
   `--fry-delay: ${SCENE_TIMELINE.bounceStartMs + fry.bounceDelayMs}ms; --lean-delay: ${fry.leanDelayMs}ms`;
-
-const wordStyle = (index: number) =>
-  `--word-delay: ${SCENE_TIMELINE.wordRevealStartsMs[index]}ms; --word-duration: ${SCENE_TIMELINE.wordRevealDurationMs}ms`;
 ---
 
 <section class="bay" data-testid="hero-bay">
@@ -46,11 +43,13 @@ const wordStyle = (index: number) =>
 
   <p class="wordmark">yait<span class="wordmark-note">rhymes with "yacht"</span></p>
 
-  <h1 class="headline">
-    {words.map((word, index) => (
-      <span class="word" style={wordStyle(index)}><span class="word-inner">{word}</span></span>
-    ))}
-  </h1>
+  <div class="headline-mask">
+    <h1 class="headline">
+      {words.map(word => (
+        <span class="word">{word}</span>
+      ))}
+    </h1>
+  </div>
 
   <div class="envelope-track" data-testid="envelope">
     <div class="envelope">

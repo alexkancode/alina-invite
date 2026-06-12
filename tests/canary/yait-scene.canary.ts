@@ -37,8 +37,6 @@ describe('yait scene contract canary', () => {
   test('the timeline constants the stylesheet choreography depends on are stable', () => {
     expect(SCENE_TIMELINE).toEqual({
       sailDurationMs: 5000,
-      wordRevealStartsMs: [1000, 2000, 3000, 4000],
-      wordRevealDurationMs: 1000,
       dockSettleDurationMs: 1000,
       bounceStartMs: 6000,
       ctaRiseStartMs: 6000
