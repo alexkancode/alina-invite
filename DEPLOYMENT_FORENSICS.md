@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Staggered Headline
+# Deployment Forensics - yait Slanted Reveal Edge
 
 ## Deployment Details
 
@@ -7,32 +7,34 @@
 
 ## Commits Being Deployed
 
-- staggered-headline plan
-- staggered-headline implementation
+- slanted-reveal-edge plan
+- slanted-reveal-edge implementation
 
 ## Changes Deployed
 
-1. The headline becomes a left-aligned two-line lockup: "You Are" on line one,
-   "Invited To" on line two indented exactly 100px (style rule, locked by canary).
-   Line structure is data (HEADLINE_LINES in heroScene.ts); words remain .word
-   spans so all content assertions hold. Reveal mechanics untouched; with the text
-   in the left half of the page the stern passes it earlier, so the previously
-   back-loaded tail finishes sooner.
+1. The reveal boundary tilts to ~45 degrees (top leaning left, bottom leaning
+   right, letter bottoms emerge first): a static clip-path polygon on the
+   translating mask cuts its top-right corner in by 2.7 headline font-sizes. The
+   clip never animates — only translateX does — so the compositor-only guarantee
+   is unchanged. The headline font-size clamp is consolidated into one
+   --headline-fs custom property consumed by both the font-size rule and the slant
+   calc (canary asserts the clamp appears exactly once).
 
 ## Cutover Sentinel
 
-The stylesheet referenced by https://yait.social/home contains
-"headline-line-indent" (verified absent in the BEFORE check).
+The stylesheet referenced by https://yait.social/home contains "clip-path:polygon"
+(verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 81 unit/canary/integration green (HEADLINE_LINES canary, 100px rule canary);
-  8 e2e including a geometric lockup test (line two left = line one left + 100px
-  within 5px; first line within the left 200px)
-- TDD note: the lockup e2e first compared concatenated textContent and failed
-  ("YouAre") because Astro strips inter-element whitespace; assertion corrected to
-  compare the word list, which is the real contract
-- Frames reviewed desktop and mobile at beats and settle
+- 82 unit/canary/integration green (new canary: polygon rule, slant derivation,
+  single-clamp consolidation); 9 e2e (new: computed clip-path slant within 25
+  percent of the mask's rendered height, keeping the edge in the 39-52 degree
+  band; compositor guard still passes — animated properties remain transform and
+  opacity only)
+- Frames reviewed: the diagonal boundary slices the lockup with the lower line
+  leading; settled headline fully visible (the cut corner sits at the viewport's
+  right edge, far from the left-aligned text)
 
 ## Earlier deployments today
 
@@ -45,19 +47,11 @@ The stylesheet referenced by https://yait.social/home contains
 - yait Three-Beat Sail: cutover 42s; split travel from weave for three felt beats.
 - yait Wake Reveal: cutover 32s; boat-synced wipe replaced word timers.
 - yait Hull-Locked Reveal (2026-06-11): cutover 53s; bow-locked edge.
-- yait Stern-Locked Reveal: cutover 42s on the translate(-91%) sentinel; reveal
-  edge moved to the stern, prod probe showed edge and stern both at 115px at
-  beat 1.
-
-## Production Validation
-
-- Cutover in 53 seconds (sentinel: new hashed stylesheet containing
-  headline-line-indent)
-- Prod geometry probe after the intro: line lefts 34px and 134px — the indent is
-  exactly 100px; screenshot reviewed (lockup top-left, boat docked, full headline)
-- Live invite page 200 and /api/health ok throughout
+- yait Stern-Locked Reveal: cutover 42s; reveal edge moved to the stern (edge and
+  stern both 115px at beat 1 on prod).
+- yait Staggered Headline: cutover 53s on the headline-line-indent sentinel;
+  left-aligned two-line lockup, prod indent measured exactly 100px.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
