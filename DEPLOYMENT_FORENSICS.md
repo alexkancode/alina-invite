@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Wave Reveal Edge (12.5px amplitude retune)
+# Deployment Forensics - yait Bezier Wave Edge
 
 ## Deployment Details
 
@@ -7,23 +7,29 @@
 
 ## Commits Being Deployed
 
-- wave-reveal-edge: halve amplitude to 12.5px
+- bezier-wave-edge plan
+- bezier-wave-edge implementation
 
 ## Changes Deployed
 
-1. Wave amplitude halved to 12.5px crest/trough; eight periods unchanged. One
-   number in WAVE_REFERENCE; e2e amplitude band retuned to 8-18px both signs.
+1. The wave generator upgrades from polyline sampling (256 straight segments) to
+   cubic Bezier segments built from the sine's analytic tangents (Hermite
+   construction, 64 cubics = 8 per period): the edge is C1-continuous — no corner
+   joints anywhere — and the emitted path shrinks. Wave tuning unchanged (eight
+   periods, 12.5px amplitude, 45-degree stern-locked edge).
 
 ## Cutover Sentinel
 
-Prod /home HTML contains a mid-path coordinate snippet unique to the 12.5px
-eight-period wave (verified absent in the BEFORE check, present locally).
+Prod /home HTML contains an early-path control-point snippet unique to the cubic
+curve (verified absent in the BEFORE check, present locally).
 
 ## Pre-Deploy Validation
 
-- 89 unit/canary/integration green; 9 e2e green
-- Frames reviewed: eight delicate undulations along the cut, much more refined
-  than the 25px squiggle
+- 90 unit/canary/integration green; new C1-continuity unit test asserts the
+  incoming and outgoing tangent at every joint match to 4 decimals; all prior wave
+  invariants re-asserted on the cubic anchors
+- 9 e2e green (wave probe parser updated to cubic anchors; bands unchanged)
+- Frames reviewed
 
 ## Earlier deployments today
 
@@ -44,17 +50,8 @@ eight-period wave (verified absent in the BEFORE check, present locally).
 - yait Wave Reveal Edge two-period retune: cutover 51s; prod-verified.
 - yait Wave Reveal Edge four-period retune: cutover 62s; prod-verified.
 - yait Wave Reveal Edge eight-period retune: cutover 41s; prod-verified at 25px.
-
-## Production Validation
-
-- Cutover in 122 seconds (sentinel: 12.5px-amplitude mid-path coordinate snippet
-  in prod /home HTML; slower than the usual ~50s but within normal Railway
-  variance, no errors in the rollout)
-- Prod geometry probe mid-reveal: crest +13px, trough -13px (12.5 rounded by the
-  probe) over the unchanged 285px/287px slant on the served eight-period path
-- Live invite page 200 and /api/health ok throughout
+- yait Wave Reveal Edge 12.5px amplitude retune: cutover 122s; prod-verified.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
