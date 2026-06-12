@@ -60,6 +60,15 @@ The stylesheet referenced by https://yait.social/home contains "reveal-mask-top"
 - yait Symmetric Wave Crests: cutover 71s; perpendicular displacement, worst apex
   offset 0.0px prod-verified.
 
+## Production Validation
+
+- Cutover in 32 seconds (sentinel: reveal-mask-top in the new hashed stylesheet)
+- Prod stagger probe: bottom edge leads the top by 48.7px at the 3.0s pinned
+  clock (50px spec, sub-2px from rounding and the eased frame), converging to a
+  0px gap at settle; screenshot reviewed with the full lockup landed
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
