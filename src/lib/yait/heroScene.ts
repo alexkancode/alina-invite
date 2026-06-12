@@ -78,7 +78,7 @@ export interface WaveEdgeSpec {
   samples: number;
 }
 
-export const WAVE_REFERENCE = { viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 50 };
+export const WAVE_REFERENCE = { viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 25 };
 
 const frac = (n: number) => Math.round(n * 100000) / 100000;
 
@@ -92,12 +92,14 @@ export function buildWaveEdgePath(spec: WaveEdgeSpec): string {
   return `M 0 0 ${wave.join(' ')} L 0 1 Z`;
 }
 
-export const WAVE_EDGE_PATH: string = buildWaveEdgePath({
+export const WAVE_SPEC: WaveEdgeSpec = {
   slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
   ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,
-  periods: 1,
-  samples: 48
-});
+  periods: 2,
+  samples: 64
+};
+
+export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_SPEC);
 
 export interface SceneTimeline {
   sailDurationMs: number;

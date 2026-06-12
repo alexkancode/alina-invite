@@ -137,10 +137,10 @@ test.describe('yait home hero', () => {
     const ratio = probe!.slantPx / probe!.heightPx;
     expect(ratio).toBeGreaterThan(0.75);
     expect(ratio).toBeLessThan(1.25);
-    expect(probe!.maxDevPx).toBeGreaterThan(35);
-    expect(probe!.maxDevPx).toBeLessThan(65);
-    expect(probe!.minDevPx).toBeLessThan(-35);
-    expect(probe!.minDevPx).toBeGreaterThan(-65);
+    expect(probe!.maxDevPx).toBeGreaterThan(15);
+    expect(probe!.maxDevPx).toBeLessThan(35);
+    expect(probe!.minDevPx).toBeLessThan(-15);
+    expect(probe!.minDevPx).toBeGreaterThan(-35);
   });
 
   test('the intro animates transform and opacity only', async ({ page }) => {
