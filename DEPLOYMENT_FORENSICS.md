@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Symmetric Wave Crests
+# Deployment Forensics - yait Staggered Line Reveal
 
 ## Deployment Details
 
@@ -7,31 +7,34 @@
 
 ## Commits Being Deployed
 
-- symmetric-wave-crests plan
-- symmetric-wave-crests implementation
+- staggered-line-reveal plan
+- staggered-line-reveal implementation
 
 ## Changes Deployed
 
-1. Fixed the leaning crests: the wave now displaces perpendicular to the
-   45-degree slant (computed in pixel space against the anisotropic mask box and
-   converted back to box fractions per axis) instead of horizontally, so every
-   apex is centered between its zero crossings. Generator consumes a merged
-   WAVE_GEOMETRY (dims + tuning); cubic Beziers and all tuning unchanged (eight
-   periods, 12.5px).
+1. Each headline line now has its own wavy 45-degree reveal edge: lines wrap in
+   per-line clip masks sharing one clipPath whose geometry rescaled to the line
+   box (143/143, 4 periods, 12.5px — same angle and wavelength as before). The
+   bottom line keeps the stern lock exactly; the top line's keyframes derive via
+   staggerRevealEdge (every sweeping waypoint shifted left by 50px = 3.90625
+   percent, final waypoint untouched so both lines converge at the settle).
+2. Mobile variants derived from the same stagger fraction (about 15px on phones).
 
 ## Cutover Sentinel
 
-Prod /home HTML contains an early-path control-point snippet unique to the
-perpendicular-displacement curve (verified absent in the BEFORE check).
+The stylesheet referenced by https://yait.social/home contains "reveal-mask-top"
+(verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 91 unit/canary/integration green; new apex-centering test (each apex within 5
-  percent of the half-wavelength from its crossings midpoint) failed against the
-  old generator and passes now; monotonic-y replaced by monotonic-along-edge
-  (perpendicular waves legitimately curl past vertical on steep flanks);
-  perpendicular amplitude asserted at exactly 12.5px
-- 9 e2e green; frames reviewed: balanced symmetric scallops
+- 104 unit/canary/integration green (stagger derivation invariants for both
+  viewports, convergence and advance-only locks, rescaled wave geometry with
+  45-degree and matched-wavelength invariants; canary covers all eight reveal
+  keyframe blocks and the four animation-name swaps)
+- 10 e2e green (new: bottom mask leads top by 42-58px at a pinned mid-sail clock
+  and converges to under 2px at settle; clip and stern-lock probes retargeted to
+  the per-line masks)
+- Frames reviewed at both viewports
 
 ## Earlier deployments today
 
@@ -53,18 +56,10 @@ perpendicular-displacement curve (verified absent in the BEFORE check).
 - yait Wave Reveal Edge four-period retune: cutover 62s; prod-verified.
 - yait Wave Reveal Edge eight-period retune: cutover 41s; prod-verified at 25px.
 - yait Wave Reveal Edge 12.5px amplitude retune: cutover 122s; prod-verified.
-- yait Bezier Wave Edge: cutover 41s; 64 cubics, zero tangent kinks prod-verified.
-
-## Production Validation
-
-- Cutover in 71 seconds (sentinel: perpendicular-curve control-point snippet in
-  prod /home HTML)
-- Prod symmetry probe: perpendicular crest +12.5px and trough -12.5px exactly;
-  worst apex offset from its crossings midpoint 0.0px against a 25px
-  half-wavelength — the lean is fully eliminated; screenshot reviewed
-- Live invite page 200 and /api/health ok throughout
+- yait Bezier Wave Edge: cutover 41s; 64 cubics, zero kinks prod-verified.
+- yait Symmetric Wave Crests: cutover 71s; perpendicular displacement, worst apex
+  offset 0.0px prod-verified.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
