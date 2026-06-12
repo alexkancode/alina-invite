@@ -67,6 +67,14 @@ The stylesheet referenced by https://yait.social/home contains "wave-roll"
 - yait Taller Tucked Fries: cutover 82s; 78-126px crowd, feet tucked with bounce
   headroom, mobile 0.8 scale, prod close-up verified.
 
+## Production Validation
+
+- Cutover in 42 seconds (sentinel: wave-roll in the new hashed stylesheet)
+- Prod roll probe across a 2s clock pin: carrier transform changed while the
+  word's position drifted 0.0px — the waves roll, the text holds still
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
