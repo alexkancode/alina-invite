@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, test } from 'vitest';
-import { REVEAL_EDGE, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
+import { REVEAL_EDGE, REVEAL_EDGE_MOBILE, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
 
 const css = readFileSync(resolve(__dirname, '../../src/styles/yait.css'), 'utf8');
 
@@ -11,7 +11,7 @@ const keyframeBlock = (name: string) => {
 };
 
 const pctFor = (offset: number) =>
-  offset === 0 ? 'from' : offset === 1 ? 'to' : `${Math.round(offset * 1000) / 10}%`;
+  offset === 0 ? 'from' : offset === 1 ? 'to' : `${Math.round(offset * 10000) / 100}%`;
 
 const escape = (s: string) => s.replace(/[().]/g, c => `\\${c}`);
 
@@ -39,26 +39,33 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(block.match(/[\d.]+%|from|to/g) ?? []).toHaveLength(SAIL_WEAVE.length);
   });
 
-  test('reveal-mask sweeps with the track-derived edge', () => {
-    const block = keyframeBlock('reveal-mask');
+  const revealPairs = [
+    { mask: 'reveal-mask', text: 'reveal-text', edge: REVEAL_EDGE },
+    { mask: 'reveal-mask-mobile', text: 'reveal-text-mobile', edge: REVEAL_EDGE_MOBILE }
+  ];
+
+  test.each(revealPairs)('$mask sweeps with the hull-locked edge', ({ mask, edge }) => {
+    const block = keyframeBlock(mask);
     expect(block.length).toBeGreaterThan(0);
-    for (const wp of REVEAL_EDGE) {
+    for (const wp of edge) {
       expectFrame(block, wp.offset, `translateX(${wp.percent}%)`);
     }
   });
 
-  test('reveal-text counter-translates by the same magnitudes', () => {
-    const block = keyframeBlock('reveal-text');
+  test.each(revealPairs)('$text counter-translates by the same magnitudes', ({ text, edge }) => {
+    const block = keyframeBlock(text);
     expect(block.length).toBeGreaterThan(0);
-    for (const wp of REVEAL_EDGE) {
+    for (const wp of edge) {
       expectFrame(block, wp.offset, `translateX(${-wp.percent}%)`);
     }
   });
 
-  test('all four layers ride the easeInOutSine curve', () => {
+  test('all layers ride the easeInOutSine curve, reveals spanning sail plus settle', () => {
     expect(css).toMatch(/sail-x 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
     expect(css).toMatch(/sail-weave 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-mask 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-text 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-mask 6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-text 6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
+    expect(css).toMatch(/animation-name: reveal-text-mobile;/);
   });
 });

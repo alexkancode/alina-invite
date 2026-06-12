@@ -67,22 +67,28 @@ test.describe('yait home hero', () => {
     expect(translateX).toBeLessThan(-300);
   });
 
-  test('the wake reveal edge tracks the boat through beat 1', async ({ page }) => {
+  test('the reveal edge sits at the bow, never ahead of it', async ({ page }) => {
     await page.goto('/home');
-    const probe = await page.evaluate(() => {
+    const probes = await page.evaluate(() => {
       const mask = document.querySelector('.headline-mask');
-      if (!mask) return null;
-      for (const a of document.getAnimations({ subtree: true })) {
-        a.pause();
-        a.currentTime = 2000;
-      }
-      const width = mask.getBoundingClientRect().width;
-      const tx = new DOMMatrix(getComputedStyle(mask).transform).e;
-      return { ratio: tx / width };
+      const track = document.querySelector('[data-testid="envelope"]');
+      if (!mask || !track) return null;
+      const sample = (t: number) => {
+        for (const a of document.getAnimations({ subtree: true })) {
+          a.pause();
+          a.currentTime = t;
+        }
+        return {
+          edge: mask.getBoundingClientRect().right,
+          bow: track.getBoundingClientRect().right
+        };
+      };
+      return [sample(1200), sample(2000), sample(3750)];
     });
-    expect(probe).not.toBeNull();
-    expect(probe!.ratio).toBeGreaterThan(-0.6);
-    expect(probe!.ratio).toBeLessThan(-0.53);
+    expect(probes).not.toBeNull();
+    for (const { edge, bow } of probes!) {
+      expect(Math.abs(edge - bow)).toBeLessThan(40);
+    }
   });
 
   test('the intro animates transform and opacity only', async ({ page }) => {

@@ -41,14 +41,34 @@ export interface RevealWaypoint {
   percent: number;
 }
 
-export function buildRevealEdge(track: TrackWaypoint[]): RevealWaypoint[] {
-  return track.map(wp => ({
-    offset: wp.offset,
-    percent: Math.round((wp.xVw / track[0].xVw) * -10000) / 100
-  }));
+export interface HullGeometry {
+  leftPercent: number;
+  widthVw: number;
 }
 
-export const REVEAL_EDGE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK);
+export const ENVELOPE_LEFT_PERCENT = 61;
+export const ENVELOPE_WIDTH_VW = 24;
+export const ENVELOPE_LEFT_PERCENT_MOBILE = 46;
+export const ENVELOPE_WIDTH_VW_MOBILE = 52;
+export const REVEAL_SAIL_SHARE = 5 / 6;
+
+export function buildRevealEdge(track: TrackWaypoint[], hull: HullGeometry): RevealWaypoint[] {
+  const sailing = track.map(wp => ({
+    offset: Math.round(wp.offset * REVEAL_SAIL_SHARE * 10000) / 10000,
+    percent: wp.xVw + hull.leftPercent + hull.widthVw - 100
+  }));
+  return [...sailing, { offset: 1, percent: 0 }];
+}
+
+export const REVEAL_EDGE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
+  leftPercent: ENVELOPE_LEFT_PERCENT,
+  widthVw: ENVELOPE_WIDTH_VW
+});
+
+export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
+  leftPercent: ENVELOPE_LEFT_PERCENT_MOBILE,
+  widthVw: ENVELOPE_WIDTH_VW_MOBILE
+});
 
 export interface SceneTimeline {
   sailDurationMs: number;

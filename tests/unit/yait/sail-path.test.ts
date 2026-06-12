@@ -1,5 +1,16 @@
 import { describe, expect, test } from 'vitest';
-import { buildRevealEdge, REVEAL_EDGE, SAIL_TRACK, SAIL_WEAVE } from '../../../src/lib/yait/heroScene';
+import {
+  buildRevealEdge,
+  ENVELOPE_LEFT_PERCENT,
+  ENVELOPE_LEFT_PERCENT_MOBILE,
+  ENVELOPE_WIDTH_VW,
+  ENVELOPE_WIDTH_VW_MOBILE,
+  REVEAL_EDGE,
+  REVEAL_EDGE_MOBILE,
+  REVEAL_SAIL_SHARE,
+  SAIL_TRACK,
+  SAIL_WEAVE
+} from '../../../src/lib/yait/heroScene';
 
 const lastTrack = SAIL_TRACK[SAIL_TRACK.length - 1];
 const lastWeave = SAIL_WEAVE[SAIL_WEAVE.length - 1];
@@ -72,28 +83,40 @@ describe('SAIL_WEAVE side-to-side course', () => {
   });
 });
 
-describe('REVEAL_EDGE wake reveal', () => {
-  test('derives from the track with identical offsets', () => {
-    expect(REVEAL_EDGE).toEqual(buildRevealEdge(SAIL_TRACK));
-    expect(REVEAL_EDGE.map(wp => wp.offset)).toEqual(SAIL_TRACK.map(wp => wp.offset));
+const hulls = [
+  { label: 'desktop', edge: REVEAL_EDGE, left: ENVELOPE_LEFT_PERCENT, width: ENVELOPE_WIDTH_VW },
+  { label: 'mobile', edge: REVEAL_EDGE_MOBILE, left: ENVELOPE_LEFT_PERCENT_MOBILE, width: ENVELOPE_WIDTH_VW_MOBILE }
+];
+
+describe.each(hulls)('REVEAL_EDGE hull-locked reveal ($label)', ({ edge, left, width }) => {
+  test('derives from the track and hull geometry', () => {
+    expect(edge).toEqual(buildRevealEdge(SAIL_TRACK, { leftPercent: left, widthVw: width }));
   });
 
-  test('sweeps from fully hidden to fully revealed', () => {
-    expect(REVEAL_EDGE[0].percent).toBe(-100);
-    expect(REVEAL_EDGE[REVEAL_EDGE.length - 1].percent).toBe(0);
+  test('track offsets are rescaled into the sail share, then the settle finishes', () => {
+    const expected = SAIL_TRACK.map(wp => Math.round(wp.offset * REVEAL_SAIL_SHARE * 10000) / 10000);
+    expect(edge.map(wp => wp.offset)).toEqual([...expected, 1]);
+  });
+
+  test('starts fully hidden and ends fully revealed', () => {
+    expect(edge[0].percent).toBeLessThanOrEqual(-94);
+    expect(edge[edge.length - 1].percent).toBe(0);
   });
 
   test('the edge only ever advances', () => {
-    for (let i = 1; i < REVEAL_EDGE.length; i++) {
-      expect(REVEAL_EDGE[i].percent).toBeGreaterThan(REVEAL_EDGE[i - 1].percent);
+    for (let i = 1; i < edge.length; i++) {
+      expect(edge[i].percent).toBeGreaterThan(edge[i - 1].percent);
     }
   });
 
-  test('each edge position is exactly proportional to the boat position', () => {
-    for (let i = 0; i < REVEAL_EDGE.length; i++) {
-      const expected = Math.round((SAIL_TRACK[i].xVw / SAIL_TRACK[0].xVw) * -10000) / 100;
-      expect(REVEAL_EDGE[i].percent).toBe(expected);
+  test('each sailing waypoint sits exactly at the bow', () => {
+    for (let i = 0; i < SAIL_TRACK.length; i++) {
+      expect(edge[i].percent).toBe(SAIL_TRACK[i].xVw + left + width - 100);
     }
+  });
+
+  test('the settle tail is a modest final sweep', () => {
+    expect(Math.abs(edge[edge.length - 2].percent)).toBeLessThanOrEqual(20);
   });
 });
 

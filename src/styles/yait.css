@@ -62,7 +62,7 @@
   top: 11%;
   width: 100%;
   overflow: hidden;
-  animation: reveal-mask 5s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-mask 6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .headline {
@@ -74,20 +74,38 @@
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
-  animation: reveal-text 5s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-text 6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 @keyframes reveal-mask {
-  from { transform: translateX(-100%); }
-  40% { transform: translateX(-56.52%); }
-  75% { transform: translateX(-17.39%); }
+  from { transform: translateX(-107%); }
+  33.33% { transform: translateX(-67%); }
+  62.5% { transform: translateX(-31%); }
+  83.33% { transform: translateX(-15%); }
   to { transform: translateX(0%); }
 }
 
 @keyframes reveal-text {
-  from { transform: translateX(100%); }
-  40% { transform: translateX(56.52%); }
-  75% { transform: translateX(17.39%); }
+  from { transform: translateX(107%); }
+  33.33% { transform: translateX(67%); }
+  62.5% { transform: translateX(31%); }
+  83.33% { transform: translateX(15%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes reveal-mask-mobile {
+  from { transform: translateX(-94%); }
+  33.33% { transform: translateX(-54%); }
+  62.5% { transform: translateX(-18%); }
+  83.33% { transform: translateX(-2%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes reveal-text-mobile {
+  from { transform: translateX(94%); }
+  33.33% { transform: translateX(54%); }
+  62.5% { transform: translateX(18%); }
+  83.33% { transform: translateX(2%); }
   to { transform: translateX(0%); }
 }
 
@@ -293,6 +311,11 @@
 @media (max-width: 640px) {
   .headline-mask {
     top: 11%;
+    animation-name: reveal-mask-mobile;
+  }
+
+  .headline {
+    animation-name: reveal-text-mobile;
   }
 
   .envelope-track {
