@@ -54,7 +54,7 @@ describe('buildWaveEdgePath', () => {
 
 describe('WAVE_EDGE_PATH constant', () => {
   test('round-trips through the reference geometry', () => {
-    expect(WAVE_REFERENCE).toEqual({ viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 25 });
+    expect(WAVE_REFERENCE).toEqual({ viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 12.5 });
     expect(WAVE_SPEC).toEqual({
       slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
       ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,

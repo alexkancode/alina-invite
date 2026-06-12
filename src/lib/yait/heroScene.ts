@@ -78,7 +78,7 @@ export interface WaveEdgeSpec {
   samples: number;
 }
 
-export const WAVE_REFERENCE = { viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 25 };
+export const WAVE_REFERENCE = { viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 12.5 };
 
 const frac = (n: number) => Math.round(n * 100000) / 100000;
 
