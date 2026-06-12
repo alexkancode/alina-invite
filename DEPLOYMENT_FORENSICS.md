@@ -52,6 +52,14 @@ curve (verified absent in the BEFORE check, present locally).
 - yait Wave Reveal Edge eight-period retune: cutover 41s; prod-verified at 25px.
 - yait Wave Reveal Edge 12.5px amplitude retune: cutover 122s; prod-verified.
 
+## Production Validation
+
+- Cutover in 41 seconds (sentinel: cubic control-point snippet in prod /home HTML)
+- Prod curve probe: 64 cubic segments, zero tangent kinks at joints, crest +12.5px
+  and trough -12.5px exactly; screenshot reviewed
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
