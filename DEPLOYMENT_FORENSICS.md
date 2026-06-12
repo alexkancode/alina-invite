@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Bezier Wave Edge
+# Deployment Forensics - yait Symmetric Wave Crests
 
 ## Deployment Details
 
@@ -7,29 +7,31 @@
 
 ## Commits Being Deployed
 
-- bezier-wave-edge plan
-- bezier-wave-edge implementation
+- symmetric-wave-crests plan
+- symmetric-wave-crests implementation
 
 ## Changes Deployed
 
-1. The wave generator upgrades from polyline sampling (256 straight segments) to
-   cubic Bezier segments built from the sine's analytic tangents (Hermite
-   construction, 64 cubics = 8 per period): the edge is C1-continuous — no corner
-   joints anywhere — and the emitted path shrinks. Wave tuning unchanged (eight
-   periods, 12.5px amplitude, 45-degree stern-locked edge).
+1. Fixed the leaning crests: the wave now displaces perpendicular to the
+   45-degree slant (computed in pixel space against the anisotropic mask box and
+   converted back to box fractions per axis) instead of horizontally, so every
+   apex is centered between its zero crossings. Generator consumes a merged
+   WAVE_GEOMETRY (dims + tuning); cubic Beziers and all tuning unchanged (eight
+   periods, 12.5px).
 
 ## Cutover Sentinel
 
-Prod /home HTML contains an early-path control-point snippet unique to the cubic
-curve (verified absent in the BEFORE check, present locally).
+Prod /home HTML contains an early-path control-point snippet unique to the
+perpendicular-displacement curve (verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 90 unit/canary/integration green; new C1-continuity unit test asserts the
-  incoming and outgoing tangent at every joint match to 4 decimals; all prior wave
-  invariants re-asserted on the cubic anchors
-- 9 e2e green (wave probe parser updated to cubic anchors; bands unchanged)
-- Frames reviewed
+- 91 unit/canary/integration green; new apex-centering test (each apex within 5
+  percent of the half-wavelength from its crossings midpoint) failed against the
+  old generator and passes now; monotonic-y replaced by monotonic-along-edge
+  (perpendicular waves legitimately curl past vertical on steep flanks);
+  perpendicular amplitude asserted at exactly 12.5px
+- 9 e2e green; frames reviewed: balanced symmetric scallops
 
 ## Earlier deployments today
 
@@ -51,15 +53,8 @@ curve (verified absent in the BEFORE check, present locally).
 - yait Wave Reveal Edge four-period retune: cutover 62s; prod-verified.
 - yait Wave Reveal Edge eight-period retune: cutover 41s; prod-verified at 25px.
 - yait Wave Reveal Edge 12.5px amplitude retune: cutover 122s; prod-verified.
-
-## Production Validation
-
-- Cutover in 41 seconds (sentinel: cubic control-point snippet in prod /home HTML)
-- Prod curve probe: 64 cubic segments, zero tangent kinks at joints, crest +12.5px
-  and trough -12.5px exactly; screenshot reviewed
-- Live invite page 200 and /api/health ok throughout
+- yait Bezier Wave Edge: cutover 41s; 64 cubics, zero tangent kinks prod-verified.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
