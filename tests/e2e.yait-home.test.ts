@@ -168,6 +168,28 @@ test.describe('yait home hero', () => {
     expect(Math.abs(gaps!.afterBoth)).toBeLessThan(2);
   });
 
+  test('the open flap points skyward behind the fries', async ({ page }) => {
+    await page.goto('/home');
+    const probe = await page.evaluate(() => {
+      const flap = document.querySelector('.envelope-flap');
+      const art = document.querySelector('.envelope-art');
+      const fry = document.querySelector('.fry');
+      if (!flap || !art || !fry) return null;
+      return {
+        flapTop: flap.getBoundingClientRect().top,
+        flapBottom: flap.getBoundingClientRect().bottom,
+        artTop: art.getBoundingClientRect().top,
+        fryTop: fry.getBoundingClientRect().top,
+        flapZ: getComputedStyle(flap).zIndex,
+        artZ: getComputedStyle(art).zIndex
+      };
+    });
+    expect(probe).not.toBeNull();
+    expect(probe!.flapTop).toBeLessThan(probe!.fryTop);
+    expect(probe!.flapBottom).toBeGreaterThan(probe!.artTop);
+    expect(Number(probe!.flapZ)).toBeLessThan(Number(probe!.artZ));
+  });
+
   test('the intro animates transform and opacity only', async ({ page }) => {
     await page.goto('/home');
     const animated = await page.evaluate(() =>

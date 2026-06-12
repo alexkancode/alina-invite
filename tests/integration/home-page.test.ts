@@ -47,6 +47,17 @@ describe('GET /home', () => {
     expect(homeHtml).toContain(WAVE_EDGE_PATH.slice(0, 60));
   });
 
+  test('the envelope is open with one broken seal on the flap', () => {
+    expect(homeHtml).toContain('class="envelope-flap"');
+    expect(homeHtml.match(/class="seal"/g)).toHaveLength(1);
+    const flapIndex = homeHtml.indexOf('class="envelope-flap"');
+    const friesIndex = homeHtml.indexOf('class="fries"');
+    const artIndex = homeHtml.indexOf('class="envelope-art"');
+    expect(flapIndex).toBeGreaterThan(-1);
+    expect(flapIndex).toBeLessThan(friesIndex);
+    expect(friesIndex).toBeLessThan(artIndex);
+  });
+
   test('unknown sibling routes still 404', async () => {
     const res = await fetch(`${BASE}/homex`);
     expect(res.status).toBe(404);

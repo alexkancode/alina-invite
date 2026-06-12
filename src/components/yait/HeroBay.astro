@@ -61,6 +61,10 @@ const fryStyle = (fry: (typeof fries)[number]) =>
 
   <div class="envelope-track" data-testid="envelope">
     <div class="envelope">
+    <svg class="envelope-flap" viewBox="0 0 200 92">
+      <path d="M 12 90 L 100 8 L 188 90 Z" fill="#EBDCC0" stroke="#264653" stroke-width="4" stroke-linejoin="round"></path>
+      <circle class="seal" cx="100" cy="26" r="10" fill="#E76F51" stroke="#264653" stroke-width="3.5"></circle>
+    </svg>
     <div class="fries">
       {fries.map(fry => (
         <div class="fry" data-face={fry.face} style={fryStyle(fry)}></div>
@@ -70,7 +74,6 @@ const fryStyle = (fry: (typeof fries)[number]) =>
       <ellipse cx="100" cy="133" rx="86" ry="6" fill="#F4E8D1" opacity="0.5"></ellipse>
       <rect x="4" y="38" width="192" height="90" rx="10" fill="#F4E8D1" stroke="#264653" stroke-width="4"></rect>
       <path d="M6 46 L100 106 L194 46" fill="none" stroke="#264653" stroke-width="4" stroke-linejoin="round"></path>
-      <circle cx="100" cy="106" r="11" fill="#E76F51" stroke="#264653" stroke-width="3.5"></circle>
       <line x1="14" y1="38" x2="14" y2="10" stroke="#264653" stroke-width="3.5" stroke-linecap="round"></line>
       <path d="M14 10 L44 18 L14 26 Z" fill="#E76F51" stroke="#264653" stroke-width="2.5" stroke-linejoin="round"></path>
     </svg>

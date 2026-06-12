@@ -185,6 +185,14 @@
   width: 100%;
 }
 
+.envelope-flap {
+  position: absolute;
+  z-index: 0;
+  left: 2%;
+  bottom: 70%;
+  width: 96%;
+}
+
 .fries {
   position: absolute;
   z-index: 1;
