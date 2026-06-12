@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Wave Reveal Edge (four-period retune)
+# Deployment Forensics - yait Wave Reveal Edge (eight-period retune)
 
 ## Deployment Details
 
@@ -7,24 +7,24 @@
 
 ## Commits Being Deployed
 
-- wave-reveal-edge: four periods
+- wave-reveal-edge: eight periods
 
 ## Changes Deployed
 
-1. Wave retuned again: four sine periods (four crests, four troughs) at the
-   unchanged 25px amplitude; samples raised to 128 keeping 32 per period. Two
-   numbers in WAVE_SPEC; the extrema-count test re-derives and now asserts four
-   of each.
+1. Wave retuned to eight sine periods at the unchanged 25px amplitude; samples
+   256 (32 per period). Flagged to and accepted by the user: at this density the
+   edge reads as scalloped texture rather than distinct waves.
 
 ## Cutover Sentinel
 
-Prod /home HTML contains a mid-path coordinate snippet unique to the four-period
+Prod /home HTML contains a mid-path coordinate snippet unique to the eight-period
 wave (verified absent in the BEFORE check, present locally).
 
 ## Pre-Deploy Validation
 
-- 89 unit/canary/integration green; 9 e2e green (amplitude band unchanged)
-- Frames reviewed: finer chop through the lockup
+- 89 unit/canary/integration green (extrema test asserts eight crests and eight
+  troughs); 9 e2e green
+- Frames reviewed: tight squiggle texture through the glyphs
 
 ## Earlier deployments today
 
@@ -42,19 +42,9 @@ wave (verified absent in the BEFORE check, present locally).
 - yait Staggered Headline: cutover 53s; left-aligned lockup, prod indent 100px.
 - yait Slanted Reveal Edge: cutover 42s; prod measured 45 degrees exactly.
 - yait Wave Reveal Edge: cutover 52s; one period at 50px, prod-verified.
-- yait Wave Reveal Edge two-period retune: cutover 51s; crest +25px / trough
-  -25px prod-verified.
-
-## Production Validation
-
-- Cutover in 62 seconds (sentinel: four-period mid-path coordinate snippet in prod
-  /home HTML)
-- Prod geometry probe mid-reveal: crest +25px, trough -25px over the unchanged
-  285px/287px slant; the served path is the four-period curve (sentinel snippet
-  matches); screenshot reviewed
-- Live invite page 200 and /api/health ok throughout
+- yait Wave Reveal Edge two-period retune: cutover 51s; prod-verified.
+- yait Wave Reveal Edge four-period retune: cutover 62s; prod-verified.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
