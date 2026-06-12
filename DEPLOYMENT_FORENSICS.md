@@ -60,6 +60,14 @@ The stylesheet referenced by https://yait.social/home contains
 - yait Independent Line Reveals: cutover 32s; 537ms delayed top line, prod gaps
   202px mid-sail / 271px at dock / 0 after both, no convergence.
 
+## Production Validation
+
+- Cutover in 32 seconds (sentinel: the new clamp token in the hashed stylesheet)
+- Prod probe: computed headline font-size 136px at 1280 (the 8.5rem cap);
+  screenshot reviewed — big lockup, boat fronting the To as accepted
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
