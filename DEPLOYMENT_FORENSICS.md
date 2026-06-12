@@ -45,6 +45,16 @@ eight-period wave (verified absent in the BEFORE check, present locally).
 - yait Wave Reveal Edge four-period retune: cutover 62s; prod-verified.
 - yait Wave Reveal Edge eight-period retune: cutover 41s; prod-verified at 25px.
 
+## Production Validation
+
+- Cutover in 122 seconds (sentinel: 12.5px-amplitude mid-path coordinate snippet
+  in prod /home HTML; slower than the usual ~50s but within normal Railway
+  variance, no errors in the rollout)
+- Prod geometry probe mid-reveal: crest +13px, trough -13px (12.5 rounded by the
+  probe) over the unchanged 285px/287px slant on the served eight-period path
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
