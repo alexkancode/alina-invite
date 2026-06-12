@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Open Front V
+# Deployment Forensics - yait Taller Tucked Fries
 
 ## Deployment Details
 
@@ -7,28 +7,30 @@
 
 ## Commits Being Deployed
 
-- open-front-v plan
-- open-front-v implementation
+- taller-tucked-fries plan
+- taller-tucked-fries implementation
 
 ## Changes Deployed
 
-1. The wax seal tucks behind the flap and rises by half its height (cy 26 to 16,
-   drawn before the triangle), peeking over the apex.
-2. The front closure seam is removed; the front panel is one path whose top edge
-   dips from the corners into a center V (the opened-envelope mouth). An interior
-   band (the flap's darker sand) backs the mouth so it never sees through to the
-   sky, and the fries seat deeper (bottom 48 percent).
+1. Fry crowd 50 percent taller (FRY_HEIGHT_RANGE 52-84 to 78-126) and seated
+   deeper (fries baseline bottom 48 to 30 percent) so feet stay hidden behind the
+   front V with full bounce-amplitude headroom.
+2. Mobile keeps proportion via a media-query height scale (0.8) — at fixed pixel
+   heights the tall fries reached 89 percent of the smaller envelope and buried
+   the flap; the scale was the pre-authorized fallback in the confirmed plan.
 
 ## Cutover Sentinel
 
-GET https://yait.social/home contains the V-mouth path fragment
-"M 4 38 L 100 80 L 196 38" (verified absent in the BEFORE check).
+Prod /home HTML contains a three-digit --fry-h value (impossible under the old
+84px cap; verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 109 unit/canary/integration green (new: seal drawn behind the flap path at
-  cy 16; old seam absent; V path and interior band present); 11 e2e green
-- Close-up frame reviewed: V mouth, crowd inside, seal shoulder above the apex
+- 111 unit/canary/integration green (height range numerically locked; mobile
+  scale rule canary-locked); 12 e2e green (new geometric tuck assertion: fries
+  baseline minus max bounce amplitude stays below the front V dip — failed at the
+  old seating, passes now)
+- Close-up and full frames reviewed at both viewports
 
 ## Earlier deployments today
 
@@ -55,18 +57,10 @@ GET https://yait.social/home contains the V-mouth path fragment
 - yait Staggered Line Reveal: cutover 32s; superseded by the independent model.
 - yait Independent Line Reveals: cutover 32s; prod gaps 202/271/0, no convergence.
 - yait Larger Headline: cutover 32s; prod 136px, accepted overlap decision.
-- yait Open Envelope: cutover 41s; raised flap, fries inside, prod close-up
-  verified.
-
-## Production Validation
-
-- Cutover in 52 seconds (sentinel: V-mouth path fragment in prod /home HTML)
-- Prod probe: flap above the fries, exactly one seal; close-up screenshot
-  reviewed — V mouth open, crowd seated inside over the interior band, seal
-  shoulder peeking above the flap apex
-- Live invite page 200 and /api/health ok throughout
+- yait Open Envelope: cutover 41s; raised flap, fries inside, prod-verified.
+- yait Open Front V: cutover 52s; V mouth, seal behind the flap tip, interior
+  band, prod close-up verified.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
