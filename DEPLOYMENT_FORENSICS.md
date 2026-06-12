@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Taller Tucked Fries
+# Deployment Forensics - yait Rolling Waves
 
 ## Deployment Details
 
@@ -7,30 +7,35 @@
 
 ## Commits Being Deployed
 
-- taller-tucked-fries plan
-- taller-tucked-fries implementation
+- rolling-waves plan
+- rolling-waves implementation
 
 ## Changes Deployed
 
-1. Fry crowd 50 percent taller (FRY_HEIGHT_RANGE 52-84 to 78-126) and seated
-   deeper (fries baseline bottom 48 to 30 percent) so feet stay hidden behind the
-   front V with full bounce-amplitude headroom.
-2. Mobile keeps proportion via a media-query height scale (0.8) — at fixed pixel
-   heights the tall fries reached 89 percent of the smaller envelope and buried
-   the flap; the scale was the pre-authorized fallback in the confirmed plan.
+1. The wave crests roll continuously along both reveal edges like ocean swell —
+   one wavelength per 4s loop toward the dock, seamless because the pattern is
+   periodic. Built as a diagonal clip-slide: the clip path gained one wavelength
+   of margin at each end plus a half-box enclosure, a new .wave-carrier layer
+   slides it parallel to the edge while the line content counter-translates —
+   pure transforms, so the compositor guarantee genuinely holds with the edge in
+   motion. Per-line nesting is now mask / wave-carrier / line-counter (reveal
+   counter-sweep and the 537ms top delay) / headline-line (roll counter).
+2. Reveal timing untouched; reduced motion freezes the wave as before.
 
 ## Cutover Sentinel
 
-Prod /home HTML contains a three-digit --fry-h value (impossible under the old
-84px cap; verified absent in the BEFORE check).
+The stylesheet referenced by https://yait.social/home contains "wave-roll"
+(verified absent in the BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 111 unit/canary/integration green (height range numerically locked; mobile
-  scale rule canary-locked); 12 e2e green (new geometric tuck assertion: fries
-  baseline minus max bounce amplitude stays below the front V dip — failed at the
-  old seating, passes now)
-- Close-up and full frames reviewed at both viewports
+- 113 unit/canary/integration green (extended-margin generator invariants,
+  zero-phase margin anchors, WAVE_ROLL derivation, keyframe and structure
+  canaries)
+- 13 e2e green (new: carrier transform changes across a 2s pin while a word's
+  rect holds within 0.5px — waves move, text does not; legacy probes updated to
+  the carrier clip and central anchors; compositor guard still passes)
+- Roll-phase frames reviewed
 
 ## Earlier deployments today
 
@@ -58,17 +63,10 @@ Prod /home HTML contains a three-digit --fry-h value (impossible under the old
 - yait Independent Line Reveals: cutover 32s; prod gaps 202/271/0, no convergence.
 - yait Larger Headline: cutover 32s; prod 136px, accepted overlap decision.
 - yait Open Envelope: cutover 41s; raised flap, fries inside, prod-verified.
-- yait Open Front V: cutover 52s; V mouth, seal behind the flap tip, interior
-  band, prod close-up verified.
-
-## Production Validation
-
-- Cutover in 82 seconds (sentinel: three-digit --fry-h in prod /home HTML)
-- Prod probe: flap above the fries, one seal; close-up screenshot reviewed —
-  taller crowd seated deep with no feet visible below the V
-- Live invite page 200 and /api/health ok throughout
+- yait Open Front V: cutover 52s; V mouth and seal-behind-flap prod-verified.
+- yait Taller Tucked Fries: cutover 82s; 78-126px crowd, feet tucked with bounce
+  headroom, mobile 0.8 scale, prod close-up verified.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
