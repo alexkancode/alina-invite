@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Rolling Waves
+# Deployment Forensics - yait Rolling Waves ROLLBACK
 
 ## Deployment Details
 
@@ -7,35 +7,30 @@
 
 ## Commits Being Deployed
 
-- rolling-waves plan
-- rolling-waves implementation
+- Revert "rolling-waves implementation"
 
 ## Changes Deployed
 
-1. The wave crests roll continuously along both reveal edges like ocean swell —
-   one wavelength per 4s loop toward the dock, seamless because the pattern is
-   periodic. Built as a diagonal clip-slide: the clip path gained one wavelength
-   of margin at each end plus a half-box enclosure, a new .wave-carrier layer
-   slides it parallel to the edge while the line content counter-translates —
-   pure transforms, so the compositor guarantee genuinely holds with the edge in
-   motion. Per-line nesting is now mask / wave-carrier / line-counter (reveal
-   counter-sweep and the 537ms top delay) / headline-line (roll counter).
-2. Reveal timing untouched; reduced motion freezes the wave as before.
+1. ROLLBACK: the rolling-waves change regressed production — the user reported the
+   reveal edge rendering as a straight line (the clip not applying in live
+   rendering) and the settled text jittering (the carrier/counter pair keeps the
+   text layer in perpetual subpixel motion; net-zero mathematically but each layer
+   resamples per frame). The clock-pinned validation probes checked attributes and
+   computed transforms, not live rendered pixels — the gap this slipped through.
+2. The revert restores the static wave exactly as deployed in taller-tucked-fries:
+   clip on .line-mask, no carrier or counter layers, no wave-roll keyframes.
 
 ## Cutover Sentinel
 
-The stylesheet referenced by https://yait.social/home contains "wave-roll"
-(verified absent in the BEFORE check).
+The stylesheet referenced by https://yait.social/home no longer contains
+"wave-roll" (present in the broken build; count 0 locally after revert).
 
 ## Pre-Deploy Validation
 
-- 113 unit/canary/integration green (extended-margin generator invariants,
-  zero-phase margin anchors, WAVE_ROLL derivation, keyframe and structure
-  canaries)
-- 13 e2e green (new: carrier transform changes across a 2s pin while a word's
-  rect holds within 0.5px — waves move, text does not; legacy probes updated to
-  the carrier clip and central anchors; compositor guard still passes)
-- Roll-phase frames reviewed
+- 111 unit/canary/integration and 12 e2e green on the reverted tree
+- Investigation of a correct rolling implementation (animating the clip path
+  itself, no counter-translation) to follow separately with live-rendering
+  validation before any redeploy
 
 ## Earlier deployments today
 
@@ -67,14 +62,6 @@ The stylesheet referenced by https://yait.social/home contains "wave-roll"
 - yait Taller Tucked Fries: cutover 82s; 78-126px crowd, feet tucked with bounce
   headroom, mobile 0.8 scale, prod close-up verified.
 
-## Production Validation
-
-- Cutover in 42 seconds (sentinel: wave-roll in the new hashed stylesheet)
-- Prod roll probe across a 2s clock pin: carrier transform changed while the
-  word's position drifted 0.0px — the waves roll, the text holds still
-- Live invite page 200 and /api/health ok throughout
-
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
