@@ -1,4 +1,4 @@
-# Deployment Forensics - yait Larger Headline
+# Deployment Forensics - yait Open Envelope
 
 ## Deployment Details
 
@@ -7,32 +7,30 @@
 
 ## Commits Being Deployed
 
-- larger-headline plan
-- larger-headline implementation
+- open-envelope plan
+- open-envelope implementation
 
 ## Changes Deployed
 
-1. Headline grows ~30 percent on desktop: --headline-fs clamp(2.8rem, 11vw,
-   8.5rem) (about 106px to 136px at 1280); mobile floor up slightly (2.6 to
-   2.8rem), measured fitting at 385px of 390 with the 100px indent.
-2. Wave-clip geometry rederived for the taller line box: 185/185 (45 degrees
-   held), 5 periods (wavelength stays ~52px), amplitude and the 537ms independent
-   delay unchanged.
-3. Confirmed design decision: at the new size the docked envelope fronts most of
-   the second line's "To" at rest on desktop; options (move boat, shrink, accept)
-   were presented and the user chose to accept — boat as foreground scenery.
+1. The envelope is now open: a raised back flap points skyward (darker sand inner
+   face, the coral wax seal relocated to its tip as a broken seal), the fry people
+   stand inside the mouth — layered between the flap (z 0) and the front panel
+   (z 2) — and the front panel keeps its seams but drops the center seal. Pure
+   markup and style rules; no animation changes (the flap rides the existing bob
+   and settle).
 
 ## Cutover Sentinel
 
-The stylesheet referenced by https://yait.social/home contains
-"clamp(2.8rem, 11vw, 8.5rem)" (verified absent in the BEFORE check).
+GET https://yait.social/home contains "envelope-flap" (verified absent in the
+BEFORE check).
 
 ## Pre-Deploy Validation
 
-- 97 unit/canary/integration green (geometry round-trip, 45-degree invariant,
-  wavelength band, single-clamp canary on the new token)
-- 10 e2e green; font-ready final frames reviewed at both viewports (an earlier
-  thin-font frame was the screenshot tool racing the webfont, not the site)
+- 97 unit/canary green; 10 integration (new: flap present, exactly one seal, DOM
+  layering order flap-fries-art); 11 e2e (new: flap top above the fries, flap base
+  overlapping the front art, z-index ordering)
+- Close-up frame reviewed: flap triangle and tip seal clearly read above the
+  crowd; full-page frames at both viewports reviewed
 
 ## Earlier deployments today
 
@@ -57,17 +55,10 @@ The stylesheet referenced by https://yait.social/home contains
 - yait Bezier Wave Edge: cutover 41s; 64 cubics, zero kinks prod-verified.
 - yait Symmetric Wave Crests: cutover 71s; worst apex offset 0.0px prod-verified.
 - yait Staggered Line Reveal: cutover 32s; superseded by the independent model.
-- yait Independent Line Reveals: cutover 32s; 537ms delayed top line, prod gaps
-  202px mid-sail / 271px at dock / 0 after both, no convergence.
-
-## Production Validation
-
-- Cutover in 32 seconds (sentinel: the new clamp token in the hashed stylesheet)
-- Prod probe: computed headline font-size 136px at 1280 (the 8.5rem cap);
-  screenshot reviewed — big lockup, boat fronting the To as accepted
-- Live invite page 200 and /api/health ok throughout
+- yait Independent Line Reveals: cutover 32s; prod gaps 202/271/0, no convergence.
+- yait Larger Headline: cutover 32s; prod computed 136px at 1280; accepted
+  boat-fronts-the-To decision recorded.
 
 ## Final Status Assessment
 
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page 200 throughout)
+**Deployment Status:** PENDING
