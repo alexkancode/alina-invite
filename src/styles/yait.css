@@ -62,9 +62,6 @@
   position: absolute;
   top: 11%;
   width: 100%;
-  overflow: hidden;
-  clip-path: url(#yait-wave-clip);
-  animation: reveal-mask 6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .headline {
@@ -77,7 +74,21 @@
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
-  animation: reveal-text 6s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+.line-mask {
+  display: block;
+  overflow: hidden;
+  clip-path: url(#yait-wave-clip);
+  animation: reveal-mask 6s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+.line-mask-top {
+  animation-name: reveal-mask-top;
+}
+
+.line-mask-top .headline-line {
+  animation-name: reveal-text-top;
 }
 
 @keyframes reveal-mask {
@@ -112,8 +123,41 @@
   to { transform: translateX(0%); }
 }
 
+@keyframes reveal-mask-top {
+  from { transform: translateX(-134.90625%); }
+  33.33% { transform: translateX(-94.90625%); }
+  62.5% { transform: translateX(-58.90625%); }
+  83.33% { transform: translateX(-42.90625%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes reveal-text-top {
+  from { transform: translateX(134.90625%); }
+  33.33% { transform: translateX(94.90625%); }
+  62.5% { transform: translateX(58.90625%); }
+  83.33% { transform: translateX(42.90625%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes reveal-mask-top-mobile {
+  from { transform: translateX(-149.90625%); }
+  33.33% { transform: translateX(-109.90625%); }
+  62.5% { transform: translateX(-73.90625%); }
+  83.33% { transform: translateX(-57.90625%); }
+  to { transform: translateX(0%); }
+}
+
+@keyframes reveal-text-top-mobile {
+  from { transform: translateX(149.90625%); }
+  33.33% { transform: translateX(109.90625%); }
+  62.5% { transform: translateX(73.90625%); }
+  83.33% { transform: translateX(57.90625%); }
+  to { transform: translateX(0%); }
+}
+
 .headline-line {
   display: block;
+  animation: reveal-text 6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .headline-line-indent {
@@ -322,11 +366,22 @@
 @media (max-width: 640px) {
   .headline-mask {
     top: 11%;
+  }
+
+  .line-mask {
     animation-name: reveal-mask-mobile;
   }
 
-  .headline {
+  .line-mask-top {
+    animation-name: reveal-mask-top-mobile;
+  }
+
+  .headline-line {
     animation-name: reveal-text-mobile;
+  }
+
+  .line-mask-top .headline-line {
+    animation-name: reveal-text-top-mobile;
   }
 
   .envelope-track {
@@ -352,8 +407,8 @@
 @media (prefers-reduced-motion: reduce) {
   .envelope-track,
   .envelope,
-  .headline-mask,
-  .headline,
+  .line-mask,
+  .headline-line,
   .fry,
   .club {
     animation: none;

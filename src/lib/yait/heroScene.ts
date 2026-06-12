@@ -71,6 +71,21 @@ export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, 
   lockVw: REVEAL_LOCK_VW
 });
 
+export const REVEAL_STAGGER_PX = 50;
+
+export function staggerRevealEdge(edge: RevealWaypoint[], staggerPx: number, viewportW: number): RevealWaypoint[] {
+  const shift = (staggerPx / viewportW) * 100;
+  return edge.map((wp, i) =>
+    i === edge.length - 1
+      ? { ...wp }
+      : { offset: wp.offset, percent: Math.round((wp.percent - shift) * 100000) / 100000 }
+  );
+}
+
+export const REVEAL_EDGE_TOP: RevealWaypoint[] = staggerRevealEdge(REVEAL_EDGE, REVEAL_STAGGER_PX, 1280);
+
+export const REVEAL_EDGE_TOP_MOBILE: RevealWaypoint[] = staggerRevealEdge(REVEAL_EDGE_MOBILE, REVEAL_STAGGER_PX, 1280);
+
 export interface WaveGeometry {
   viewportW: number;
   maskH: number;
@@ -82,11 +97,11 @@ export interface WaveGeometry {
 
 export const WAVE_GEOMETRY: WaveGeometry = {
   viewportW: 1280,
-  maskH: 287,
-  slantPx: 285,
+  maskH: 143,
+  slantPx: 143,
   amplitudePx: 12.5,
-  periods: 8,
-  samples: 64
+  periods: 4,
+  samples: 32
 };
 
 const frac = (n: number) => Math.round(n * 100000) / 100000;

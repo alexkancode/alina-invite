@@ -114,15 +114,24 @@ describe('buildWaveEdgePath', () => {
 });
 
 describe('WAVE_EDGE_PATH constant', () => {
-  test('round-trips through the geometry', () => {
+  test('round-trips through the per-line geometry', () => {
     expect(WAVE_GEOMETRY).toEqual({
       viewportW: 1280,
-      maskH: 287,
-      slantPx: 285,
+      maskH: 143,
+      slantPx: 143,
       amplitudePx: 12.5,
-      periods: 8,
-      samples: 64
+      periods: 4,
+      samples: 32
     });
     expect(WAVE_EDGE_PATH).toBe(buildWaveEdgePath(WAVE_GEOMETRY));
+  });
+
+  test('the per-line edge keeps the 45-degree slant', () => {
+    expect(WAVE_GEOMETRY.slantPx).toBe(WAVE_GEOMETRY.maskH);
+  });
+
+  test('the wavelength matches the two-line edge it replaced', () => {
+    const edgeLen = Math.hypot(WAVE_GEOMETRY.slantPx, WAVE_GEOMETRY.maskH);
+    expect(edgeLen / WAVE_GEOMETRY.periods).toBeCloseTo(Math.hypot(285, 287) / 8, 0);
   });
 });

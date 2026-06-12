@@ -70,7 +70,7 @@ test.describe('yait home hero', () => {
   test('the reveal edge sits at the stern, never ahead of it', async ({ page }) => {
     await page.goto('/home');
     const probes = await page.evaluate(() => {
-      const mask = document.querySelector('.headline-mask');
+      const mask = document.querySelector('.line-mask:not(.line-mask-top)');
       const track = document.querySelector('[data-testid="envelope"]');
       if (!mask || !track) return null;
       const sample = (t: number) => {
@@ -79,7 +79,7 @@ test.describe('yait home hero', () => {
           a.currentTime = t;
         }
         return {
-          edge: mask.getBoundingClientRect().right,
+          edge: mask!.getBoundingClientRect().right,
           stern: track.getBoundingClientRect().left
         };
       };
@@ -114,7 +114,7 @@ test.describe('yait home hero', () => {
   test('the reveal edge is a wavy 45-degree slant with a 50px swell', async ({ page }) => {
     await page.goto('/home');
     const probe = await page.evaluate(() => {
-      const mask = document.querySelector('.headline-mask');
+      const mask = document.querySelector('.line-mask:not(.line-mask-top)');
       const wave = document.querySelector('#yait-wave-clip path');
       if (!mask || !wave) return null;
       const rect = mask.getBoundingClientRect();
@@ -144,6 +144,27 @@ test.describe('yait home hero', () => {
     expect(probe!.maxDevPx).toBeLessThan(18);
     expect(probe!.minDevPx).toBeLessThan(-8);
     expect(probe!.minDevPx).toBeGreaterThan(-18);
+  });
+
+  test('the bottom line reveals about 50px ahead of the top line', async ({ page }) => {
+    await page.goto('/home');
+    const gaps = await page.evaluate(() => {
+      const top = document.querySelector('.line-mask-top');
+      const bottom = document.querySelector('.line-mask:not(.line-mask-top)');
+      if (!top || !bottom) return null;
+      const sample = (t: number) => {
+        for (const a of document.getAnimations({ subtree: true })) {
+          a.pause();
+          a.currentTime = t;
+        }
+        return bottom.getBoundingClientRect().right - top.getBoundingClientRect().right;
+      };
+      return { midSail: sample(3000), settled: sample(6000) };
+    });
+    expect(gaps).not.toBeNull();
+    expect(gaps!.midSail).toBeGreaterThan(42);
+    expect(gaps!.midSail).toBeLessThan(58);
+    expect(Math.abs(gaps!.settled)).toBeLessThan(2);
   });
 
   test('the intro animates transform and opacity only', async ({ page }) => {
