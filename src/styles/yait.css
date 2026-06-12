@@ -79,35 +79,15 @@
 .line-mask {
   display: block;
   overflow: hidden;
-  animation: reveal-mask 6s cubic-bezier(0.37, 0, 0.63, 1) both;
-}
-
-.wave-carrier {
-  display: block;
   clip-path: url(#yait-wave-clip);
-  animation: wave-roll 4s linear infinite;
-}
-
-.line-counter {
-  display: block;
-  animation: reveal-text 6s cubic-bezier(0.37, 0, 0.63, 1) both;
-}
-
-@keyframes wave-roll {
-  from { transform: translate(0%, 0%); }
-  to { transform: translate(2.89063%, 20%); }
-}
-
-@keyframes wave-roll-counter {
-  from { transform: translate(0%, 0%); }
-  to { transform: translate(-2.89063%, -20%); }
+  animation: reveal-mask 6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .line-mask-top {
   animation-delay: 537ms;
 }
 
-.line-mask-top .line-counter {
+.line-mask-top .headline-line {
   animation-delay: 537ms;
 }
 
@@ -145,7 +125,7 @@
 
 .headline-line {
   display: block;
-  animation: wave-roll-counter 4s linear infinite;
+  animation: reveal-text 6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .headline-line-indent {
@@ -368,7 +348,7 @@
     animation-name: reveal-mask-mobile;
   }
 
-  .line-counter {
+  .headline-line {
     animation-name: reveal-text-mobile;
   }
 
@@ -400,8 +380,6 @@
   .envelope-track,
   .envelope,
   .line-mask,
-  .wave-carrier,
-  .line-counter,
   .headline-line,
   .fry,
   .club {

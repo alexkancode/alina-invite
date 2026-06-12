@@ -78,14 +78,7 @@ describe('sail keyframes match the three-beat spec', () => {
     const delay = new RegExp(`animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`, 'g');
     expect(css.match(delay)).toHaveLength(2);
     expect(css).toMatch(new RegExp(`\\.line-mask-top \\{\\s*animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`));
-    expect(css).toMatch(new RegExp(`\\.line-mask-top \\.line-counter \\{\\s*animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`));
-  });
-
-  test('the wave rolls one wavelength per loop on carrier and counter', () => {
-    expect(css).toMatch(/\.wave-carrier \{[^}]*animation: wave-roll 4s linear infinite;/s);
-    expect(css).toMatch(/\.headline-line \{[^}]*animation: wave-roll-counter 4s linear infinite;/s);
-    expect(css).toMatch(/@keyframes wave-roll \{\s*from \{ transform: translate\(0%, 0%\); \}\s*to \{ transform: translate\(2\.89063%, 20%\); \}\s*\}/);
-    expect(css).toMatch(/@keyframes wave-roll-counter \{\s*from \{ transform: translate\(0%, 0%\); \}\s*to \{ transform: translate\(-2\.89063%, -20%\); \}\s*\}/);
+    expect(css).toMatch(new RegExp(`\\.line-mask-top \\.headline-line \\{\\s*animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`));
   });
 
   test('the second headline line is indented exactly 100px by rule', () => {

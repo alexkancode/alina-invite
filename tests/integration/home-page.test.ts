@@ -64,19 +64,6 @@ describe('GET /home', () => {
     expect(flapSvg).toContain('cy="16"');
   });
 
-  test('each line nests mask, wave carrier, counter, then line', () => {
-    const firstMask = homeHtml.indexOf('line-mask');
-    const firstCarrier = homeHtml.indexOf('wave-carrier');
-    const firstCounter = homeHtml.indexOf('line-counter');
-    const firstLine = homeHtml.indexOf('headline-line');
-    expect(firstMask).toBeGreaterThan(-1);
-    expect(firstMask).toBeLessThan(firstCarrier);
-    expect(firstCarrier).toBeLessThan(firstCounter);
-    expect(firstCounter).toBeLessThan(firstLine);
-    expect(homeHtml.match(/class="wave-carrier"/g)).toHaveLength(2);
-    expect(homeHtml.match(/class="line-counter"/g)).toHaveLength(2);
-  });
-
   test('the front closure is gone, replaced by the open V mouth', () => {
     expect(homeHtml).not.toContain('M6 46 L100 106 L194 46');
     expect(homeHtml).toContain('M 4 38 L 100 80 L 196 38');

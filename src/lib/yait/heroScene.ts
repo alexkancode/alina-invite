@@ -114,13 +114,10 @@ export function buildWaveEdgePath(g: WaveGeometry): string {
     x: (g.slantPx + g.amplitudePx * omega * Math.cos(omega * s) * normal.x) / g.viewportW,
     y: (g.maskH + g.amplitudePx * omega * Math.cos(omega * s) * normal.y) / g.maskH
   });
-  const margin = 1 / g.periods;
-  const span = 1 + 2 * margin;
-  const segs = Math.round(g.samples * span);
-  const ds = span / segs;
-  const cubics = Array.from({ length: segs }, (_, i) => {
-    const s0 = -margin + i * ds;
-    const s1 = -margin + (i + 1) * ds;
+  const ds = 1 / g.samples;
+  const cubics = Array.from({ length: g.samples }, (_, i) => {
+    const s0 = i * ds;
+    const s1 = (i + 1) * ds;
     const p0 = pointAt(s0);
     const p1 = pointAt(s1);
     const d0 = tangentAt(s0);
@@ -129,16 +126,8 @@ export function buildWaveEdgePath(g: WaveGeometry): string {
     const c2 = { x: p1.x - (ds / 3) * d1.x, y: p1.y - (ds / 3) * d1.y };
     return `C ${frac(c1.x)} ${frac(c1.y)} ${frac(c2.x)} ${frac(c2.y)} ${frac(p1.x)} ${frac(p1.y)}`;
   });
-  const head = pointAt(-margin);
-  const tail = pointAt(1 + margin);
-  return `M -0.5 -0.5 L ${frac(head.x)} -0.5 L ${frac(head.x)} ${frac(head.y)} ${cubics.join(' ')} L ${frac(tail.x)} 1.5 L -0.5 1.5 Z`;
+  return `M 0 0 L ${frac(x0Px / g.viewportW)} 0 ${cubics.join(' ')} L 0 1 Z`;
 }
-
-export const WAVE_ROLL = {
-  xPercent: Math.round(((WAVE_GEOMETRY.slantPx / WAVE_GEOMETRY.periods) / WAVE_GEOMETRY.viewportW) * 10000000) / 100000,
-  yPercent: Math.round((100 / WAVE_GEOMETRY.periods) * 100000) / 100000,
-  durationMs: 4000
-};
 
 export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_GEOMETRY);
 
