@@ -71,6 +71,34 @@ export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, 
   lockVw: REVEAL_LOCK_VW
 });
 
+export interface WaveEdgeSpec {
+  slantFracX: number;
+  ampFracX: number;
+  periods: number;
+  samples: number;
+}
+
+export const WAVE_REFERENCE = { viewportW: 1280, maskH: 287, slantPx: 285, amplitudePx: 50 };
+
+const frac = (n: number) => Math.round(n * 100000) / 100000;
+
+export function buildWaveEdgePath(spec: WaveEdgeSpec): string {
+  const x0 = 1 - spec.slantFracX;
+  const wave = Array.from({ length: spec.samples + 1 }, (_, i) => {
+    const t = i / spec.samples;
+    const x = x0 + spec.slantFracX * t + spec.ampFracX * Math.sin(2 * Math.PI * spec.periods * t);
+    return `L ${frac(x)} ${frac(t)}`;
+  });
+  return `M 0 0 ${wave.join(' ')} L 0 1 Z`;
+}
+
+export const WAVE_EDGE_PATH: string = buildWaveEdgePath({
+  slantFracX: WAVE_REFERENCE.slantPx / WAVE_REFERENCE.viewportW,
+  ampFracX: WAVE_REFERENCE.amplitudePx / WAVE_REFERENCE.viewportW,
+  periods: 1,
+  samples: 48
+});
+
 export interface SceneTimeline {
   sailDurationMs: number;
   dockSettleDurationMs: number;

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'vitest';
-import { FRY_COUNT } from '../../src/lib/yait/heroScene';
+import { FRY_COUNT, WAVE_EDGE_PATH } from '../../src/lib/yait/heroScene';
 
 const BASE = 'http://localhost:4321';
 
@@ -40,6 +40,11 @@ describe('GET /home', () => {
 
   test('loads Shrikhand for the headline', () => {
     expect(homeHtml).toContain('Shrikhand');
+  });
+
+  test('ships the generated wave clip', () => {
+    expect(homeHtml).toContain('id="yait-wave-clip"');
+    expect(homeHtml).toContain(WAVE_EDGE_PATH.slice(0, 60));
   });
 
   test('unknown sibling routes still 404', async () => {

@@ -111,25 +111,36 @@ test.describe('yait home hero', () => {
     expect(lines[0].left).toBeLessThan(200);
   });
 
-  test('the reveal edge slants close to 45 degrees, top leaning left', async ({ page }) => {
+  test('the reveal edge is a wavy 45-degree slant with a 50px swell', async ({ page }) => {
     await page.goto('/home');
     const probe = await page.evaluate(() => {
       const mask = document.querySelector('.headline-mask');
-      if (!mask) return null;
-      const clip = getComputedStyle(mask).clipPath;
-      const slantMatch = clip.match(/calc\(100% - ([\d.]+)px\)/);
+      const wave = document.querySelector('#yait-wave-clip path');
+      if (!mask || !wave) return null;
+      const rect = mask.getBoundingClientRect();
+      const pts = [...(wave.getAttribute('d') ?? '').matchAll(/L (-?[\d.]+) (-?[\d.]+)/g)]
+        .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
+        .filter(p => !(p.x === 0 && (p.y === 0 || p.y === 1)));
+      const x0 = pts[0].x;
+      const slantFrac = pts[pts.length - 1].x - x0;
+      const deviations = pts.map(p => (p.x - (x0 + slantFrac * p.y)));
       return {
-        clip,
-        slantPx: slantMatch ? Number(slantMatch[1]) : null,
-        heightPx: mask.getBoundingClientRect().height
+        clip: getComputedStyle(mask).clipPath,
+        slantPx: slantFrac * rect.width,
+        heightPx: rect.height,
+        maxDevPx: Math.max(...deviations) * rect.width,
+        minDevPx: Math.min(...deviations) * rect.width
       };
     });
     expect(probe).not.toBeNull();
-    expect(probe!.clip).toContain('polygon');
-    expect(probe!.slantPx).not.toBeNull();
-    const ratio = probe!.slantPx! / probe!.heightPx;
+    expect(probe!.clip).toContain('yait-wave-clip');
+    const ratio = probe!.slantPx / probe!.heightPx;
     expect(ratio).toBeGreaterThan(0.75);
     expect(ratio).toBeLessThan(1.25);
+    expect(probe!.maxDevPx).toBeGreaterThan(35);
+    expect(probe!.maxDevPx).toBeLessThan(65);
+    expect(probe!.minDevPx).toBeLessThan(-35);
+    expect(probe!.minDevPx).toBeGreaterThan(-65);
   });
 
   test('the intro animates transform and opacity only', async ({ page }) => {
