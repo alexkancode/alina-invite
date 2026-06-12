@@ -54,6 +54,16 @@ BEFORE check; present in HTML and CSS locally).
 - yait Slanted Reveal Edge: cutover 42s on the clip-path:polygon sentinel; prod
   probe measured 285.12px slant vs 287px height = 45 degrees.
 
+## Production Validation
+
+- Cutover in 52 seconds (sentinel: prod /home HTML containing yait-wave-clip)
+- Prod geometry probe mid-reveal: computed clip is url(#yait-wave-clip); parsed
+  wave path resolves to crest +50px, trough -50px, slant 285px against a 287px
+  mask (45 degrees) at the 1280 viewport — exactly the spec; screenshot shows the
+  undulating boundary slicing the lockup
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
