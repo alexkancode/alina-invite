@@ -45,6 +45,16 @@ wave (verified absent in the BEFORE check, present locally).
 - yait Wave Reveal Edge two-period retune: cutover 51s; crest +25px / trough
   -25px prod-verified.
 
+## Production Validation
+
+- Cutover in 62 seconds (sentinel: four-period mid-path coordinate snippet in prod
+  /home HTML)
+- Prod geometry probe mid-reveal: crest +25px, trough -25px over the unchanged
+  285px/287px slant; the served path is the four-period curve (sentinel snippet
+  matches); screenshot reviewed
+- Live invite page 200 and /api/health ok throughout
+
 ## Final Status Assessment
 
-**Deployment Status:** PENDING
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page 200 throughout)
