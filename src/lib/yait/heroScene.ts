@@ -78,6 +78,11 @@ export interface SceneTimeline {
   ctaRiseStartMs: number;
 }
 
+export const HEADLINE_LINES: string[][] = [
+  ['You', 'Are'],
+  ['Invited', 'To']
+];
+
 export const FRY_COUNT = 9;
 export const CROWD_SEED = 1977;
 export const FRY_HEIGHT_RANGE = [52, 84] as const;

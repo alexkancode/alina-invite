@@ -1,8 +1,7 @@
 ---
-import { buildFryCrowd, CROWD_SEED, FRY_COUNT, SCENE_TIMELINE } from '../../lib/yait/heroScene';
+import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, SCENE_TIMELINE } from '../../lib/yait/heroScene';
 
 const fries = buildFryCrowd(FRY_COUNT, CROWD_SEED);
-const words = ['You', 'Are', 'Invited', 'To'];
 
 const fryStyle = (fry: (typeof fries)[number]) =>
   `--fry-h: ${fry.heightPx}px; --fry-hue: ${fry.hue}; --fry-amp: ${fry.bounceAmplitudePx}px; ` +
@@ -45,8 +44,12 @@ const fryStyle = (fry: (typeof fries)[number]) =>
 
   <div class="headline-mask">
     <h1 class="headline">
-      {words.map(word => (
-        <span class="word">{word}</span>
+      {HEADLINE_LINES.map((line, index) => (
+        <span class={index === 0 ? 'headline-line' : 'headline-line headline-line-indent'}>
+          {line.map(word => (
+            <span class="word">{word}</span>
+          ))}
+        </span>
       ))}
     </h1>
   </div>

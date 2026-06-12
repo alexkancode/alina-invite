@@ -91,6 +91,26 @@ test.describe('yait home hero', () => {
     }
   });
 
+  test('the headline is a left-aligned lockup with the second line indented 100px', async ({ page }) => {
+    await page.goto('/home');
+    const lines = await page.evaluate(() => {
+      const els = [...document.querySelectorAll('.headline-line')];
+      return els.map(el => {
+        const words = [...el.querySelectorAll('.word')];
+        return {
+          words: words.map(w => w.textContent?.trim()),
+          left: Math.round(words[0].getBoundingClientRect().left)
+        };
+      });
+    });
+    expect(lines).toHaveLength(2);
+    expect(lines[0].words).toEqual(['You', 'Are']);
+    expect(lines[1].words).toEqual(['Invited', 'To']);
+    expect(lines[1].left - lines[0].left).toBeGreaterThanOrEqual(95);
+    expect(lines[1].left - lines[0].left).toBeLessThanOrEqual(105);
+    expect(lines[0].left).toBeLessThan(200);
+  });
+
   test('the intro animates transform and opacity only', async ({ page }) => {
     await page.goto('/home');
     const animated = await page.evaluate(() =>

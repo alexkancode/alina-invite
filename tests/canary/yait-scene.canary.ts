@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildFryCrowd, CROWD_SEED, FRY_COUNT, FRY_FACES, SCENE_TIMELINE, type FryConfig } from '../../src/lib/yait/heroScene';
+import { buildFryCrowd, CROWD_SEED, FRY_COUNT, FRY_FACES, HEADLINE_LINES, SCENE_TIMELINE, type FryConfig } from '../../src/lib/yait/heroScene';
 
 const componentBinding = (fry: FryConfig) => ({
   '--fry-h': `${fry.heightPx}px`,
@@ -32,6 +32,12 @@ describe('yait scene contract canary', () => {
   test('the crowd survives a JSON round trip unchanged (serializable, no hidden state)', () => {
     const crowd = buildFryCrowd(FRY_COUNT, CROWD_SEED);
     expect(JSON.parse(JSON.stringify(crowd))).toEqual(crowd);
+  });
+
+  test('the headline lockup is two lines carrying the four words in order', () => {
+    expect(HEADLINE_LINES).toHaveLength(2);
+    expect(HEADLINE_LINES[0]).toEqual(['You', 'Are']);
+    expect(HEADLINE_LINES[1]).toEqual(['Invited', 'To']);
   });
 
   test('the timeline constants the stylesheet choreography depends on are stable', () => {

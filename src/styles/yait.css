@@ -67,7 +67,8 @@
 
 .headline {
   margin: 0;
-  text-align: center;
+  padding-left: 34px;
+  text-align: left;
   font-family: 'Shrikhand', cursive;
   font-weight: 400;
   font-size: clamp(2.6rem, 8.5vw, 6.6rem);
@@ -107,6 +108,14 @@
   62.5% { transform: translateX(70%); }
   83.33% { transform: translateX(54%); }
   to { transform: translateX(0%); }
+}
+
+.headline-line {
+  display: block;
+}
+
+.headline-line-indent {
+  padding-left: 100px;
 }
 
 .word {

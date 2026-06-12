@@ -68,4 +68,8 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
     expect(css).toMatch(/animation-name: reveal-text-mobile;/);
   });
+
+  test('the second headline line is indented exactly 100px by rule', () => {
+    expect(css).toMatch(/\.headline-line-indent \{\s*padding-left: 100px;/);
+  });
 });
