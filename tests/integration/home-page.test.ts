@@ -58,6 +58,18 @@ describe('GET /home', () => {
     expect(friesIndex).toBeLessThan(artIndex);
   });
 
+  test('the seal hides behind the flap tip, raised by half its height', () => {
+    const flapSvg = homeHtml.match(/class="envelope-flap"[\s\S]*?<\/svg>/)?.[0] ?? '';
+    expect(flapSvg.indexOf('class="seal"')).toBeLessThan(flapSvg.indexOf('L 100 8'));
+    expect(flapSvg).toContain('cy="16"');
+  });
+
+  test('the front closure is gone, replaced by the open V mouth', () => {
+    expect(homeHtml).not.toContain('M6 46 L100 106 L194 46');
+    expect(homeHtml).toContain('M 4 38 L 100 80 L 196 38');
+    expect(homeHtml).toContain('class="interior"');
+  });
+
   test('unknown sibling routes still 404', async () => {
     const res = await fetch(`${BASE}/homex`);
     expect(res.status).toBe(404);
