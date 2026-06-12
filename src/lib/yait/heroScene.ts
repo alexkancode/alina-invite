@@ -145,7 +145,7 @@ export const HEADLINE_LINES: string[][] = [
 
 export const FRY_COUNT = 9;
 export const CROWD_SEED = 1977;
-export const FRY_HEIGHT_RANGE = [52, 84] as const;
+export const FRY_HEIGHT_RANGE = [78, 126] as const;
 export const FRY_HUES = [14, 28, 172] as const;
 export const FRY_AMPLITUDE_RANGE = [8, 16] as const;
 export const BOUNCE_STEP_MS = 90;

@@ -70,6 +70,10 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).not.toMatch(/reveal-mask-top|reveal-text-top/);
   });
 
+  test('mobile scales the tall fries back into proportion', () => {
+    expect(css).toMatch(/\.fry \{\s*height: calc\(var\(--fry-h\) \* 0\.8\);\s*\}/);
+  });
+
   test('the top line is an independent entity trailing purely by delay', () => {
     const delay = new RegExp(`animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`, 'g');
     expect(css.match(delay)).toHaveLength(2);

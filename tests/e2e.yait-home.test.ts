@@ -190,6 +190,22 @@ test.describe('yait home hero', () => {
     expect(Number(probe!.flapZ)).toBeLessThan(Number(probe!.artZ));
   });
 
+  test('fry feet stay tucked behind the front V even at full bounce', async ({ page }) => {
+    await page.goto('/home');
+    const probe = await page.evaluate(() => {
+      const fries = document.querySelector('.fries');
+      const art = document.querySelector('.envelope-art');
+      if (!fries || !art) return null;
+      const artRect = art.getBoundingClientRect();
+      return {
+        feetBaseline: fries.getBoundingClientRect().bottom,
+        vDip: artRect.top + artRect.height * (80 / 140)
+      };
+    });
+    expect(probe).not.toBeNull();
+    expect(probe!.feetBaseline - 16).toBeGreaterThan(probe!.vDip);
+  });
+
   test('the intro animates transform and opacity only', async ({ page }) => {
     await page.goto('/home');
     const animated = await page.evaluate(() =>
