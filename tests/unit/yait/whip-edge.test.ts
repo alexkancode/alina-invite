@@ -140,7 +140,7 @@ describe('WHIP_EDGE_FRAMES', () => {
 });
 
 describe('WHIP timing', () => {
-  test('one full down-and-back crack every 3333ms (gallery cadence)', () => {
-    expect(WHIP.durationMs).toBe(3333);
+  test('one full down-and-back crack every 2222ms (gallery cadence, 1.5x faster)', () => {
+    expect(WHIP.durationMs).toBe(2222);
   });
 });
