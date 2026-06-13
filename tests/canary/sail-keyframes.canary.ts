@@ -61,10 +61,10 @@ describe('sail keyframes match the three-beat spec', () => {
   });
 
   test('all layers ride the easeInOutSine curve, reveals spanning sail plus settle', () => {
-    expect(css).toMatch(/sail-x 5\.333s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/sail-weave 5\.333s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-mask 6\.4s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-text 6\.4s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/sail-x 8s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/sail-weave 8s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-mask 9\.6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-text 9\.6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
     expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
     expect(css).toMatch(/animation-name: reveal-text-mobile;/);
     expect(css).not.toMatch(/reveal-mask-top|reveal-text-top/);
@@ -75,7 +75,7 @@ describe('sail keyframes match the three-beat spec', () => {
   });
 
   test('one reveal window clips and sweeps the whole headline as a unit', () => {
-    expect(css).toMatch(/\.reveal-window \{[\s\S]*?clip-path: url\(#yait-wave-clip\);[\s\S]*?animation: reveal-mask 6\.4s/);
+    expect(css).toMatch(/\.reveal-window \{[\s\S]*?clip-path: url\(#yait-wave-clip\);[\s\S]*?animation: reveal-mask 9\.6s/);
     expect(css).not.toMatch(/\.line-mask/);
   });
 

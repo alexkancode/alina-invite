@@ -50,7 +50,7 @@ describe('GET /home', () => {
   test('the clip path morphs its d through the whip frames', () => {
     expect(homeHtml).toContain('<animate');
     expect(homeHtml).toContain('attributeName="d"');
-    expect(homeHtml).toContain('dur="2.222s"');
+    expect(homeHtml).toContain('dur="3.333s"');
     expect(homeHtml).toContain('repeatCount="indefinite"');
     expect(homeHtml).not.toContain('<animateTransform');
     expect(homeHtml).not.toContain('fill="freeze"');

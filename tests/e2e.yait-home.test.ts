@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import sharp from 'sharp';
 
-const DOCKED_AFTER_MS = 7000;
+const DOCKED_AFTER_MS = 10500;
 const MIN_ROLL_DELTA_PX = 800;
 const ROLL_BURST_FRAMES = 7;
 const ROLL_BURST_STEP_MS = 220;
@@ -76,7 +76,7 @@ test.describe('yait home hero', () => {
       if (!el) return 'missing';
       for (const a of el.getAnimations()) {
         a.pause();
-        a.currentTime = 2667;
+        a.currentTime = 4000;
       }
       return getComputedStyle(el).transform;
     });
@@ -102,7 +102,7 @@ test.describe('yait home hero', () => {
           stern: track.getBoundingClientRect().left
         };
       };
-      return [sample(1600), sample(2667), sample(5000)];
+      return [sample(2400), sample(4000), sample(7500)];
     });
     expect(probes).not.toBeNull();
     for (const { edge, stern } of probes!) {
@@ -217,7 +217,7 @@ test.describe('yait home hero', () => {
     await page.evaluate(() => {
       for (const a of document.getAnimations({ subtree: true })) {
         a.pause();
-        a.currentTime = 4500;
+        a.currentTime = 7000;
       }
     });
     const edgeRegion = { x: 150, y: 80, width: 480, height: 360 };
