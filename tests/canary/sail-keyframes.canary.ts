@@ -78,6 +78,18 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(keyframeBlock('reveal-mask')).toMatch(/83\.33% \{[\s\S]*?animation-timing-function: cubic-bezier\(0\.61, 1, 0\.88, 1\);/);
   });
 
+  test('the envelope swivels toward the screen at both inner beats and returns flat', () => {
+    expect(css).toMatch(/\.envelope-pivot \{[\s\S]*?animation: pivot 4\.444s ease-in-out both;/);
+    const block = keyframeBlock('pivot');
+    expect(block.length).toBeGreaterThan(0);
+    expect(block).toMatch(/25% \{ transform: perspective\(600px\) rotateY\(20deg\); \}/);
+    expect(block).toMatch(/68\.75% \{ transform: perspective\(600px\) rotateY\(20deg\); \}/);
+    expect(block).toMatch(/0% \{ transform: perspective\(600px\) rotateY\(0deg\); \}/);
+    expect(block).toMatch(/47% \{ transform: perspective\(600px\) rotateY\(0deg\); \}/);
+    expect(block).toMatch(/to \{ transform: perspective\(600px\) rotateY\(0deg\); \}/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.envelope-pivot/);
+  });
+
   test('mobile scales the tall fries back into proportion', () => {
     expect(css).toMatch(/\.fry \{\s*height: calc\(var\(--fry-h\) \* 0\.8\);\s*\}/);
   });
