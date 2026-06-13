@@ -131,8 +131,8 @@ describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }
 describe('independent top-line reveal delay', () => {
   test('the trail is 150px expressed as time over the reference sweep', () => {
     expect(REVEAL_STAGGER_PX).toBe(150);
-    expect(REVEAL_DURATION_MS).toBe(6000);
-    expect(REVEAL_TOP_DELAY_MS).toBe(537);
+    expect(REVEAL_DURATION_MS).toBe(12000);
+    expect(REVEAL_TOP_DELAY_MS).toBe(1073);
     expect(REVEAL_TOP_DELAY_MS).toBe(revealDelayMs(REVEAL_EDGE, REVEAL_STAGGER_PX, 1280, REVEAL_DURATION_MS));
   });
 

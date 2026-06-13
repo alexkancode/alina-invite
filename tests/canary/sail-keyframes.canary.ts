@@ -61,10 +61,10 @@ describe('sail keyframes match the three-beat spec', () => {
   });
 
   test('all layers ride the easeInOutSine curve, reveals spanning sail plus settle', () => {
-    expect(css).toMatch(/sail-x 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/sail-weave 5s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-mask 6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-text 6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/sail-x 10s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/sail-weave 10s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-mask 12s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+    expect(css).toMatch(/reveal-text 12s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
     expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
     expect(css).toMatch(/animation-name: reveal-text-mobile;/);
     expect(css).not.toMatch(/reveal-mask-top|reveal-text-top/);

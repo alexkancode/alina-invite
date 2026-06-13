@@ -80,15 +80,15 @@
   display: block;
   overflow: hidden;
   clip-path: url(#yait-wave-clip);
-  animation: reveal-mask 6s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-mask 12s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .line-mask-top {
-  animation-delay: 537ms;
+  animation-delay: 1073ms;
 }
 
 .line-mask-top .headline-line {
-  animation-delay: 537ms;
+  animation-delay: 1073ms;
 }
 
 @keyframes reveal-mask {
@@ -125,7 +125,7 @@
 
 .headline-line {
   display: block;
-  animation: reveal-text 6s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-text 12s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .headline-line-indent {
@@ -142,15 +142,15 @@
   left: 61%;
   top: 44%;
   width: clamp(190px, 24vw, 310px);
-  animation: sail-x 5s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: sail-x 10s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .envelope {
   position: relative;
   animation:
-    sail-weave 5s cubic-bezier(0.37, 0, 0.63, 1) both,
-    dock-settle 1s 5s ease-in-out forwards,
-    bob 3.4s 6s ease-in-out infinite;
+    sail-weave 10s cubic-bezier(0.37, 0, 0.63, 1) both,
+    dock-settle 2s 10s ease-in-out forwards,
+    bob 3.4s 12s ease-in-out infinite;
 }
 
 @keyframes sail-x {

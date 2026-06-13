@@ -73,7 +73,7 @@ export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, 
 }, REVEAL_REST_PERCENT);
 
 export const REVEAL_STAGGER_PX = 150;
-export const REVEAL_DURATION_MS = 6000;
+export const REVEAL_DURATION_MS = 12000;
 
 export function revealDelayMs(edge: RevealWaypoint[], staggerPx: number, viewportW: number, durationMs: number): number {
   const sweepPx = (-edge[0].percent / 100) * viewportW;
@@ -172,8 +172,8 @@ export const FRY_AMPLITUDE_RANGE = [8, 16] as const;
 export const BOUNCE_STEP_MS = 90;
 export const LEAN_CYCLE_MS = 4000;
 
-const SAIL_MS = 5000;
-const SETTLE_MS = 1000;
+const SAIL_MS = 10000;
+const SETTLE_MS = 2000;
 
 export const SCENE_TIMELINE: SceneTimeline = {
   sailDurationMs: SAIL_MS,

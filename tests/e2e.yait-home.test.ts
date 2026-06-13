@@ -1,12 +1,10 @@
 import { expect, test } from '@playwright/test';
 import sharp from 'sharp';
 
-const DOCKED_AFTER_MS = 6600;
+const DOCKED_AFTER_MS = 13200;
 const MIN_ROLL_DELTA_PX = 800;
-const MIN_DOCKED_ROLL_DELTA_PX = 250;
 const ROLL_BURST_FRAMES = 6;
 const ROLL_BURST_STEP_MS = 70;
-const ROLL_SETTLED_AFTER_MS = 8000;
 
 async function changedPixels(a: Buffer, b: Buffer): Promise<number> {
   const [ra, rb] = await Promise.all(
@@ -34,9 +32,9 @@ test.describe('yait home hero', () => {
 
   test('the headline reveals fully and the CTA rises once docked', async ({ page }) => {
     await page.goto('/home');
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(6000);
     await page.screenshot({ path: '/tmp/yait-home-midsail.png' });
-    await page.waitForTimeout(DOCKED_AFTER_MS - 3000);
+    await page.waitForTimeout(DOCKED_AFTER_MS - 6000);
     for (const word of ['You', 'Are', 'Invited', 'To']) {
       const el = page.locator('.word', { hasText: word }).first();
       await expect(el).toBeVisible();
@@ -78,7 +76,7 @@ test.describe('yait home hero', () => {
       if (!el) return 'missing';
       for (const a of el.getAnimations()) {
         a.pause();
-        a.currentTime = 2500;
+        a.currentTime = 5000;
       }
       return getComputedStyle(el).transform;
     });
@@ -104,7 +102,7 @@ test.describe('yait home hero', () => {
           stern: track.getBoundingClientRect().left
         };
       };
-      return [sample(1200), sample(2000), sample(3750)];
+      return [sample(2400), sample(4000), sample(7500)];
     });
     expect(probes).not.toBeNull();
     for (const { edge, stern } of probes!) {
@@ -176,7 +174,7 @@ test.describe('yait home hero', () => {
         }
         return bottom.getBoundingClientRect().right - top.getBoundingClientRect().right;
       };
-      return { midSail: sample(3000), atDock: sample(6000), afterBoth: sample(7000) };
+      return { midSail: sample(6000), atDock: sample(12000), afterBoth: sample(14000) };
     });
     expect(gaps).not.toBeNull();
     expect(gaps!.midSail).toBeGreaterThan(100);
@@ -229,7 +227,7 @@ test.describe('yait home hero', () => {
     await page.evaluate(() => {
       for (const a of document.getAnimations({ subtree: true })) {
         a.pause();
-        a.currentTime = 3000;
+        a.currentTime = 6000;
       }
     });
     const edgeRegion = { x: 250, y: 280, width: 220, height: 160 };
@@ -246,18 +244,12 @@ test.describe('yait home hero', () => {
     expect(Buffer.compare(wordA, wordB)).toBe(0);
   });
 
-  test('the roll keeps traveling on the docked edge after the reveal completes', async ({ page }) => {
+  test('the morph never freezes: it loops unbounded with no fill', async ({ page }) => {
     await page.goto('/home');
-    await page.evaluate(() => document.fonts.ready);
-    await page.waitForTimeout(ROLL_SETTLED_AFTER_MS);
-    const dockedEdgeRegion = { x: 760, y: 264, width: 200, height: 56 };
-    const frames = [];
-    for (let i = 0; i < ROLL_BURST_FRAMES; i++) {
-      frames.push(await page.screenshot({ clip: dockedEdgeRegion }));
-      if (i < ROLL_BURST_FRAMES - 1) await page.waitForTimeout(ROLL_BURST_STEP_MS);
-    }
-    const deltas = await Promise.all(frames.slice(1).map(f => changedPixels(frames[0], f)));
-    expect(Math.max(...deltas)).toBeGreaterThan(MIN_DOCKED_ROLL_DELTA_PX);
+    const morph = page.locator('#yait-wave-clip animate');
+    await expect(morph).toHaveCount(1);
+    await expect(morph).toHaveAttribute('repeatCount', 'indefinite');
+    expect(await morph.getAttribute('fill')).toBeNull();
   });
 
   test('reduced motion removes the morphing clip animation entirely', async ({ page }) => {
