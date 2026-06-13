@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import sharp from 'sharp';
 
-const DOCKED_AFTER_MS = 8750;
+const DOCKED_AFTER_MS = 6300;
 const MIN_ROLL_DELTA_PX = 800;
 const ROLL_BURST_FRAMES = 7;
 const ROLL_BURST_STEP_MS = 220;
@@ -33,9 +33,9 @@ test.describe('yait home hero', () => {
 
   test('the headline reveals fully and the CTA rises once docked', async ({ page }) => {
     await page.goto('/home');
-    await page.waitForTimeout(6000);
+    await page.waitForTimeout(2500);
     await page.screenshot({ path: '/tmp/yait-home-midsail.png' });
-    await page.waitForTimeout(DOCKED_AFTER_MS - 6000);
+    await page.waitForTimeout(DOCKED_AFTER_MS - 2500);
     for (const word of ['You', 'Are', 'Invited', 'To']) {
       const el = page.locator('.word', { hasText: word }).first();
       await expect(el).toBeVisible();
@@ -77,7 +77,7 @@ test.describe('yait home hero', () => {
       if (!el) return 'missing';
       for (const a of el.getAnimations()) {
         a.pause();
-        a.currentTime = 3333;
+        a.currentTime = 2222;
       }
       return getComputedStyle(el).transform;
     });
@@ -98,8 +98,8 @@ test.describe('yait home hero', () => {
       const m = getComputedStyle(el!).transform.match(/matrix\(([^)]+)\)/);
       return Number(m![1].split(',')[4]);
     }, t);
-    const atBeat = await tx(1667);
-    const justAfter = await tx(1787);
+    const atBeat = await tx(1111);
+    const justAfter = await tx(1231);
     expect(Math.abs(justAfter - atBeat)).toBeGreaterThan(MIN_BEAT_FLOW_PX);
   });
 
@@ -119,7 +119,7 @@ test.describe('yait home hero', () => {
           stern: track.getBoundingClientRect().left
         };
       };
-      return [sample(2000), sample(3333), sample(6250)];
+      return [sample(1333), sample(2222), sample(4167)];
     });
     expect(probes).not.toBeNull();
     for (const { edge, stern } of probes!) {
@@ -234,7 +234,7 @@ test.describe('yait home hero', () => {
     await page.evaluate(() => {
       for (const a of document.getAnimations({ subtree: true })) {
         a.pause();
-        a.currentTime = 5833;
+        a.currentTime = 3889;
       }
     });
     const edgeRegion = { x: 150, y: 80, width: 480, height: 360 };

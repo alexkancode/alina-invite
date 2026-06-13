@@ -61,10 +61,10 @@ describe('sail keyframes match the three-beat spec', () => {
   });
 
   test('layers flow linearly through the beats and ease out only into the dock', () => {
-    expect(css).toMatch(/sail-x 6.667s linear both/);
-    expect(css).toMatch(/sail-weave 6.667s linear both/);
-    expect(css).toMatch(/reveal-mask 8s linear both/);
-    expect(css).toMatch(/reveal-text 8s linear both/);
+    expect(css).toMatch(/sail-x 4.444s linear both/);
+    expect(css).toMatch(/sail-weave 4.444s linear both/);
+    expect(css).toMatch(/reveal-mask 5.333s linear both/);
+    expect(css).toMatch(/reveal-text 5.333s linear both/);
     expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
     expect(css).toMatch(/animation-name: reveal-text-mobile;/);
     expect(css).not.toMatch(/reveal-mask-top|reveal-text-top/);
@@ -83,7 +83,7 @@ describe('sail keyframes match the three-beat spec', () => {
   });
 
   test('one reveal window clips and sweeps the whole headline as a unit', () => {
-    expect(css).toMatch(/\.reveal-window \{[\s\S]*?clip-path: url\(#yait-wave-clip\);[\s\S]*?animation: reveal-mask 8s/);
+    expect(css).toMatch(/\.reveal-window \{[\s\S]*?clip-path: url\(#yait-wave-clip\);[\s\S]*?animation: reveal-mask 5.333s/);
     expect(css).not.toMatch(/\.line-mask/);
   });
 
