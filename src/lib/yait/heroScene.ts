@@ -72,7 +72,7 @@ export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, 
   lockVw: REVEAL_LOCK_VW
 }, REVEAL_REST_PERCENT);
 
-export const REVEAL_DURATION_MS = 9600;
+export const REVEAL_DURATION_MS = 8000;
 
 export interface WhipGeometry {
   viewportW: number;
@@ -166,8 +166,8 @@ export const FRY_AMPLITUDE_RANGE = [8, 16] as const;
 export const BOUNCE_STEP_MS = 90;
 export const LEAN_CYCLE_MS = 4000;
 
-const SAIL_MS = 8000;
-const SETTLE_MS = 1600;
+const SAIL_MS = 6667;
+const SETTLE_MS = 1333;
 
 export const SCENE_TIMELINE: SceneTimeline = {
   sailDurationMs: SAIL_MS,

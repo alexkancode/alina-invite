@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import sharp from 'sharp';
 
-const DOCKED_AFTER_MS = 10500;
+const DOCKED_AFTER_MS = 8750;
 const MIN_ROLL_DELTA_PX = 800;
 const ROLL_BURST_FRAMES = 7;
 const ROLL_BURST_STEP_MS = 220;
@@ -77,7 +77,7 @@ test.describe('yait home hero', () => {
       if (!el) return 'missing';
       for (const a of el.getAnimations()) {
         a.pause();
-        a.currentTime = 4000;
+        a.currentTime = 3333;
       }
       return getComputedStyle(el).transform;
     });
@@ -98,8 +98,8 @@ test.describe('yait home hero', () => {
       const m = getComputedStyle(el!).transform.match(/matrix\(([^)]+)\)/);
       return Number(m![1].split(',')[4]);
     }, t);
-    const atBeat = await tx(2000);
-    const justAfter = await tx(2120);
+    const atBeat = await tx(1667);
+    const justAfter = await tx(1787);
     expect(Math.abs(justAfter - atBeat)).toBeGreaterThan(MIN_BEAT_FLOW_PX);
   });
 
@@ -119,7 +119,7 @@ test.describe('yait home hero', () => {
           stern: track.getBoundingClientRect().left
         };
       };
-      return [sample(2400), sample(4000), sample(7500)];
+      return [sample(2000), sample(3333), sample(6250)];
     });
     expect(probes).not.toBeNull();
     for (const { edge, stern } of probes!) {
@@ -234,7 +234,7 @@ test.describe('yait home hero', () => {
     await page.evaluate(() => {
       for (const a of document.getAnimations({ subtree: true })) {
         a.pause();
-        a.currentTime = 7000;
+        a.currentTime = 5833;
       }
     });
     const edgeRegion = { x: 150, y: 80, width: 480, height: 360 };

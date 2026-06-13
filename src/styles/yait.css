@@ -74,14 +74,14 @@
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
-  animation: reveal-text 9.6s linear both;
+  animation: reveal-text 8s linear both;
 }
 
 .reveal-window {
   display: block;
   overflow: hidden;
   clip-path: url(#yait-wave-clip);
-  animation: reveal-mask 9.6s linear both;
+  animation: reveal-mask 8s linear both;
 }
 
 @keyframes reveal-mask {
@@ -134,15 +134,15 @@
   left: 61%;
   top: 44%;
   width: clamp(190px, 24vw, 310px);
-  animation: sail-x 8s linear both;
+  animation: sail-x 6.667s linear both;
 }
 
 .envelope {
   position: relative;
   animation:
-    sail-weave 8s linear both,
-    dock-settle 1.6s 8s ease-in-out forwards,
-    bob 3.4s 9.6s ease-in-out infinite;
+    sail-weave 6.667s linear both,
+    dock-settle 1.333s 6.667s ease-in-out forwards,
+    bob 3.4s 8s ease-in-out infinite;
 }
 
 @keyframes sail-x {
