@@ -3,6 +3,8 @@ import sharp from 'sharp';
 
 const DOCKED_AFTER_MS = 6600;
 const MIN_ROLL_DELTA_PX = 800;
+const ROLL_BURST_FRAMES = 6;
+const ROLL_BURST_STEP_MS = 70;
 const ROLL_FROZEN_AFTER_MS = 8000;
 
 async function changedPixels(a: Buffer, b: Buffer): Promise<number> {
@@ -233,12 +235,15 @@ test.describe('yait home hero', () => {
     });
     const edgeRegion = { x: 250, y: 280, width: 220, height: 160 };
     const wordRegion = { x: 140, y: 300, width: 70, height: 120 };
-    const edgeA = await page.screenshot({ clip: edgeRegion });
     const wordA = await page.screenshot({ clip: wordRegion });
-    await page.waitForTimeout(500);
-    const edgeB = await page.screenshot({ clip: edgeRegion });
+    const edgeFrames = [];
+    for (let i = 0; i < ROLL_BURST_FRAMES; i++) {
+      edgeFrames.push(await page.screenshot({ clip: edgeRegion }));
+      if (i < ROLL_BURST_FRAMES - 1) await page.waitForTimeout(ROLL_BURST_STEP_MS);
+    }
     const wordB = await page.screenshot({ clip: wordRegion });
-    expect(await changedPixels(edgeA, edgeB)).toBeGreaterThan(MIN_ROLL_DELTA_PX);
+    const deltas = await Promise.all(edgeFrames.slice(1).map(f => changedPixels(edgeFrames[0], f)));
+    expect(Math.max(...deltas)).toBeGreaterThan(MIN_ROLL_DELTA_PX);
     expect(Buffer.compare(wordA, wordB)).toBe(0);
   });
 

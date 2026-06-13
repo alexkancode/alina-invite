@@ -107,12 +107,13 @@ describe('WAVE_ROLL', () => {
     expect(WAVE_ROLL.yBox).toBe(0.2);
   });
 
-  test('rolls one perceptible wavelength per second', () => {
-    expect(WAVE_ROLL_PERIOD_MS).toBe(1000);
-    expect(WAVE_ROLL.durationMs).toBe(1000);
+  test('rolls one wavelength every third of a second', () => {
+    expect(WAVE_ROLL_PERIOD_MS).toBe(333);
+    expect(WAVE_ROLL.durationMs).toBe(333);
   });
 
   test('freezes on a whole-wavelength seam that covers the entire reveal', () => {
+    expect(WAVE_ROLL.repeatCount).toBe(20);
     expect(Number.isInteger(WAVE_ROLL.repeatCount)).toBe(true);
     expect(WAVE_ROLL.repeatCount * WAVE_ROLL_PERIOD_MS).toBeGreaterThanOrEqual(
       REVEAL_DURATION_MS + REVEAL_TOP_DELAY_MS
