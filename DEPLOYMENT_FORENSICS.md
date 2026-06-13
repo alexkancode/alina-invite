@@ -82,10 +82,22 @@ must also appear and `repeatCount="indefinite"` must disappear.
 
 ## Production Validation
 
-- PENDING (pre-deploy). To be filled after `railway up` completes and the sentinel
-  is checked on prod.
+- Cutover in 42 seconds (sentinel: `fill="freeze"` in prod /home HTML, poll #9).
+  Prod now serves `dur="1s"`, `repeatCount="7"`, `fill="freeze"`, and the derived
+  vector `to="0.02891 0.2"`; `dur="4s"` and `repeatCount="indefinite"` are gone
+  (both confirmed 0 occurrences post-cutover).
+- LIVE-PIXEL prod probe on https://yait.social/home (CSS animations pinned at 3.0s,
+  SMIL running free):
+  - edge region changed 1131 px across 500ms mid-reveal (floor 800; the wave rolls
+    perceptibly at the new speed on production)
+  - fully-revealed word region byte-identical across the same 500ms (no jitter)
+  - after letting the page run past 8s, the edge region is byte-identical across 1s
+    (the roll froze at rest on production)
+- Magnified prod mid-reveal capture reviewed: the wavy cut edge crosses the glyphs
+  as intended.
+- Live invite page /home 200 and /api/health 200 throughout.
 
 ## Final Status Assessment
 
-**Deployment Status:** PENDING (pre-deploy entry recorded)
-**Service Availability:** to be confirmed during cutover
+**Deployment Status:** SUCCESSFUL
+**Service Availability:** STABLE (live invite page and health 200 throughout)
