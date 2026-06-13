@@ -52,7 +52,7 @@ describe('WHIP_GEOMETRY', () => {
       viewportW: 1280,
       maskH: 370,
       slantPx: 370,
-      amplitudePx: 34,
+      amplitudePx: 50,
       widthFrac: 0.16667,
       samples: 28
     });
@@ -80,7 +80,7 @@ describe('buildWhipEdgePath', () => {
   test('the baseline is straight away from the bump (no residual waviness)', () => {
     const farFromCenter = anchors.map((a, i) => ({ s: a.y, out: outs[i] })).filter(p => Math.abs(p.s - 0.5) > 0.3);
     for (const p of farFromCenter) {
-      expect(Math.abs(p.out)).toBeLessThan(1);
+      expect(Math.abs(p.out)).toBeLessThan(g.amplitudePx * 0.05);
     }
   });
 

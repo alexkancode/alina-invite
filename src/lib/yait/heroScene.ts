@@ -87,7 +87,7 @@ export const WHIP_GEOMETRY: WhipGeometry = {
   viewportW: 1280,
   maskH: 370,
   slantPx: 370,
-  amplitudePx: 34,
+  amplitudePx: 50,
   widthFrac: 0.16667,
   samples: 28
 };
