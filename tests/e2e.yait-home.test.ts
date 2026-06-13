@@ -103,6 +103,22 @@ test.describe('yait home hero', () => {
     expect(Math.abs(justAfter - atBeat)).toBeGreaterThan(MIN_BEAT_FLOW_PX);
   });
 
+  test('the headline reveal swivels toward the screen at the inner beat and returns flat', async ({ page }) => {
+    await page.goto('/home');
+    const at = (t: number) => page.evaluate((time) => {
+      const el = document.querySelector('.headline-mask');
+      for (const a of el!.getAnimations()) {
+        a.pause();
+        a.currentTime = time;
+      }
+      return getComputedStyle(el!).transform;
+    }, t);
+    const atBeat = await at(1111);
+    const between = await at(2200);
+    expect(atBeat).toContain('matrix3d');
+    expect(atBeat).not.toBe(between);
+  });
+
   test('the envelope swivels toward the screen at the inner beat and returns flat', async ({ page }) => {
     await page.goto('/home');
     const at = (t: number) => page.evaluate((time) => {
