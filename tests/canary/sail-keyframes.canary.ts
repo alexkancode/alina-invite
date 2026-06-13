@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, test } from 'vitest';
-import { REVEAL_EDGE, REVEAL_EDGE_MOBILE, REVEAL_TOP_DELAY_MS, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
+import { REVEAL_EDGE, REVEAL_EDGE_MOBILE, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
 
 const css = readFileSync(resolve(__dirname, '../../src/styles/yait.css'), 'utf8');
 
@@ -74,11 +74,9 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/\.fry \{\s*height: calc\(var\(--fry-h\) \* 0\.8\);\s*\}/);
   });
 
-  test('the top line is an independent entity trailing purely by delay', () => {
-    const delay = new RegExp(`animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`, 'g');
-    expect(css.match(delay)).toHaveLength(2);
-    expect(css).toMatch(new RegExp(`\\.line-mask-top \\{\\s*animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`));
-    expect(css).toMatch(new RegExp(`\\.line-mask-top \\.headline-line \\{\\s*animation-delay: ${REVEAL_TOP_DELAY_MS}ms;`));
+  test('one reveal window clips and sweeps the whole headline as a unit', () => {
+    expect(css).toMatch(/\.reveal-window \{[\s\S]*?clip-path: url\(#yait-wave-clip\);[\s\S]*?animation: reveal-mask 12s/);
+    expect(css).not.toMatch(/\.line-mask/);
   });
 
   test('the second headline line is indented exactly 100px by rule', () => {

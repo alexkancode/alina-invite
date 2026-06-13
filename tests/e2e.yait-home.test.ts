@@ -3,8 +3,8 @@ import sharp from 'sharp';
 
 const DOCKED_AFTER_MS = 13200;
 const MIN_ROLL_DELTA_PX = 800;
-const ROLL_BURST_FRAMES = 6;
-const ROLL_BURST_STEP_MS = 70;
+const ROLL_BURST_FRAMES = 7;
+const ROLL_BURST_STEP_MS = 220;
 
 async function changedPixels(a: Buffer, b: Buffer): Promise<number> {
   const [ra, rb] = await Promise.all(
@@ -89,7 +89,7 @@ test.describe('yait home hero', () => {
   test('the reveal edge sits at the stern, never ahead of it', async ({ page }) => {
     await page.goto('/home');
     const probes = await page.evaluate(() => {
-      const mask = document.querySelector('.line-mask:not(.line-mask-top)');
+      const mask = document.querySelector('.reveal-window');
       const track = document.querySelector('[data-testid="envelope"]');
       if (!mask || !track) return null;
       const sample = (t: number) => {
@@ -133,7 +133,7 @@ test.describe('yait home hero', () => {
   test('the reveal edge clips through a 45-degree slant, and a mid frame carries one whip bump', async ({ page }) => {
     await page.goto('/home');
     const probe = await page.evaluate(() => {
-      const mask = document.querySelector('.line-mask:not(.line-mask-top)');
+      const mask = document.querySelector('.reveal-window');
       const morph = document.querySelector('#yait-wave-clip animate');
       if (!mask || !morph) return null;
       const rect = mask.getBoundingClientRect();
@@ -161,26 +161,16 @@ test.describe('yait home hero', () => {
     expect(probe!.mid.lobes).toBe(1);
   });
 
-  test('the lines reveal as independent entities, top trailing without convergence', async ({ page }) => {
+  test('a single reveal window clips the whole headline (no per-line masks)', async ({ page }) => {
     await page.goto('/home');
-    const gaps = await page.evaluate(() => {
-      const top = document.querySelector('.line-mask-top');
-      const bottom = document.querySelector('.line-mask:not(.line-mask-top)');
-      if (!top || !bottom) return null;
-      const sample = (t: number) => {
-        for (const a of document.getAnimations({ subtree: true })) {
-          a.pause();
-          a.currentTime = t;
-        }
-        return bottom.getBoundingClientRect().right - top.getBoundingClientRect().right;
-      };
-      return { midSail: sample(6000), atDock: sample(12000), afterBoth: sample(14000) };
-    });
-    expect(gaps).not.toBeNull();
-    expect(gaps!.midSail).toBeGreaterThan(100);
-    expect(gaps!.midSail).toBeLessThan(260);
-    expect(gaps!.atDock).toBeGreaterThan(100);
-    expect(Math.abs(gaps!.afterBoth)).toBeLessThan(2);
+    const counts = await page.evaluate(() => ({
+      windows: document.querySelectorAll('.reveal-window').length,
+      lineMasks: document.querySelectorAll('.line-mask').length,
+      lines: document.querySelectorAll('.headline-line').length
+    }));
+    expect(counts.windows).toBe(1);
+    expect(counts.lineMasks).toBe(0);
+    expect(counts.lines).toBe(2);
   });
 
   test('the open flap points skyward behind the fries', async ({ page }) => {
@@ -227,11 +217,11 @@ test.describe('yait home hero', () => {
     await page.evaluate(() => {
       for (const a of document.getAnimations({ subtree: true })) {
         a.pause();
-        a.currentTime = 6000;
+        a.currentTime = 10500;
       }
     });
-    const edgeRegion = { x: 250, y: 280, width: 220, height: 160 };
-    const wordRegion = { x: 140, y: 300, width: 70, height: 120 };
+    const edgeRegion = { x: 150, y: 80, width: 480, height: 360 };
+    const wordRegion = { x: 55, y: 100, width: 95, height: 85 };
     const wordA = await page.screenshot({ clip: wordRegion });
     const edgeFrames = [];
     for (let i = 0; i < ROLL_BURST_FRAMES; i++) {

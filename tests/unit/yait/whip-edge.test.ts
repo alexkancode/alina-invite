@@ -50,8 +50,8 @@ describe('WHIP_GEOMETRY', () => {
   test('is a 45-degree slant with the tuned bump shape', () => {
     expect(WHIP_GEOMETRY).toEqual({
       viewportW: 1280,
-      maskH: 185,
-      slantPx: 185,
+      maskH: 370,
+      slantPx: 370,
       amplitudePx: 34,
       widthFrac: 0.16667,
       samples: 28

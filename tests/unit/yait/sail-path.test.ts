@@ -11,9 +11,6 @@ import {
   REVEAL_LOCK_VW,
   REVEAL_REST_PERCENT,
   REVEAL_SAIL_SHARE,
-  REVEAL_STAGGER_PX,
-  REVEAL_TOP_DELAY_MS,
-  revealDelayMs,
   SAIL_TRACK,
   SAIL_WEAVE
 } from '../../../src/lib/yait/heroScene';
@@ -128,22 +125,9 @@ describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }
   });
 });
 
-describe('independent top-line reveal delay', () => {
-  test('the trail is 150px expressed as time over the reference sweep', () => {
-    expect(REVEAL_STAGGER_PX).toBe(150);
+describe('reveal duration', () => {
+  test('the single sweep runs for the doubled reveal duration', () => {
     expect(REVEAL_DURATION_MS).toBe(12000);
-    expect(REVEAL_TOP_DELAY_MS).toBe(1073);
-    expect(REVEAL_TOP_DELAY_MS).toBe(revealDelayMs(REVEAL_EDGE, REVEAL_STAGGER_PX, 1280, REVEAL_DURATION_MS));
-  });
-
-  test('the delay scales linearly with the trail distance', () => {
-    expect(revealDelayMs(REVEAL_EDGE, 300, 1280, 6000)).toBe(1073);
-    expect(revealDelayMs(REVEAL_EDGE, 0, 1280, 6000)).toBe(0);
-  });
-
-  test('the delay derives from the full sweep length', () => {
-    const sweepPx = (-REVEAL_EDGE[0].percent / 100) * 1280;
-    expect(revealDelayMs(REVEAL_EDGE, 150, 1280, 6000)).toBe(Math.round((6000 * 150) / sweepPx));
   });
 });
 

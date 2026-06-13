@@ -72,15 +72,7 @@ export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, 
   lockVw: REVEAL_LOCK_VW
 }, REVEAL_REST_PERCENT);
 
-export const REVEAL_STAGGER_PX = 150;
 export const REVEAL_DURATION_MS = 12000;
-
-export function revealDelayMs(edge: RevealWaypoint[], staggerPx: number, viewportW: number, durationMs: number): number {
-  const sweepPx = (-edge[0].percent / 100) * viewportW;
-  return Math.round((durationMs * staggerPx) / sweepPx);
-}
-
-export const REVEAL_TOP_DELAY_MS = revealDelayMs(REVEAL_EDGE, REVEAL_STAGGER_PX, 1280, REVEAL_DURATION_MS);
 
 export interface WhipGeometry {
   viewportW: number;
@@ -93,8 +85,8 @@ export interface WhipGeometry {
 
 export const WHIP_GEOMETRY: WhipGeometry = {
   viewportW: 1280,
-  maskH: 185,
-  slantPx: 185,
+  maskH: 370,
+  slantPx: 370,
   amplitudePx: 34,
   widthFrac: 0.16667,
   samples: 28
