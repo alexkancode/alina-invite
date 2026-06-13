@@ -126,8 +126,8 @@ describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }
 });
 
 describe('reveal duration', () => {
-  test('the single sweep runs for the doubled reveal duration', () => {
-    expect(REVEAL_DURATION_MS).toBe(12000);
+  test('the single sweep runs for the first-leg-shortened reveal duration', () => {
+    expect(REVEAL_DURATION_MS).toBe(9600);
   });
 });
 

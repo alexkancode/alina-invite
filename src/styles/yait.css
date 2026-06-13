@@ -74,44 +74,44 @@
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
-  animation: reveal-text 12s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-text 9.6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .reveal-window {
   display: block;
   overflow: hidden;
   clip-path: url(#yait-wave-clip);
-  animation: reveal-mask 12s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-mask 9.6s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 @keyframes reveal-mask {
   from { transform: translateX(-131%); }
-  33.33% { transform: translateX(-91%); }
-  62.5% { transform: translateX(-55%); }
+  20.83% { transform: translateX(-91%); }
+  57.29% { transform: translateX(-55%); }
   83.33% { transform: translateX(-39%); }
   to { transform: translateX(-15%); }
 }
 
 @keyframes reveal-text {
   from { transform: translateX(131%); }
-  33.33% { transform: translateX(91%); }
-  62.5% { transform: translateX(55%); }
+  20.83% { transform: translateX(91%); }
+  57.29% { transform: translateX(55%); }
   83.33% { transform: translateX(39%); }
   to { transform: translateX(15%); }
 }
 
 @keyframes reveal-mask-mobile {
   from { transform: translateX(-146%); }
-  33.33% { transform: translateX(-106%); }
-  62.5% { transform: translateX(-70%); }
+  20.83% { transform: translateX(-106%); }
+  57.29% { transform: translateX(-70%); }
   83.33% { transform: translateX(-54%); }
   to { transform: translateX(-15%); }
 }
 
 @keyframes reveal-text-mobile {
   from { transform: translateX(146%); }
-  33.33% { transform: translateX(106%); }
-  62.5% { transform: translateX(70%); }
+  20.83% { transform: translateX(106%); }
+  57.29% { transform: translateX(70%); }
   83.33% { transform: translateX(54%); }
   to { transform: translateX(15%); }
 }
@@ -134,28 +134,28 @@
   left: 61%;
   top: 44%;
   width: clamp(190px, 24vw, 310px);
-  animation: sail-x 10s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: sail-x 8s cubic-bezier(0.37, 0, 0.63, 1) both;
 }
 
 .envelope {
   position: relative;
   animation:
-    sail-weave 10s cubic-bezier(0.37, 0, 0.63, 1) both,
-    dock-settle 2s 10s ease-in-out forwards,
-    bob 3.4s 12s ease-in-out infinite;
+    sail-weave 8s cubic-bezier(0.37, 0, 0.63, 1) both,
+    dock-settle 1.6s 8s ease-in-out forwards,
+    bob 3.4s 9.6s ease-in-out infinite;
 }
 
 @keyframes sail-x {
   from { transform: translateX(-92vw); }
-  40% { transform: translateX(-52vw); }
-  75% { transform: translateX(-16vw); }
+  25% { transform: translateX(-52vw); }
+  68.75% { transform: translateX(-16vw); }
   to { transform: translateX(0vw); }
 }
 
 @keyframes sail-weave {
   from { transform: translateY(-14px) rotate(2deg) scale(0.96); }
-  40% { transform: translateY(22px) rotate(3deg) scale(1.04); }
-  75% { transform: translateY(-10px) rotate(-2.5deg) scale(0.97); }
+  25% { transform: translateY(22px) rotate(3deg) scale(1.04); }
+  68.75% { transform: translateY(-10px) rotate(-2.5deg) scale(0.97); }
   to { transform: translateY(0px) rotate(0deg) scale(1); }
 }
 

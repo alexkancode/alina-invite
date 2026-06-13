@@ -24,15 +24,15 @@ export interface WeaveWaypoint {
 
 export const SAIL_TRACK: TrackWaypoint[] = [
   { offset: 0, xVw: -92 },
-  { offset: 0.4, xVw: -52 },
-  { offset: 0.75, xVw: -16 },
+  { offset: 0.25, xVw: -52 },
+  { offset: 0.6875, xVw: -16 },
   { offset: 1, xVw: 0 }
 ];
 
 export const SAIL_WEAVE: WeaveWaypoint[] = [
   { offset: 0, yPx: -14, rotateDeg: 2, scale: 0.96 },
-  { offset: 0.4, yPx: 22, rotateDeg: 3, scale: 1.04 },
-  { offset: 0.75, yPx: -10, rotateDeg: -2.5, scale: 0.97 },
+  { offset: 0.25, yPx: 22, rotateDeg: 3, scale: 1.04 },
+  { offset: 0.6875, yPx: -10, rotateDeg: -2.5, scale: 0.97 },
   { offset: 1, yPx: 0, rotateDeg: 0, scale: 1 }
 ];
 
@@ -72,7 +72,7 @@ export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, 
   lockVw: REVEAL_LOCK_VW
 }, REVEAL_REST_PERCENT);
 
-export const REVEAL_DURATION_MS = 12000;
+export const REVEAL_DURATION_MS = 9600;
 
 export interface WhipGeometry {
   viewportW: number;
@@ -166,8 +166,8 @@ export const FRY_AMPLITUDE_RANGE = [8, 16] as const;
 export const BOUNCE_STEP_MS = 90;
 export const LEAN_CYCLE_MS = 4000;
 
-const SAIL_MS = 10000;
-const SETTLE_MS = 2000;
+const SAIL_MS = 8000;
+const SETTLE_MS = 1600;
 
 export const SCENE_TIMELINE: SceneTimeline = {
   sailDurationMs: SAIL_MS,
