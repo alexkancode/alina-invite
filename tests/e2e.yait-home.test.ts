@@ -132,7 +132,7 @@ test.describe('yait home hero', () => {
     expect(lines[0].left).toBeLessThan(200);
   });
 
-  test('the reveal edge is a wavy 45-degree slant with a 50px swell', async ({ page }) => {
+  test('the reveal edge is a wavy 45-degree slant with a bold swoop', async ({ page }) => {
     await page.goto('/home');
     const probe = await page.evaluate(() => {
       const mask = document.querySelector('.line-mask:not(.line-mask-top)');
@@ -159,10 +159,10 @@ test.describe('yait home hero', () => {
     const ratio = probe!.slantPx / probe!.heightPx;
     expect(ratio).toBeGreaterThan(0.75);
     expect(ratio).toBeLessThan(1.25);
-    expect(probe!.maxDevPx).toBeGreaterThan(8);
-    expect(probe!.maxDevPx).toBeLessThan(18);
-    expect(probe!.minDevPx).toBeLessThan(-8);
-    expect(probe!.minDevPx).toBeGreaterThan(-18);
+    expect(probe!.maxDevPx).toBeGreaterThan(30);
+    expect(probe!.maxDevPx).toBeLessThan(47);
+    expect(probe!.minDevPx).toBeLessThan(-30);
+    expect(probe!.minDevPx).toBeGreaterThan(-47);
   });
 
   test('the lines reveal as independent entities, top trailing without convergence', async ({ page }) => {

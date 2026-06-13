@@ -95,8 +95,8 @@ export const WAVE_GEOMETRY: WaveGeometry = {
   viewportW: 1280,
   maskH: 185,
   slantPx: 185,
-  amplitudePx: 12.5,
-  periods: 5,
+  amplitudePx: 28,
+  periods: 2,
   samples: 40
 };
 
@@ -135,7 +135,7 @@ export function buildWaveEdgePath(g: WaveGeometry): string {
   return `M -0.5 -0.5 L ${frac(head.x)} -0.5 L ${frac(head.x)} ${frac(head.y)} ${cubics.join(' ')} L ${frac(tail.x)} 1.5 L -0.5 1.5 Z`;
 }
 
-export const WAVE_ROLL_PERIOD_MS = 1000;
+export const WAVE_ROLL_PERIOD_MS = 700;
 
 export const WAVE_ROLL = {
   xBox: Math.round((WAVE_GEOMETRY.slantPx / WAVE_GEOMETRY.viewportW / WAVE_GEOMETRY.periods) * 100000) / 100000,

@@ -102,14 +102,14 @@ describe('WAVE_ROLL', () => {
       yBox: Math.round((1 / g.periods) * 100000) / 100000,
       durationMs: WAVE_ROLL_PERIOD_MS
     });
-    expect(WAVE_ROLL.xBox).toBeCloseTo(0.02891, 5);
-    expect(WAVE_ROLL.yBox).toBe(0.2);
+    expect(WAVE_ROLL.xBox).toBeCloseTo(0.07227, 5);
+    expect(WAVE_ROLL.yBox).toBe(0.5);
     expect('repeatCount' in WAVE_ROLL).toBe(false);
   });
 
-  test('rolls at a readable one wavelength per second so crests travel, not shimmer', () => {
-    expect(WAVE_ROLL_PERIOD_MS).toBe(1000);
-    expect(WAVE_ROLL.durationMs).toBe(1000);
+  test('rolls one broad wavelength every 700ms so the swoop travels, not shimmers', () => {
+    expect(WAVE_ROLL_PERIOD_MS).toBe(700);
+    expect(WAVE_ROLL.durationMs).toBe(700);
   });
 });
 
@@ -119,8 +119,8 @@ describe('WAVE_EDGE_PATH constant', () => {
       viewportW: 1280,
       maskH: 185,
       slantPx: 185,
-      amplitudePx: 12.5,
-      periods: 5,
+      amplitudePx: 28,
+      periods: 2,
       samples: 40
     });
     expect(WAVE_EDGE_PATH).toBe(buildWaveEdgePath(WAVE_GEOMETRY));

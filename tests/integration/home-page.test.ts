@@ -50,8 +50,8 @@ describe('GET /home', () => {
   test('the clip path carries the SMIL roll with the derived vector', () => {
     expect(homeHtml).toContain('<animateTransform');
     expect(homeHtml).toContain('attributeName="transform"');
-    expect(homeHtml).toContain('to="0.02891 0.2"');
-    expect(homeHtml).toContain('dur="1s"');
+    expect(homeHtml).toContain('to="0.07227 0.5"');
+    expect(homeHtml).toContain('dur="0.7s"');
     expect(homeHtml).toContain('repeatCount="indefinite"');
     expect(homeHtml).not.toContain('fill="freeze"');
   });
