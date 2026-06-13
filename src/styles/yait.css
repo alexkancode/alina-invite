@@ -96,7 +96,7 @@
   33.33% { transform: translateX(-91%); }
   62.5% { transform: translateX(-55%); }
   83.33% { transform: translateX(-39%); }
-  to { transform: translateX(0%); }
+  to { transform: translateX(-15%); }
 }
 
 @keyframes reveal-text {
@@ -104,7 +104,7 @@
   33.33% { transform: translateX(91%); }
   62.5% { transform: translateX(55%); }
   83.33% { transform: translateX(39%); }
-  to { transform: translateX(0%); }
+  to { transform: translateX(15%); }
 }
 
 @keyframes reveal-mask-mobile {
@@ -112,7 +112,7 @@
   33.33% { transform: translateX(-106%); }
   62.5% { transform: translateX(-70%); }
   83.33% { transform: translateX(-54%); }
-  to { transform: translateX(0%); }
+  to { transform: translateX(-15%); }
 }
 
 @keyframes reveal-text-mobile {
@@ -120,7 +120,7 @@
   33.33% { transform: translateX(106%); }
   62.5% { transform: translateX(70%); }
   83.33% { transform: translateX(54%); }
-  to { transform: translateX(0%); }
+  to { transform: translateX(15%); }
 }
 
 .headline-line {

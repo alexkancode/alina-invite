@@ -3,9 +3,10 @@ import sharp from 'sharp';
 
 const DOCKED_AFTER_MS = 6600;
 const MIN_ROLL_DELTA_PX = 800;
+const MIN_DOCKED_ROLL_DELTA_PX = 250;
 const ROLL_BURST_FRAMES = 6;
 const ROLL_BURST_STEP_MS = 70;
-const ROLL_FROZEN_AFTER_MS = 8000;
+const ROLL_SETTLED_AFTER_MS = 8000;
 
 async function changedPixels(a: Buffer, b: Buffer): Promise<number> {
   const [ra, rb] = await Promise.all(
@@ -247,15 +248,18 @@ test.describe('yait home hero', () => {
     expect(Buffer.compare(wordA, wordB)).toBe(0);
   });
 
-  test('the roll freezes at rest once the reveal completes', async ({ page }) => {
+  test('the roll keeps traveling on the docked edge after the reveal completes', async ({ page }) => {
     await page.goto('/home');
     await page.evaluate(() => document.fonts.ready);
-    await page.waitForTimeout(ROLL_FROZEN_AFTER_MS);
-    const edgeRegion = { x: 250, y: 280, width: 220, height: 160 };
-    const restA = await page.screenshot({ clip: edgeRegion });
-    await page.waitForTimeout(1000);
-    const restB = await page.screenshot({ clip: edgeRegion });
-    expect(Buffer.compare(restA, restB)).toBe(0);
+    await page.waitForTimeout(ROLL_SETTLED_AFTER_MS);
+    const dockedEdgeRegion = { x: 760, y: 264, width: 200, height: 56 };
+    const frames = [];
+    for (let i = 0; i < ROLL_BURST_FRAMES; i++) {
+      frames.push(await page.screenshot({ clip: dockedEdgeRegion }));
+      if (i < ROLL_BURST_FRAMES - 1) await page.waitForTimeout(ROLL_BURST_STEP_MS);
+    }
+    const deltas = await Promise.all(frames.slice(1).map(f => changedPixels(frames[0], f)));
+    expect(Math.max(...deltas)).toBeGreaterThan(MIN_DOCKED_ROLL_DELTA_PX);
   });
 
   test('reduced motion removes the rolling clip animation entirely', async ({ page }) => {

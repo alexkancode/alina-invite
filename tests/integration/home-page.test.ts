@@ -51,10 +51,9 @@ describe('GET /home', () => {
     expect(homeHtml).toContain('<animateTransform');
     expect(homeHtml).toContain('attributeName="transform"');
     expect(homeHtml).toContain('to="0.02891 0.2"');
-    expect(homeHtml).toContain('dur="0.333s"');
-    expect(homeHtml).toContain('repeatCount="20"');
-    expect(homeHtml).toContain('fill="freeze"');
-    expect(homeHtml).not.toContain('repeatCount="indefinite"');
+    expect(homeHtml).toContain('dur="1s"');
+    expect(homeHtml).toContain('repeatCount="indefinite"');
+    expect(homeHtml).not.toContain('fill="freeze"');
   });
 
   test('reduced-motion users get the roll removed by the inline script', () => {

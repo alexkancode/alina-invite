@@ -9,6 +9,7 @@ import {
   REVEAL_EDGE,
   REVEAL_EDGE_MOBILE,
   REVEAL_LOCK_VW,
+  REVEAL_REST_PERCENT,
   REVEAL_SAIL_SHARE,
   REVEAL_STAGGER_PX,
   REVEAL_TOP_DELAY_MS,
@@ -96,7 +97,7 @@ const hulls = [
 describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }) => {
   test('derives from the track and the stern lock', () => {
     expect(REVEAL_LOCK_VW).toBe(0);
-    expect(edge).toEqual(buildRevealEdge(SAIL_TRACK, { leftPercent: left, lockVw: REVEAL_LOCK_VW }));
+    expect(edge).toEqual(buildRevealEdge(SAIL_TRACK, { leftPercent: left, lockVw: REVEAL_LOCK_VW }, REVEAL_REST_PERCENT));
   });
 
   test('track offsets are rescaled into the sail share, then the settle finishes', () => {
@@ -104,9 +105,10 @@ describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }
     expect(edge.map(wp => wp.offset)).toEqual([...expected, 1]);
   });
 
-  test('nothing reveals until the stern enters the screen', () => {
+  test('nothing reveals until the stern enters the screen, and the edge rests docked over the text', () => {
     expect(edge[0].percent).toBeLessThanOrEqual(-100);
-    expect(edge[edge.length - 1].percent).toBe(0);
+    expect(edge[edge.length - 1].percent).toBe(REVEAL_REST_PERCENT);
+    expect(REVEAL_REST_PERCENT).toBeLessThan(0);
   });
 
   test('the edge only ever advances', () => {

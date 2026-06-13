@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildWaveEdgePath, REVEAL_DURATION_MS, REVEAL_TOP_DELAY_MS, WAVE_EDGE_PATH, WAVE_GEOMETRY, WAVE_ROLL, WAVE_ROLL_PERIOD_MS } from '../../../src/lib/yait/heroScene';
+import { buildWaveEdgePath, WAVE_EDGE_PATH, WAVE_GEOMETRY, WAVE_ROLL, WAVE_ROLL_PERIOD_MS } from '../../../src/lib/yait/heroScene';
 
 interface Cubic {
   c1: { x: number; y: number };
@@ -96,31 +96,20 @@ describe('buildWaveEdgePath', () => {
 });
 
 describe('WAVE_ROLL', () => {
-  test('one wavelength per period, in clip box units', () => {
+  test('one wavelength per period, in clip box units, with no freeze', () => {
     expect(WAVE_ROLL).toEqual({
       xBox: Math.round((g.slantPx / g.viewportW / g.periods) * 100000) / 100000,
       yBox: Math.round((1 / g.periods) * 100000) / 100000,
-      durationMs: WAVE_ROLL_PERIOD_MS,
-      repeatCount: Math.ceil((REVEAL_DURATION_MS + REVEAL_TOP_DELAY_MS) / WAVE_ROLL_PERIOD_MS)
+      durationMs: WAVE_ROLL_PERIOD_MS
     });
     expect(WAVE_ROLL.xBox).toBeCloseTo(0.02891, 5);
     expect(WAVE_ROLL.yBox).toBe(0.2);
+    expect('repeatCount' in WAVE_ROLL).toBe(false);
   });
 
-  test('rolls one wavelength every third of a second', () => {
-    expect(WAVE_ROLL_PERIOD_MS).toBe(333);
-    expect(WAVE_ROLL.durationMs).toBe(333);
-  });
-
-  test('freezes on a whole-wavelength seam that covers the entire reveal', () => {
-    expect(WAVE_ROLL.repeatCount).toBe(20);
-    expect(Number.isInteger(WAVE_ROLL.repeatCount)).toBe(true);
-    expect(WAVE_ROLL.repeatCount * WAVE_ROLL_PERIOD_MS).toBeGreaterThanOrEqual(
-      REVEAL_DURATION_MS + REVEAL_TOP_DELAY_MS
-    );
-    expect((WAVE_ROLL.repeatCount - 1) * WAVE_ROLL_PERIOD_MS).toBeLessThan(
-      REVEAL_DURATION_MS + REVEAL_TOP_DELAY_MS
-    );
+  test('rolls at a readable one wavelength per second so crests travel, not shimmer', () => {
+    expect(WAVE_ROLL_PERIOD_MS).toBe(1000);
+    expect(WAVE_ROLL.durationMs).toBe(1000);
   });
 });
 

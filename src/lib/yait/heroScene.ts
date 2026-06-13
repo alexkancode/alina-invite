@@ -52,24 +52,25 @@ export const ENVELOPE_LEFT_PERCENT_MOBILE = 46;
 export const ENVELOPE_WIDTH_VW_MOBILE = 52;
 export const REVEAL_LOCK_VW = 0;
 export const REVEAL_SAIL_SHARE = 5 / 6;
+export const REVEAL_REST_PERCENT = -15;
 
-export function buildRevealEdge(track: TrackWaypoint[], hull: HullGeometry): RevealWaypoint[] {
+export function buildRevealEdge(track: TrackWaypoint[], hull: HullGeometry, restPercent: number): RevealWaypoint[] {
   const sailing = track.map(wp => ({
     offset: Math.round(wp.offset * REVEAL_SAIL_SHARE * 10000) / 10000,
     percent: wp.xVw + hull.leftPercent + hull.lockVw - 100
   }));
-  return [...sailing, { offset: 1, percent: 0 }];
+  return [...sailing, { offset: 1, percent: restPercent }];
 }
 
 export const REVEAL_EDGE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
   leftPercent: ENVELOPE_LEFT_PERCENT,
   lockVw: REVEAL_LOCK_VW
-});
+}, REVEAL_REST_PERCENT);
 
 export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
   leftPercent: ENVELOPE_LEFT_PERCENT_MOBILE,
   lockVw: REVEAL_LOCK_VW
-});
+}, REVEAL_REST_PERCENT);
 
 export const REVEAL_STAGGER_PX = 150;
 export const REVEAL_DURATION_MS = 6000;
@@ -134,13 +135,12 @@ export function buildWaveEdgePath(g: WaveGeometry): string {
   return `M -0.5 -0.5 L ${frac(head.x)} -0.5 L ${frac(head.x)} ${frac(head.y)} ${cubics.join(' ')} L ${frac(tail.x)} 1.5 L -0.5 1.5 Z`;
 }
 
-export const WAVE_ROLL_PERIOD_MS = 333;
+export const WAVE_ROLL_PERIOD_MS = 1000;
 
 export const WAVE_ROLL = {
   xBox: Math.round((WAVE_GEOMETRY.slantPx / WAVE_GEOMETRY.viewportW / WAVE_GEOMETRY.periods) * 100000) / 100000,
   yBox: Math.round((1 / WAVE_GEOMETRY.periods) * 100000) / 100000,
-  durationMs: WAVE_ROLL_PERIOD_MS,
-  repeatCount: Math.ceil((REVEAL_DURATION_MS + REVEAL_TOP_DELAY_MS) / WAVE_ROLL_PERIOD_MS)
+  durationMs: WAVE_ROLL_PERIOD_MS
 };
 
 export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_GEOMETRY);
