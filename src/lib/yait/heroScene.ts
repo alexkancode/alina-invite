@@ -134,10 +134,13 @@ export function buildWaveEdgePath(g: WaveGeometry): string {
   return `M -0.5 -0.5 L ${frac(head.x)} -0.5 L ${frac(head.x)} ${frac(head.y)} ${cubics.join(' ')} L ${frac(tail.x)} 1.5 L -0.5 1.5 Z`;
 }
 
+export const WAVE_ROLL_PERIOD_MS = 1000;
+
 export const WAVE_ROLL = {
   xBox: Math.round((WAVE_GEOMETRY.slantPx / WAVE_GEOMETRY.viewportW / WAVE_GEOMETRY.periods) * 100000) / 100000,
   yBox: Math.round((1 / WAVE_GEOMETRY.periods) * 100000) / 100000,
-  durationMs: 4000
+  durationMs: WAVE_ROLL_PERIOD_MS,
+  repeatCount: Math.ceil((REVEAL_DURATION_MS + REVEAL_TOP_DELAY_MS) / WAVE_ROLL_PERIOD_MS)
 };
 
 export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_GEOMETRY);

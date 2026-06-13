@@ -1,6 +1,24 @@
 import { expect, test } from '@playwright/test';
+import sharp from 'sharp';
 
 const DOCKED_AFTER_MS = 6600;
+const MIN_ROLL_DELTA_PX = 800;
+const ROLL_FROZEN_AFTER_MS = 8000;
+
+async function changedPixels(a: Buffer, b: Buffer): Promise<number> {
+  const [ra, rb] = await Promise.all(
+    [a, b].map(buf => sharp(buf).raw().toBuffer({ resolveWithObject: true }))
+  );
+  const px = ra.data;
+  const py = rb.data;
+  const ch = ra.info.channels;
+  let count = 0;
+  for (let i = 0; i < px.length; i += ch) {
+    const delta = Math.abs(px[i] - py[i]) + Math.abs(px[i + 1] - py[i + 1]) + Math.abs(px[i + 2] - py[i + 2]);
+    if (delta > 30) count++;
+  }
+  return count;
+}
 
 test.describe('yait home hero', () => {
   test('the bay scene and envelope render with the full crowd', async ({ page }) => {
@@ -204,7 +222,7 @@ test.describe('yait home hero', () => {
     expect(probe!.feetBaseline - 16).toBeGreaterThan(probe!.vDip);
   });
 
-  test('the wave rolls in rendered pixels while revealed text stays byte-stable', async ({ page }) => {
+  test('the wave rolls perceptibly while revealed text stays byte-stable', async ({ page }) => {
     await page.goto('/home');
     await page.evaluate(() => document.fonts.ready);
     await page.evaluate(() => {
@@ -217,11 +235,22 @@ test.describe('yait home hero', () => {
     const wordRegion = { x: 140, y: 300, width: 70, height: 120 };
     const edgeA = await page.screenshot({ clip: edgeRegion });
     const wordA = await page.screenshot({ clip: wordRegion });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(500);
     const edgeB = await page.screenshot({ clip: edgeRegion });
     const wordB = await page.screenshot({ clip: wordRegion });
-    expect(Buffer.compare(edgeA, edgeB)).not.toBe(0);
+    expect(await changedPixels(edgeA, edgeB)).toBeGreaterThan(MIN_ROLL_DELTA_PX);
     expect(Buffer.compare(wordA, wordB)).toBe(0);
+  });
+
+  test('the roll freezes at rest once the reveal completes', async ({ page }) => {
+    await page.goto('/home');
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(ROLL_FROZEN_AFTER_MS);
+    const edgeRegion = { x: 250, y: 280, width: 220, height: 160 };
+    const restA = await page.screenshot({ clip: edgeRegion });
+    await page.waitForTimeout(1000);
+    const restB = await page.screenshot({ clip: edgeRegion });
+    expect(Buffer.compare(restA, restB)).toBe(0);
   });
 
   test('reduced motion removes the rolling clip animation entirely', async ({ page }) => {

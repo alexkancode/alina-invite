@@ -23,7 +23,8 @@ const fryStyle = (fry: (typeof fries)[number]) =>
             from="0 0"
             to={`${WAVE_ROLL.xBox} ${WAVE_ROLL.yBox}`}
             dur={`${WAVE_ROLL.durationMs / 1000}s`}
-            repeatCount="indefinite"></animateTransform>
+            repeatCount={WAVE_ROLL.repeatCount}
+            fill="freeze"></animateTransform>
         </path>
       </clipPath>
     </defs>
