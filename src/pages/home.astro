@@ -23,7 +23,7 @@ export const prerender = true;
       <JoinClubCta />
     </main>
     <script is:inline>
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelectorAll('animateTransform').forEach(el => el.remove());
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelectorAll('animate, animateTransform').forEach(el => el.remove());
     </script>
   </body>
 </html>

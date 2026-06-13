@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'vitest';
-import { FRY_COUNT, WAVE_EDGE_PATH } from '../../src/lib/yait/heroScene';
+import { FRY_COUNT, WHIP_EDGE_FRAMES } from '../../src/lib/yait/heroScene';
 
 const BASE = 'http://localhost:4321';
 
@@ -42,23 +42,23 @@ describe('GET /home', () => {
     expect(homeHtml).toContain('Shrikhand');
   });
 
-  test('ships the generated wave clip', () => {
+  test('ships the generated whip clip', () => {
     expect(homeHtml).toContain('id="yait-wave-clip"');
-    expect(homeHtml).toContain(WAVE_EDGE_PATH.slice(0, 60));
+    expect(homeHtml).toContain(WHIP_EDGE_FRAMES[0].slice(0, 60));
   });
 
-  test('the clip path carries the SMIL roll with the derived vector', () => {
-    expect(homeHtml).toContain('<animateTransform');
-    expect(homeHtml).toContain('attributeName="transform"');
-    expect(homeHtml).toContain('to="0.07227 0.5"');
-    expect(homeHtml).toContain('dur="0.7s"');
+  test('the clip path morphs its d through the whip frames', () => {
+    expect(homeHtml).toContain('<animate');
+    expect(homeHtml).toContain('attributeName="d"');
+    expect(homeHtml).toContain('dur="1.4s"');
     expect(homeHtml).toContain('repeatCount="indefinite"');
+    expect(homeHtml).not.toContain('<animateTransform');
     expect(homeHtml).not.toContain('fill="freeze"');
   });
 
-  test('reduced-motion users get the roll removed by the inline script', () => {
+  test('reduced-motion users get the morph removed by the inline script', () => {
     expect(homeHtml).toContain('prefers-reduced-motion');
-    expect(homeHtml).toContain('animateTransform');
+    expect(homeHtml).toContain("querySelectorAll('animate, animateTransform')");
   });
 
   test('the envelope is open with one broken seal on the flap', () => {

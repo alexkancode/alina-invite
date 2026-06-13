@@ -82,46 +82,50 @@ export function revealDelayMs(edge: RevealWaypoint[], staggerPx: number, viewpor
 
 export const REVEAL_TOP_DELAY_MS = revealDelayMs(REVEAL_EDGE, REVEAL_STAGGER_PX, 1280, REVEAL_DURATION_MS);
 
-export interface WaveGeometry {
+export interface WhipGeometry {
   viewportW: number;
   maskH: number;
   slantPx: number;
   amplitudePx: number;
-  periods: number;
+  widthFrac: number;
   samples: number;
 }
 
-export const WAVE_GEOMETRY: WaveGeometry = {
+export const WHIP_GEOMETRY: WhipGeometry = {
   viewportW: 1280,
   maskH: 185,
   slantPx: 185,
-  amplitudePx: 28,
-  periods: 2,
-  samples: 40
+  amplitudePx: 34,
+  widthFrac: 0.09,
+  samples: 28
 };
+
+export const WHIP_CENTER_MIN = 0.18;
+export const WHIP_CENTER_MAX = 0.82;
+export const WHIP_HALF_FRAMES = 8;
+export const WHIP_DURATION_MS = 1400;
 
 const frac = (n: number) => Math.round(n * 100000) / 100000;
 
-export function buildWaveEdgePath(g: WaveGeometry): string {
+export function buildWhipEdgePath(g: WhipGeometry, center: number): string {
   const edgeLen = Math.hypot(g.slantPx, g.maskH);
   const normal = { x: -g.maskH / edgeLen, y: g.slantPx / edgeLen };
-  const omega = 2 * Math.PI * g.periods;
   const x0Px = g.viewportW - g.slantPx;
+  const offset = (s: number) => g.amplitudePx * Math.exp(-(((s - center) / g.widthFrac) ** 2));
+  const offsetD = (s: number) => offset(s) * (-2 * (s - center) / (g.widthFrac * g.widthFrac));
   const pointAt = (s: number) => ({
-    x: (x0Px + g.slantPx * s + g.amplitudePx * Math.sin(omega * s) * normal.x) / g.viewportW,
-    y: (g.maskH * s + g.amplitudePx * Math.sin(omega * s) * normal.y) / g.maskH
+    x: (x0Px + g.slantPx * s + offset(s) * normal.x) / g.viewportW,
+    y: (g.maskH * s + offset(s) * normal.y) / g.maskH
   });
   const tangentAt = (s: number) => ({
-    x: (g.slantPx + g.amplitudePx * omega * Math.cos(omega * s) * normal.x) / g.viewportW,
-    y: (g.maskH + g.amplitudePx * omega * Math.cos(omega * s) * normal.y) / g.maskH
+    x: (g.slantPx + offsetD(s) * normal.x) / g.viewportW,
+    y: (g.maskH + offsetD(s) * normal.y) / g.maskH
   });
-  const margin = 1 / g.periods;
-  const span = 1 + 2 * margin;
-  const segs = Math.round(g.samples * span);
-  const ds = span / segs;
+  const segs = g.samples;
+  const ds = 1 / segs;
   const cubics = Array.from({ length: segs }, (_, i) => {
-    const s0 = -margin + i * ds;
-    const s1 = -margin + (i + 1) * ds;
+    const s0 = i * ds;
+    const s1 = (i + 1) * ds;
     const p0 = pointAt(s0);
     const p1 = pointAt(s1);
     const d0 = tangentAt(s0);
@@ -130,20 +134,23 @@ export function buildWaveEdgePath(g: WaveGeometry): string {
     const c2 = { x: p1.x - (ds / 3) * d1.x, y: p1.y - (ds / 3) * d1.y };
     return `C ${frac(c1.x)} ${frac(c1.y)} ${frac(c2.x)} ${frac(c2.y)} ${frac(p1.x)} ${frac(p1.y)}`;
   });
-  const head = pointAt(-margin);
-  const tail = pointAt(1 + margin);
+  const head = pointAt(0);
+  const tail = pointAt(1);
   return `M -0.5 -0.5 L ${frac(head.x)} -0.5 L ${frac(head.x)} ${frac(head.y)} ${cubics.join(' ')} L ${frac(tail.x)} 1.5 L -0.5 1.5 Z`;
 }
 
-export const WAVE_ROLL_PERIOD_MS = 700;
+export function whipCenters(min: number, max: number, half: number): number[] {
+  return Array.from({ length: 2 * half + 1 }, (_, i) => {
+    const phase = i / half;
+    const tri = phase <= 1 ? phase : 2 - phase;
+    return Math.round((min + (max - min) * tri) * 100000) / 100000;
+  });
+}
 
-export const WAVE_ROLL = {
-  xBox: Math.round((WAVE_GEOMETRY.slantPx / WAVE_GEOMETRY.viewportW / WAVE_GEOMETRY.periods) * 100000) / 100000,
-  yBox: Math.round((1 / WAVE_GEOMETRY.periods) * 100000) / 100000,
-  durationMs: WAVE_ROLL_PERIOD_MS
-};
+export const WHIP_EDGE_FRAMES: string[] = whipCenters(WHIP_CENTER_MIN, WHIP_CENTER_MAX, WHIP_HALF_FRAMES)
+  .map(c => buildWhipEdgePath(WHIP_GEOMETRY, c));
 
-export const WAVE_EDGE_PATH: string = buildWaveEdgePath(WAVE_GEOMETRY);
+export const WHIP = { durationMs: WHIP_DURATION_MS };
 
 export interface SceneTimeline {
   sailDurationMs: number;

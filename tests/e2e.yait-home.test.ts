@@ -132,7 +132,7 @@ test.describe('yait home hero', () => {
     expect(lines[0].left).toBeLessThan(200);
   });
 
-  test('the reveal edge is a wavy 45-degree slant with a bold swoop', async ({ page }) => {
+  test('the reveal edge is a 45-degree slant carrying a single whip bump', async ({ page }) => {
     await page.goto('/home');
     const probe = await page.evaluate(() => {
       const mask = document.querySelector('.line-mask:not(.line-mask-top)');
@@ -144,25 +144,23 @@ test.describe('yait home hero', () => {
         .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
         .filter(p => p.y >= -0.001 && p.y <= 1.001);
       const x0 = pts[0].x;
-      const slantFrac = pts[pts.length - 1].x - x0;
-      const deviations = pts.map(p => (p.x - (x0 + slantFrac * p.y)));
+      const xN = pts[pts.length - 1].x;
+      const slantFrac = xN - x0;
+      const devs = pts.map(p => (p.x - (x0 + slantFrac * (p.y - pts[0].y) / (pts[pts.length - 1].y - pts[0].y))) * rect.width);
+      const lobes = devs.filter((v, i) => i > 0 && i < devs.length - 1 && Math.abs(v) > 12 && Math.abs(v) >= Math.abs(devs[i - 1]) && Math.abs(v) >= Math.abs(devs[i + 1])).length;
       return {
         clip: getComputedStyle(mask).clipPath,
-        slantPx: slantFrac * rect.width,
-        heightPx: rect.height,
-        maxDevPx: Math.max(...deviations) * rect.width,
-        minDevPx: Math.min(...deviations) * rect.width
+        ratio: (slantFrac * rect.width) / rect.height,
+        maxAbsDevPx: Math.max(...devs.map(Math.abs)),
+        lobes
       };
     });
     expect(probe).not.toBeNull();
     expect(probe!.clip).toContain('yait-wave-clip');
-    const ratio = probe!.slantPx / probe!.heightPx;
-    expect(ratio).toBeGreaterThan(0.75);
-    expect(ratio).toBeLessThan(1.25);
-    expect(probe!.maxDevPx).toBeGreaterThan(30);
-    expect(probe!.maxDevPx).toBeLessThan(47);
-    expect(probe!.minDevPx).toBeLessThan(-30);
-    expect(probe!.minDevPx).toBeGreaterThan(-47);
+    expect(probe!.ratio).toBeGreaterThan(0.75);
+    expect(probe!.ratio).toBeLessThan(1.25);
+    expect(probe!.maxAbsDevPx).toBeGreaterThan(20);
+    expect(probe!.lobes).toBe(1);
   });
 
   test('the lines reveal as independent entities, top trailing without convergence', async ({ page }) => {
@@ -262,9 +260,10 @@ test.describe('yait home hero', () => {
     expect(Math.max(...deltas)).toBeGreaterThan(MIN_DOCKED_ROLL_DELTA_PX);
   });
 
-  test('reduced motion removes the rolling clip animation entirely', async ({ page }) => {
+  test('reduced motion removes the morphing clip animation entirely', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/home');
+    await expect(page.locator('animate')).toHaveCount(0);
     await expect(page.locator('animateTransform')).toHaveCount(0);
   });
 
