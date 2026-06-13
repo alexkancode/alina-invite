@@ -96,14 +96,14 @@ export const WHIP_GEOMETRY: WhipGeometry = {
   maskH: 185,
   slantPx: 185,
   amplitudePx: 34,
-  widthFrac: 0.09,
+  widthFrac: 0.16667,
   samples: 28
 };
 
-export const WHIP_CENTER_MIN = 0.18;
-export const WHIP_CENTER_MAX = 0.82;
-export const WHIP_HALF_FRAMES = 8;
-export const WHIP_DURATION_MS = 1400;
+export const WHIP_CENTER_MIN = 0;
+export const WHIP_CENTER_MAX = 1;
+export const WHIP_HALF_FRAMES = 12;
+export const WHIP_DURATION_MS = 3333;
 
 const frac = (n: number) => Math.round(n * 100000) / 100000;
 
@@ -111,8 +111,10 @@ export function buildWhipEdgePath(g: WhipGeometry, center: number): string {
   const edgeLen = Math.hypot(g.slantPx, g.maskH);
   const normal = { x: -g.maskH / edgeLen, y: g.slantPx / edgeLen };
   const x0Px = g.viewportW - g.slantPx;
-  const offset = (s: number) => g.amplitudePx * Math.exp(-(((s - center) / g.widthFrac) ** 2));
-  const offsetD = (s: number) => offset(s) * (-2 * (s - center) / (g.widthFrac * g.widthFrac));
+  const gaussian = (s: number) => Math.exp(-(((s - center) / g.widthFrac) ** 2));
+  const offset = (s: number) => g.amplitudePx * Math.sin(Math.PI * s) * gaussian(s);
+  const offsetD = (s: number) =>
+    g.amplitudePx * gaussian(s) * (Math.PI * Math.cos(Math.PI * s) - (2 * Math.sin(Math.PI * s) * (s - center)) / (g.widthFrac * g.widthFrac));
   const pointAt = (s: number) => ({
     x: (x0Px + g.slantPx * s + offset(s) * normal.x) / g.viewportW,
     y: (g.maskH * s + offset(s) * normal.y) / g.maskH

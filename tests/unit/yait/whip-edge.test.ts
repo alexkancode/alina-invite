@@ -53,7 +53,7 @@ describe('WHIP_GEOMETRY', () => {
       maskH: 185,
       slantPx: 185,
       amplitudePx: 34,
-      widthFrac: 0.09,
+      widthFrac: 0.16667,
       samples: 28
     });
     expect(WHIP_GEOMETRY.slantPx).toBe(WHIP_GEOMETRY.maskH);
@@ -140,7 +140,7 @@ describe('WHIP_EDGE_FRAMES', () => {
 });
 
 describe('WHIP timing', () => {
-  test('one full down-and-back crack every 1400ms', () => {
-    expect(WHIP.durationMs).toBe(1400);
+  test('one full down-and-back crack every 3333ms (gallery cadence)', () => {
+    expect(WHIP.durationMs).toBe(3333);
   });
 });

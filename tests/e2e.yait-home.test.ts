@@ -130,35 +130,35 @@ test.describe('yait home hero', () => {
     expect(lines[0].left).toBeLessThan(200);
   });
 
-  test('the reveal edge is a 45-degree slant carrying a single whip bump', async ({ page }) => {
+  test('the reveal edge clips through a 45-degree slant, and a mid frame carries one whip bump', async ({ page }) => {
     await page.goto('/home');
     const probe = await page.evaluate(() => {
       const mask = document.querySelector('.line-mask:not(.line-mask-top)');
-      const wave = document.querySelector('#yait-wave-clip path');
-      if (!mask || !wave) return null;
+      const morph = document.querySelector('#yait-wave-clip animate');
+      if (!mask || !morph) return null;
       const rect = mask.getBoundingClientRect();
-      const d = wave.getAttribute('d') ?? '';
-      const pts = [...d.matchAll(/C (?:-?[\d.]+ ){4}(-?[\d.]+) (-?[\d.]+)/g)]
-        .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
-        .filter(p => p.y >= -0.001 && p.y <= 1.001);
-      const x0 = pts[0].x;
-      const xN = pts[pts.length - 1].x;
-      const slantFrac = xN - x0;
-      const devs = pts.map(p => (p.x - (x0 + slantFrac * (p.y - pts[0].y) / (pts[pts.length - 1].y - pts[0].y))) * rect.width);
-      const lobes = devs.filter((v, i) => i > 0 && i < devs.length - 1 && Math.abs(v) > 12 && Math.abs(v) >= Math.abs(devs[i - 1]) && Math.abs(v) >= Math.abs(devs[i + 1])).length;
-      return {
-        clip: getComputedStyle(mask).clipPath,
-        ratio: (slantFrac * rect.width) / rect.height,
-        maxAbsDevPx: Math.max(...devs.map(Math.abs)),
-        lobes
+      const frames = (morph.getAttribute('values') ?? '').split(';');
+      const parse = (d: string) => {
+        const pts = [...d.matchAll(/C (?:-?[\d.]+ ){4}(-?[\d.]+) (-?[\d.]+)/g)]
+          .map(m => ({ x: Number(m[1]), y: Number(m[2]) }))
+          .filter(p => p.y >= -0.001 && p.y <= 1.001);
+        const x0 = pts[0].x;
+        const slantFrac = pts[pts.length - 1].x - x0;
+        const devs = pts.map(p => (p.x - (x0 + slantFrac * p.y)) * rect.width);
+        const lobes = devs.filter((v, i) => i > 0 && i < devs.length - 1 && Math.abs(v) > 12 && Math.abs(v) >= Math.abs(devs[i - 1]) && Math.abs(v) >= Math.abs(devs[i + 1])).length;
+        return { slantPx: slantFrac * rect.width, height: rect.height, maxAbsDevPx: Math.max(...devs.map(Math.abs)), lobes };
       };
+      const mid = parse(frames[Math.floor(frames.length / 4)]);
+      return { clip: getComputedStyle(mask).clipPath, frameCount: frames.length, mid };
     });
     expect(probe).not.toBeNull();
     expect(probe!.clip).toContain('yait-wave-clip');
-    expect(probe!.ratio).toBeGreaterThan(0.75);
-    expect(probe!.ratio).toBeLessThan(1.25);
-    expect(probe!.maxAbsDevPx).toBeGreaterThan(20);
-    expect(probe!.lobes).toBe(1);
+    expect(probe!.frameCount).toBe(25);
+    const ratio = probe!.mid.slantPx / probe!.mid.height;
+    expect(ratio).toBeGreaterThan(0.75);
+    expect(ratio).toBeLessThan(1.25);
+    expect(probe!.mid.maxAbsDevPx).toBeGreaterThan(20);
+    expect(probe!.mid.lobes).toBe(1);
   });
 
   test('the lines reveal as independent entities, top trailing without convergence', async ({ page }) => {
