@@ -60,14 +60,22 @@ describe('sail keyframes match the three-beat spec', () => {
     }
   });
 
-  test('all layers ride the easeInOutSine curve, reveals spanning sail plus settle', () => {
-    expect(css).toMatch(/sail-x 8s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/sail-weave 8s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-mask 9\.6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
-    expect(css).toMatch(/reveal-text 9\.6s cubic-bezier\(0\.37, 0, 0\.63, 1\) both/);
+  test('layers flow linearly through the beats and ease out only into the dock', () => {
+    expect(css).toMatch(/sail-x 8s linear both/);
+    expect(css).toMatch(/sail-weave 8s linear both/);
+    expect(css).toMatch(/reveal-mask 9\.6s linear both/);
+    expect(css).toMatch(/reveal-text 9\.6s linear both/);
     expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
     expect(css).toMatch(/animation-name: reveal-text-mobile;/);
     expect(css).not.toMatch(/reveal-mask-top|reveal-text-top/);
+    expect(css).not.toMatch(/cubic-bezier\(0\.37, 0, 0\.63, 1\)/);
+  });
+
+  test('only the final dock segment eases out (no per-beat stops)', () => {
+    const dockEase = /animation-timing-function: cubic-bezier\(0\.61, 1, 0\.88, 1\);/g;
+    expect((css.match(dockEase) ?? []).length).toBe(6);
+    expect(keyframeBlock('sail-x')).toMatch(/68\.75% \{[\s\S]*?animation-timing-function: cubic-bezier\(0\.61, 1, 0\.88, 1\);/);
+    expect(keyframeBlock('reveal-mask')).toMatch(/83\.33% \{[\s\S]*?animation-timing-function: cubic-bezier\(0\.61, 1, 0\.88, 1\);/);
   });
 
   test('mobile scales the tall fries back into proportion', () => {

@@ -74,21 +74,21 @@
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
-  animation: reveal-text 9.6s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-text 9.6s linear both;
 }
 
 .reveal-window {
   display: block;
   overflow: hidden;
   clip-path: url(#yait-wave-clip);
-  animation: reveal-mask 9.6s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: reveal-mask 9.6s linear both;
 }
 
 @keyframes reveal-mask {
   from { transform: translateX(-131%); }
   20.83% { transform: translateX(-91%); }
   57.29% { transform: translateX(-55%); }
-  83.33% { transform: translateX(-39%); }
+  83.33% { transform: translateX(-39%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
   to { transform: translateX(-15%); }
 }
 
@@ -96,7 +96,7 @@
   from { transform: translateX(131%); }
   20.83% { transform: translateX(91%); }
   57.29% { transform: translateX(55%); }
-  83.33% { transform: translateX(39%); }
+  83.33% { transform: translateX(39%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
   to { transform: translateX(15%); }
 }
 
@@ -104,7 +104,7 @@
   from { transform: translateX(-146%); }
   20.83% { transform: translateX(-106%); }
   57.29% { transform: translateX(-70%); }
-  83.33% { transform: translateX(-54%); }
+  83.33% { transform: translateX(-54%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
   to { transform: translateX(-15%); }
 }
 
@@ -112,7 +112,7 @@
   from { transform: translateX(146%); }
   20.83% { transform: translateX(106%); }
   57.29% { transform: translateX(70%); }
-  83.33% { transform: translateX(54%); }
+  83.33% { transform: translateX(54%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
   to { transform: translateX(15%); }
 }
 
@@ -134,13 +134,13 @@
   left: 61%;
   top: 44%;
   width: clamp(190px, 24vw, 310px);
-  animation: sail-x 8s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation: sail-x 8s linear both;
 }
 
 .envelope {
   position: relative;
   animation:
-    sail-weave 8s cubic-bezier(0.37, 0, 0.63, 1) both,
+    sail-weave 8s linear both,
     dock-settle 1.6s 8s ease-in-out forwards,
     bob 3.4s 9.6s ease-in-out infinite;
 }
@@ -148,14 +148,14 @@
 @keyframes sail-x {
   from { transform: translateX(-92vw); }
   25% { transform: translateX(-52vw); }
-  68.75% { transform: translateX(-16vw); }
+  68.75% { transform: translateX(-16vw); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
   to { transform: translateX(0vw); }
 }
 
 @keyframes sail-weave {
   from { transform: translateY(-14px) rotate(2deg) scale(0.96); }
   25% { transform: translateY(22px) rotate(3deg) scale(1.04); }
-  68.75% { transform: translateY(-10px) rotate(-2.5deg) scale(0.97); }
+  68.75% { transform: translateY(-10px) rotate(-2.5deg) scale(0.97); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
   to { transform: translateY(0px) rotate(0deg) scale(1); }
 }
 

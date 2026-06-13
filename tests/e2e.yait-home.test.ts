@@ -5,6 +5,7 @@ const DOCKED_AFTER_MS = 10500;
 const MIN_ROLL_DELTA_PX = 800;
 const ROLL_BURST_FRAMES = 7;
 const ROLL_BURST_STEP_MS = 220;
+const MIN_BEAT_FLOW_PX = 5;
 
 async function changedPixels(a: Buffer, b: Buffer): Promise<number> {
   const [ra, rb] = await Promise.all(
@@ -84,6 +85,22 @@ test.describe('yait home hero', () => {
     expect(parts).not.toBeNull();
     const translateX = Number(parts![1].split(',')[4]);
     expect(translateX).toBeLessThan(-300);
+  });
+
+  test('the boat keeps moving through the inner beat (no pause)', async ({ page }) => {
+    await page.goto('/home');
+    const tx = (t: number) => page.evaluate((time) => {
+      const el = document.querySelector('[data-testid="envelope"]');
+      for (const a of el!.getAnimations()) {
+        a.pause();
+        a.currentTime = time;
+      }
+      const m = getComputedStyle(el!).transform.match(/matrix\(([^)]+)\)/);
+      return Number(m![1].split(',')[4]);
+    }, t);
+    const atBeat = await tx(2000);
+    const justAfter = await tx(2120);
+    expect(Math.abs(justAfter - atBeat)).toBeGreaterThan(MIN_BEAT_FLOW_PX);
   });
 
   test('the reveal edge sits at the stern, never ahead of it', async ({ page }) => {
