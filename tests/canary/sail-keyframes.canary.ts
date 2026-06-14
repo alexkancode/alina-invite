@@ -90,6 +90,13 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.envelope-pivot/);
   });
 
+  test('the sunset clouds drift, bob and breathe, and rest under reduced motion', () => {
+    expect(css).toMatch(/@keyframes cloud-drift \{[\s\S]*?transform: translateX\(var\(--sway\)\);/);
+    expect(css).toMatch(/@keyframes cloud-bob \{[\s\S]*?transform: translateY\(-8px\);/);
+    expect(css).toMatch(/@keyframes cloud-breathe \{[\s\S]*?opacity: 1;/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud,[\s\S]*?\.cloud-inner/);
+  });
+
   test('mobile scales the tall fries back into proportion', () => {
     expect(css).toMatch(/\.fry \{\s*height: calc\(var\(--fry-h\) \* 0\.8\);\s*\}/);
   });

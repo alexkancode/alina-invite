@@ -207,3 +207,51 @@ export function buildFryCrowd(count: number, seed: number): FryConfig[] {
     leanDelayMs: -Math.round(rand() * (LEAN_CYCLE_MS - 1))
   }));
 }
+
+export interface CloudShape {
+  ellipses: { cx: number; cy: number; rx: number; ry: number }[];
+  base: { x: number; y: number; width: number; height: number };
+}
+
+export interface CloudSpec {
+  cx: number;
+  baseY: number;
+  scale: number;
+  seed: number;
+}
+
+export interface CloudLayout {
+  id: number;
+  spec: CloudSpec;
+  opacity: number;
+  glow: boolean;
+}
+
+const CLOUD_BLUEPRINT = [
+  { dx: 0, rx: 58, ry: 40 },
+  { dx: -54, rx: 40, ry: 30 },
+  { dx: 52, rx: 44, ry: 32 },
+  { dx: -16, rx: 34, ry: 27 }
+];
+
+export function buildCloud(spec: CloudSpec): CloudShape {
+  const rand = createSeededRandom(spec.seed);
+  const jitter = (value: number, frac: number) => value * (1 + (rand() - 0.5) * 2 * frac);
+  const ellipses = CLOUD_BLUEPRINT.map(b => {
+    const rx = Math.round(jitter(b.rx, 0.18) * spec.scale);
+    const ry = Math.round(jitter(b.ry, 0.18) * spec.scale);
+    const cx = Math.round(spec.cx + jitter(b.dx, 0.12) * spec.scale);
+    return { cx, cy: spec.baseY - ry, rx, ry };
+  });
+  const left = Math.min(...ellipses.map(e => e.cx - e.rx));
+  const right = Math.max(...ellipses.map(e => e.cx + e.rx));
+  const height = Math.round(12 * spec.scale);
+  return { ellipses, base: { x: left, y: spec.baseY - height, width: right - left, height } };
+}
+
+export const CLOUDS: CloudLayout[] = [
+  { id: 1, spec: { cx: 740, baseY: 150, scale: 1.05, seed: 41 }, opacity: 0.95, glow: true },
+  { id: 2, spec: { cx: 250, baseY: 120, scale: 0.7, seed: 12 }, opacity: 0.6, glow: false },
+  { id: 3, spec: { cx: 470, baseY: 96, scale: 0.55, seed: 88 }, opacity: 0.5, glow: false },
+  { id: 4, spec: { cx: 1040, baseY: 185, scale: 0.65, seed: 23 }, opacity: 0.55, glow: false }
+];

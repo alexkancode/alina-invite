@@ -47,6 +47,14 @@ describe('GET /home', () => {
     expect(homeHtml).toContain(WHIP_EDGE_FRAMES[0].slice(0, 60));
   });
 
+  test('ships sunset clouds instead of the old flat pills', () => {
+    expect(homeHtml).toContain('id="yait-cloud-grad"');
+    expect(homeHtml).toContain('class="cloud cloud--1"');
+    expect(homeHtml).toContain('fill="url(#yait-cloud-grad)"');
+    expect(homeHtml).not.toContain('rx="13" fill="#F4E8D1"');
+    expect(homeHtml).not.toContain('rx="11" fill="#F4E8D1"');
+  });
+
   test('the clip path morphs its d through the whip frames', () => {
     expect(homeHtml).toContain('<animate');
     expect(homeHtml).toContain('attributeName="d"');
