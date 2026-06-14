@@ -103,20 +103,22 @@ test.describe('yait home hero', () => {
     expect(Math.abs(justAfter - atBeat)).toBeGreaterThan(MIN_BEAT_FLOW_PX);
   });
 
-  test('the headline reveal swivels toward the screen at the inner beat and returns flat', async ({ page }) => {
+  test('the clip cut line carries a beat rotation, leaving revealed glyphs unmoved', async ({ page }) => {
     await page.goto('/home');
-    const at = (t: number) => page.evaluate((time) => {
-      const el = document.querySelector('.headline-mask');
-      for (const a of el!.getAnimations()) {
+    await expect(page.locator('#yait-wave-clip animateTransform[type="rotate"]')).toHaveCount(1);
+    const glyph = { x: 60, y: 100, width: 90, height: 85 };
+    const pin = (t: number) => page.evaluate((time) => {
+      for (const a of document.getAnimations({ subtree: true })) {
         a.pause();
         a.currentTime = time;
       }
-      return getComputedStyle(el!).transform;
     }, t);
-    const atBeat = await at(1111);
-    const between = await at(2200);
-    expect(atBeat).toContain('matrix3d');
-    expect(atBeat).not.toBe(between);
+    await page.evaluate(() => document.fonts.ready);
+    await pin(4200);
+    const glyphA = await page.screenshot({ clip: glyph });
+    await pin(4400);
+    const glyphB = await page.screenshot({ clip: glyph });
+    expect(Buffer.compare(glyphA, glyphB)).toBe(0);
   });
 
   test('the envelope swivels toward the screen at the inner beat and returns flat', async ({ page }) => {

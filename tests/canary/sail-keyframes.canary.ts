@@ -90,18 +90,6 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.envelope-pivot/);
   });
 
-  test('the headline reveal swivels toward the screen at both inner beats and returns flat', () => {
-    expect(css).toMatch(/\.headline-mask \{[\s\S]*?animation: reveal-pivot 5\.333s ease-in-out both;/);
-    const block = keyframeBlock('reveal-pivot');
-    expect(block.length).toBeGreaterThan(0);
-    expect(block).toMatch(/20\.83% \{ transform: perspective\(2000px\) rotateY\(20deg\); \}/);
-    expect(block).toMatch(/57\.29% \{ transform: perspective\(2000px\) rotateY\(20deg\); \}/);
-    expect(block).toMatch(/0% \{ transform: perspective\(2000px\) rotateY\(0deg\); \}/);
-    expect(block).toMatch(/39% \{ transform: perspective\(2000px\) rotateY\(0deg\); \}/);
-    expect(block).toMatch(/to \{ transform: perspective\(2000px\) rotateY\(0deg\); \}/);
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.headline-mask/);
-  });
-
   test('mobile scales the tall fries back into proportion', () => {
     expect(css).toMatch(/\.fry \{\s*height: calc\(var\(--fry-h\) \* 0\.8\);\s*\}/);
   });

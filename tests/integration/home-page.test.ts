@@ -52,8 +52,14 @@ describe('GET /home', () => {
     expect(homeHtml).toContain('attributeName="d"');
     expect(homeHtml).toContain('dur="3.333s"');
     expect(homeHtml).toContain('repeatCount="indefinite"');
-    expect(homeHtml).not.toContain('<animateTransform');
-    expect(homeHtml).not.toContain('fill="freeze"');
+  });
+
+  test('the clip cut line rotates at the reveal beats while the text stays put', () => {
+    expect(homeHtml).toContain('<animateTransform');
+    expect(homeHtml).toContain('type="rotate"');
+    expect(homeHtml).toContain('dur="5.333s"');
+    expect(homeHtml).toContain('keyTimes="0; 0.2083; 0.39; 0.5729; 1"');
+    expect(homeHtml).toContain('fill="freeze"');
   });
 
   test('reduced-motion users get the morph removed by the inline script', () => {
