@@ -47,17 +47,19 @@ describe('GET /home', () => {
     expect(homeHtml).toContain(WHIP_EDGE_FRAMES[0].slice(0, 60));
   });
 
-  test('the hero ships the traced beach clouds in three tone layers', () => {
-    expect((homeHtml.match(/class="cloud-layer cloud-/g) ?? []).length).toBe(3);
+  test('the hero ships the traced beach clouds in three tone layers, split rest + hero', () => {
+    expect((homeHtml.match(/class="cloud-layer cloud-/g) ?? []).length).toBe(6);
     expect(homeHtml).toContain('cloud-layer cloud-shadow');
     expect(homeHtml).toContain('cloud-layer cloud-mid');
     expect(homeHtml).toContain('cloud-layer cloud-cream');
   });
 
-  test('each cloud layer sits in its own warp-filtered drift group for parallax', () => {
-    expect((homeHtml.match(/class="cloud-drift cloud-drift-/g) ?? []).length).toBe(3);
+  test('each cloud layer sits in its own warp-filtered drift group, biggest cloud separate', () => {
+    expect((homeHtml.match(/class="cloud-drift cloud-drift-[\w-]+" filter="url\(#yait-cloud-warp\)"/g) ?? []).length).toBe(6);
     expect(homeHtml).toContain('cloud-drift cloud-drift-cream');
-    expect((homeHtml.match(/class="cloud-drift cloud-drift-\w+" filter="url\(#yait-cloud-warp\)"/g) ?? []).length).toBe(3);
+    expect(homeHtml).toContain('cloud-drift cloud-drift-hero-shadow');
+    expect(homeHtml).toContain('cloud-drift cloud-drift-hero-mid');
+    expect(homeHtml).toContain('cloud-drift cloud-drift-hero-cream');
   });
 
   test('the clouds warp through an animated displacement filter', () => {

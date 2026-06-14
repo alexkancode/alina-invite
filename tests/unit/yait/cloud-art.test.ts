@@ -7,8 +7,23 @@ describe('CLOUD_ART traced cloud data', () => {
     expect(CLOUD_ART.height).toBeGreaterThan(0);
   });
 
-  test('is three tone layers, back-to-front shadow -> mid -> cream', () => {
-    expect(CLOUD_ART.layers.map(l => l.tone)).toEqual(['shadow', 'mid', 'cream']);
+  test('is six layers: rest + hero for each tone, shadow -> mid -> cream', () => {
+    expect(CLOUD_ART.layers).toHaveLength(6);
+    const seen = CLOUD_ART.layers.map(l => `${l.tone}:${l.group}`);
+    for (const tone of ['shadow', 'mid', 'cream']) {
+      expect(seen).toContain(`${tone}:rest`);
+      expect(seen).toContain(`${tone}:hero`);
+    }
+    expect(CLOUD_ART.layers[0].tone).toBe('shadow');
+    expect(CLOUD_ART.layers[CLOUD_ART.layers.length - 1].tone).toBe('cream');
+  });
+
+  test('the hero (biggest) cloud is split out as its own non-empty group', () => {
+    for (const tone of ['shadow', 'mid', 'cream']) {
+      const hero = CLOUD_ART.layers.find(l => l.tone === tone && l.group === 'hero');
+      expect(hero).toBeDefined();
+      expect(hero!.d.length).toBeGreaterThan(0);
+    }
   });
 
   test('every layer is a closed path with at least one subpath', () => {
@@ -28,6 +43,6 @@ describe('CLOUD_ART traced cloud data', () => {
 
   test('is static constant data (deterministic)', () => {
     expect(CLOUD_ART).toEqual(CLOUD_ART);
-    expect(CLOUD_ART.layers).toHaveLength(3);
+    expect(CLOUD_ART.layers).toHaveLength(6);
   });
 });

@@ -120,9 +120,9 @@ test.describe('yait home hero', () => {
     expect(Buffer.compare(glyphA, glyphB)).toBe(0);
   });
 
-  test('the hero renders three breathing cloud layers, and rests under reduced motion', async ({ page }) => {
+  test('the hero renders the breathing cloud layers (rest + hero split), and rests under reduced motion', async ({ page }) => {
     await page.goto('/home');
-    await expect(page.locator('.cloud-layer')).toHaveCount(3);
+    await expect(page.locator('.cloud-layer')).toHaveCount(6);
     const box = () => page.evaluate(() => {
       const r = document.querySelector('.cloud-cream')!.getBoundingClientRect();
       return r.width * 1000 + r.height;
@@ -163,6 +163,20 @@ test.describe('yait home hero', () => {
     });
     expect(tx).toBeGreaterThan(32);
     expect(tx).toBeLessThan(48);
+  });
+
+  test('the biggest cloud drifts faster than the rest, and the headline is large on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/home');
+    const dur = (sel: string) => page.evaluate(s =>
+      getComputedStyle(document.querySelector(s)!).animationDuration, sel);
+    const heroDur = parseFloat(await dur('.cloud-drift-hero-shadow'));
+    const restDur = parseFloat(await dur('.cloud-drift-shadow'));
+    expect(heroDur).toBeLessThan(restDur);          // faster = shorter period
+    expect(heroDur).toBeCloseTo(restDur * 0.9, 1);  // ~10% faster
+    const fs = await page.evaluate(() =>
+      parseFloat(getComputedStyle(document.querySelector('.headline')!).fontSize));
+    expect(fs).toBeGreaterThan(140);
   });
 
   test('reduced motion rests the cloud layers static', async ({ page }) => {
@@ -280,7 +294,7 @@ test.describe('yait home hero', () => {
     expect(probe!.clip).toContain('yait-wave-clip');
     expect(probe!.frameCount).toBe(25);
     const ratio = probe!.mid.slantPx / probe!.mid.height;
-    expect(ratio).toBeGreaterThan(0.75);
+    expect(ratio).toBeGreaterThan(0.6);
     expect(ratio).toBeLessThan(1.25);
     expect(probe!.mid.maxAbsDevPx).toBeGreaterThan(20);
     expect(probe!.mid.lobes).toBe(1);

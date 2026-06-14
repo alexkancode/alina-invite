@@ -111,6 +111,12 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).not.toMatch(/\.cloud-drift-\w+ \{[^}]*ease-in-out/);
   });
 
+  test('the biggest cloud drifts 10% faster than the rest', () => {
+    for (const tone of ['shadow', 'mid', 'cream']) {
+      expect(css).toMatch(new RegExp(`\\.cloud-drift-hero-${tone} \\{[\\s\\S]*?animation: drift-${tone} 72s linear`));
+    }
+  });
+
   test('no keyframe is defined but left unattached (orphan guard)', () => {
     const defined = [...css.matchAll(/@keyframes ([\w-]+)/g)].map(m => m[1]);
     const referenced = new Set(
@@ -137,10 +143,10 @@ describe('sail keyframes match the three-beat spec', () => {
   });
 
   test('the reveal edge clips through the generated wave path', () => {
-    expect(css).toMatch(/--headline-fs: clamp\(2\.8rem, 11vw, 8\.5rem\);/);
+    expect(css).toMatch(/--headline-fs: clamp\(2\.8rem, 12vw, 10\.5rem\);/);
     expect(css).toMatch(/clip-path: url\(#yait-wave-clip\);/);
     expect(css).not.toMatch(/--headline-slant/);
     expect(css).toMatch(/font-size: var\(--headline-fs\);/);
-    expect(css.match(/clamp\(2\.8rem, 11vw, 8\.5rem\)/g)).toHaveLength(1);
+    expect(css.match(/clamp\(2\.8rem, 12vw, 10\.5rem\)/g)).toHaveLength(1);
   });
 });
