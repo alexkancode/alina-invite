@@ -1,5 +1,5 @@
 ---
-import { buildCloud, buildFryCrowd, CLOUDS, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, SCENE_TIMELINE, WHIP, WHIP_EDGE_FRAMES } from '../../lib/yait/heroScene';
+import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, SCENE_TIMELINE, WHIP, WHIP_EDGE_FRAMES } from '../../lib/yait/heroScene';
 
 const fries = buildFryCrowd(FRY_COUNT, CROWD_SEED);
 
@@ -14,11 +14,6 @@ const fryStyle = (fry: (typeof fries)[number]) =>
       <linearGradient id="yait-sky-grad" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#F9C784"></stop>
         <stop offset="100%" stop-color="#FBE3BC"></stop>
-      </linearGradient>
-      <linearGradient id="yait-cloud-grad" gradientUnits="userSpaceOnUse" x1="0" y1="60" x2="0" y2="260">
-        <stop offset="0%" stop-color="#FBE3BC"></stop>
-        <stop offset="55%" stop-color="#F4A259"></stop>
-        <stop offset="100%" stop-color="#E76F51"></stop>
       </linearGradient>
       <clipPath id="yait-wave-clip" clipPathUnits="objectBoundingBox">
         <path d={WHIP_EDGE_FRAMES[0]}>
@@ -42,19 +37,6 @@ const fryStyle = (fry: (typeof fries)[number]) =>
     <rect x="0" y="0" width="1200" height="420" fill="url(#yait-sky-grad)"></rect>
     <circle cx="940" cy="140" r="78" fill="#F4A259" opacity="0.45"></circle>
     <circle cx="940" cy="140" r="58" fill="#F4A259"></circle>
-    {CLOUDS.map(cloud => {
-      const shape = buildCloud(cloud.spec);
-      return (
-        <g class={`cloud cloud--${cloud.id}`} opacity={cloud.opacity}>
-          <g class={`cloud-inner cloud-inner--${cloud.id}`}>
-            {cloud.glow && (
-              <ellipse class="cloud-glow" cx={cloud.spec.cx} cy={cloud.spec.baseY - 30 * cloud.spec.scale} rx={86 * cloud.spec.scale} ry={52 * cloud.spec.scale} fill="#F4A259" opacity="0.4"></ellipse>
-            )}
-            <path d={shape.d} fill="url(#yait-cloud-grad)"></path>
-          </g>
-        </g>
-      );
-    })}
     <path d="M390 180 q12 -12 24 0 q12 -12 24 0" fill="none" stroke="#264653" stroke-width="4" stroke-linecap="round"></path>
     <path d="M500 230 q10 -10 20 0 q10 -10 20 0" fill="none" stroke="#264653" stroke-width="3.5" stroke-linecap="round"></path>
     <path d="M0 420 L0 296 Q90 268 170 318 Q240 364 300 420 Z" fill="#264653"></path>

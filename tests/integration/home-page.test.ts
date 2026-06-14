@@ -47,17 +47,11 @@ describe('GET /home', () => {
     expect(homeHtml).toContain(WHIP_EDGE_FRAMES[0].slice(0, 60));
   });
 
-  test('ships sunset clouds instead of the old flat pills', () => {
-    expect(homeHtml).toContain('id="yait-cloud-grad"');
-    expect(homeHtml).toContain('class="cloud cloud--1"');
-    expect(homeHtml).toMatch(/<path d="M [^"]*Z" fill="url\(#yait-cloud-grad\)"/);
-    expect(homeHtml).not.toContain('rx="13" fill="#F4E8D1"');
-    expect(homeHtml).not.toContain('rx="11" fill="#F4E8D1"');
-  });
-
-  test('ships the pulsing rim-glow and a far parallax plane', () => {
-    expect(homeHtml).toContain('class="cloud-glow"');
-    expect((homeHtml.match(/class="cloud cloud--/g) ?? []).length).toBeGreaterThanOrEqual(6);
+  test('the hero sky carries no clouds, just the sun', () => {
+    expect(homeHtml).not.toContain('class="cloud');
+    expect(homeHtml).not.toContain('cloud-glow');
+    expect(homeHtml).not.toContain('yait-cloud-grad');
+    expect(homeHtml).toContain('r="58" fill="#F4A259"');
   });
 
   test('the clip path morphs its d through the whip frames', () => {

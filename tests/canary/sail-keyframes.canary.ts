@@ -90,17 +90,14 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.envelope-pivot/);
   });
 
-  test('the sunset clouds drift, bob and breathe, and rest under reduced motion', () => {
-    expect(css).toMatch(/@keyframes cloud-drift \{[\s\S]*?transform: translateX\(var\(--sway\)\);/);
-    expect(css).toMatch(/@keyframes cloud-bob \{[\s\S]*?transform: translateY\(-8px\);/);
-    expect(css).toMatch(/@keyframes cloud-breathe \{[\s\S]*?opacity: 1;/);
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud,[\s\S]*?\.cloud-inner/);
-  });
-
-  test('the hero cloud rim-glow pulses like golden-hour light and rests under reduced motion', () => {
-    expect(css).toMatch(/@keyframes glow-breathe \{[\s\S]*?transform: scale\(1\.04\);/);
-    expect(css).toMatch(/\.cloud-glow \{[\s\S]*?animation: glow-breathe 12s ease-in-out infinite;/);
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud-glow/);
+  test('the clouds are gone: no cloud keyframes, rules, or reduced-motion entries', () => {
+    expect(css).not.toMatch(/@keyframes cloud-drift/);
+    expect(css).not.toMatch(/@keyframes cloud-bob/);
+    expect(css).not.toMatch(/@keyframes cloud-breathe/);
+    expect(css).not.toMatch(/@keyframes glow-breathe/);
+    expect(css).not.toMatch(/\.cloud-glow/);
+    expect(css).not.toMatch(/\.cloud--/);
+    expect(css).not.toMatch(/\.cloud-inner/);
   });
 
   test('mobile scales the tall fries back into proportion', () => {

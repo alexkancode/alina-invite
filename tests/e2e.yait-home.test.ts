@@ -121,44 +121,10 @@ test.describe('yait home hero', () => {
     expect(Buffer.compare(glyphA, glyphB)).toBe(0);
   });
 
-  test('the sunset clouds drift, and rest on-screen under reduced motion', async ({ page }) => {
+  test('no clouds render in the hero sky', async ({ page }) => {
     await page.goto('/home');
-    await expect(page.locator('.cloud')).toHaveCount(6);
-    const driftX = () => page.evaluate(() => {
-      const m = getComputedStyle(document.querySelector('.cloud--1')!).transform;
-      const parts = m.match(/matrix\(([^)]+)\)/);
-      return parts ? Number(parts[1].split(',')[4]) : 0;
-    });
-    const a = await driftX();
-    await page.waitForTimeout(900);
-    const b = await driftX();
-    expect(Math.abs(b - a)).toBeGreaterThan(0.5);
-  });
-
-  test('the hero rim-glow pulses, and rests static under reduced motion', async ({ page }) => {
-    await page.goto('/home');
-    await expect(page.locator('.cloud-glow')).toHaveCount(1);
-    const glowState = () => page.evaluate(() => {
-      const s = getComputedStyle(document.querySelector('.cloud-glow')!);
-      return s.opacity + '|' + s.transform;
-    });
-    const a = await glowState();
-    await page.waitForTimeout(1500);
-    const b = await glowState();
-    expect(a).not.toBe(b);
-  });
-
-  test('reduced motion rests the clouds on-screen and still', async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/home');
-    const box = await page.evaluate(() => {
-      const r = document.querySelector('.cloud--1')!.getBoundingClientRect();
-      const t = getComputedStyle(document.querySelector('.cloud--1')!).transform;
-      return { left: r.left, right: r.right, width: window.innerWidth, transform: t };
-    });
-    expect(box.left).toBeGreaterThan(0);
-    expect(box.right).toBeLessThan(box.width);
-    expect(box.transform === 'none' || box.transform === 'matrix(1, 0, 0, 1, 0, 0)').toBe(true);
+    await expect(page.locator('.cloud')).toHaveCount(0);
+    await expect(page.locator('.cloud-glow')).toHaveCount(0);
   });
 
   test('the envelope swivels toward the screen at the inner beat and returns flat', async ({ page }) => {
