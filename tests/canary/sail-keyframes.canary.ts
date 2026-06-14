@@ -90,14 +90,28 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.envelope-pivot/);
   });
 
-  test('the clouds are gone: no cloud keyframes, rules, or reduced-motion entries', () => {
-    expect(css).not.toMatch(/@keyframes cloud-drift/);
-    expect(css).not.toMatch(/@keyframes cloud-bob/);
-    expect(css).not.toMatch(/@keyframes cloud-breathe/);
-    expect(css).not.toMatch(/@keyframes glow-breathe/);
-    expect(css).not.toMatch(/\.cloud-glow/);
-    expect(css).not.toMatch(/\.cloud--/);
-    expect(css).not.toMatch(/\.cloud-inner/);
+  test('the traced clouds carry their tone fills and breathe on per-layer phases', () => {
+    expect(css).toMatch(/\.cloud-shadow \{[\s\S]*?fill: #A9D9CE;/);
+    expect(css).toMatch(/\.cloud-mid \{[\s\S]*?fill: #CDEAE0;/);
+    expect(css).toMatch(/\.cloud-cream \{[\s\S]*?fill: #FBF6E9;/);
+    expect(css).toMatch(/@keyframes swell-tall/);
+    expect(css).toMatch(/@keyframes swell-flat/);
+    expect(css).toMatch(/\.cloud-shadow \{[\s\S]*?animation: swell-flat/);
+    expect(css).toMatch(/\.cloud-mid \{[\s\S]*?animation: swell-tall/);
+    expect(css).toMatch(/\.cloud-cream \{[\s\S]*?animation: swell-tall/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud-layer/);
+  });
+
+  test('no keyframe is defined but left unattached (orphan guard)', () => {
+    const defined = [...css.matchAll(/@keyframes ([\w-]+)/g)].map(m => m[1]);
+    const referenced = new Set(
+      [...css.matchAll(/animation(?:-name)?:\s*([^;]+);/g)].flatMap(m =>
+        m[1].split(',').map(part => part.trim().split(/\s+/).find(tok => /^[a-zA-Z][\w-]*$/.test(tok)) ?? '')
+      )
+    );
+    for (const name of defined) {
+      expect(referenced.has(name), `@keyframes ${name} is never referenced by an animation`).toBe(true);
+    }
   });
 
   test('mobile scales the tall fries back into proportion', () => {

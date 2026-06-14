@@ -32,6 +32,27 @@
   height: 100%;
 }
 
+.cloud-shadow { fill: #A9D9CE; animation: swell-flat 12s ease-in-out infinite; }
+.cloud-mid { fill: #CDEAE0; animation: swell-tall 9s ease-in-out infinite -2s; }
+.cloud-cream { fill: #FBF6E9; animation: swell-tall 8s ease-in-out infinite -4s; }
+
+.cloud-layer {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+}
+
+@keyframes swell-tall {
+  0%, 100% { transform: scale(1, 1); }
+  45% { transform: scale(1.011, 1.03); }
+  75% { transform: scale(0.995, 0.987); }
+}
+
+@keyframes swell-flat {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.022, 0.984); }
+  80% { transform: scale(0.992, 1.015); }
+}
+
 .grain {
   position: absolute;
   inset: 0;
@@ -388,7 +409,8 @@
   .reveal-window,
   .headline,
   .fry,
-  .club {
+  .club,
+  .cloud-layer {
     animation: none;
   }
 }

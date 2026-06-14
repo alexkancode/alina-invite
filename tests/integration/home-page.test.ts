@@ -47,11 +47,24 @@ describe('GET /home', () => {
     expect(homeHtml).toContain(WHIP_EDGE_FRAMES[0].slice(0, 60));
   });
 
-  test('the hero sky carries no clouds, just the sun', () => {
-    expect(homeHtml).not.toContain('class="cloud');
-    expect(homeHtml).not.toContain('cloud-glow');
-    expect(homeHtml).not.toContain('yait-cloud-grad');
-    expect(homeHtml).toContain('r="58" fill="#F4A259"');
+  test('the hero ships the traced beach clouds in three tone layers', () => {
+    expect((homeHtml.match(/class="cloud-layer cloud-/g) ?? []).length).toBe(3);
+    expect(homeHtml).toContain('cloud-layer cloud-shadow');
+    expect(homeHtml).toContain('cloud-layer cloud-mid');
+    expect(homeHtml).toContain('cloud-layer cloud-cream');
+  });
+
+  test('the clouds warp through an animated displacement filter', () => {
+    expect(homeHtml).toContain('id="yait-cloud-warp"');
+    expect(homeHtml.toLowerCase()).toContain('feturbulence');
+    expect(homeHtml.toLowerCase()).toContain('fedisplacementmap');
+    const filter = homeHtml.match(/id="yait-cloud-warp"[\s\S]*?<\/filter>/)?.[0] ?? '';
+    expect(filter).toContain('<animate');
+  });
+
+  test('the hero sky is the cyan beach gradient, not the old amber sunset', () => {
+    expect(homeHtml).toContain('#34BBD0');
+    expect(homeHtml).not.toContain('#F9C784');
   });
 
   test('the clip path morphs its d through the whip frames', () => {

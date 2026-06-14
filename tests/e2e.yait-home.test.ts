@@ -121,10 +121,25 @@ test.describe('yait home hero', () => {
     expect(Buffer.compare(glyphA, glyphB)).toBe(0);
   });
 
-  test('no clouds render in the hero sky', async ({ page }) => {
+  test('the hero renders three breathing cloud layers, and rests under reduced motion', async ({ page }) => {
     await page.goto('/home');
-    await expect(page.locator('.cloud')).toHaveCount(0);
-    await expect(page.locator('.cloud-glow')).toHaveCount(0);
+    await expect(page.locator('.cloud-layer')).toHaveCount(3);
+    const box = () => page.evaluate(() => {
+      const r = document.querySelector('.cloud-cream')!.getBoundingClientRect();
+      return r.width * 1000 + r.height;
+    });
+    const a = await box();
+    await page.waitForTimeout(2200);
+    const b = await box();
+    expect(a).not.toBe(b);
+  });
+
+  test('reduced motion rests the cloud layers static', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/home');
+    const name = await page.evaluate(() =>
+      getComputedStyle(document.querySelector('.cloud-cream')!).animationName);
+    expect(name === 'none' || name === '').toBe(true);
   });
 
   test('the envelope swivels toward the screen at the inner beat and returns flat', async ({ page }) => {
