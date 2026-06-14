@@ -90,6 +90,14 @@ describe('GET /home', () => {
     expect(homeHtml).not.toContain('; 15 0.5 0.5;');
   });
 
+  test('the reveal sweep is a clip translate from REVEAL_EDGE (text itself never animates)', () => {
+    expect(homeHtml).toContain('type="translate"');
+    expect(homeHtml).toContain('additive="sum"');
+    const sweep = homeHtml.match(/type="translate"[\s\S]*?values="([^"]+)"/)?.[1] ?? '';
+    expect(sweep.startsWith('-1.31 0')).toBe(true);
+    expect(sweep.endsWith('-0.15 0')).toBe(true);
+  });
+
   test('reduced-motion users get the morph removed by the inline script', () => {
     expect(homeHtml).toContain('prefers-reduced-motion');
     expect(homeHtml).toContain("querySelectorAll('animate, animateTransform')");

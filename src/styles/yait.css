@@ -114,46 +114,12 @@
   line-height: 1.1;
   color: var(--yait-ink);
   text-shadow: 4px 4px 0 var(--yait-sand);
-  animation: reveal-text 5.333s linear both;
 }
 
 .reveal-window {
   display: block;
   overflow: hidden;
   clip-path: url(#yait-wave-clip);
-  animation: reveal-mask 5.333s linear both;
-}
-
-@keyframes reveal-mask {
-  from { transform: translateX(-131%); }
-  20.83% { transform: translateX(-91%); }
-  57.29% { transform: translateX(-55%); }
-  83.33% { transform: translateX(-39%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
-  to { transform: translateX(-15%); }
-}
-
-@keyframes reveal-text {
-  from { transform: translateX(131%); }
-  20.83% { transform: translateX(91%); }
-  57.29% { transform: translateX(55%); }
-  83.33% { transform: translateX(39%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
-  to { transform: translateX(15%); }
-}
-
-@keyframes reveal-mask-mobile {
-  from { transform: translateX(-146%); }
-  20.83% { transform: translateX(-106%); }
-  57.29% { transform: translateX(-70%); }
-  83.33% { transform: translateX(-54%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
-  to { transform: translateX(-15%); }
-}
-
-@keyframes reveal-text-mobile {
-  from { transform: translateX(146%); }
-  20.83% { transform: translateX(106%); }
-  57.29% { transform: translateX(70%); }
-  83.33% { transform: translateX(54%); animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); }
-  to { transform: translateX(15%); }
 }
 
 .headline-line {
@@ -387,14 +353,6 @@
 @media (max-width: 640px) {
   .headline-mask {
     top: 11%;
-  }
-
-  .reveal-window {
-    animation-name: reveal-mask-mobile;
-  }
-
-  .headline {
-    animation-name: reveal-text-mobile;
   }
 
   .fry {

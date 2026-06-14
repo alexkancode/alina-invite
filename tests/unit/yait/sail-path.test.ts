@@ -7,7 +7,6 @@ import {
   ENVELOPE_WIDTH_VW_MOBILE,
   REVEAL_DURATION_MS,
   REVEAL_EDGE,
-  REVEAL_EDGE_MOBILE,
   REVEAL_LOCK_VW,
   REVEAL_REST_PERCENT,
   REVEAL_SAIL_SHARE,
@@ -88,7 +87,7 @@ describe('SAIL_WEAVE side-to-side course', () => {
 
 const hulls = [
   { label: 'desktop', edge: REVEAL_EDGE, left: ENVELOPE_LEFT_PERCENT, width: ENVELOPE_WIDTH_VW },
-  { label: 'mobile', edge: REVEAL_EDGE_MOBILE, left: ENVELOPE_LEFT_PERCENT_MOBILE, width: ENVELOPE_WIDTH_VW_MOBILE }
+  { label: 'mobile', edge: buildRevealEdge(SAIL_TRACK, { leftPercent: ENVELOPE_LEFT_PERCENT_MOBILE, lockVw: REVEAL_LOCK_VW }, REVEAL_REST_PERCENT), left: ENVELOPE_LEFT_PERCENT_MOBILE, width: ENVELOPE_WIDTH_VW_MOBILE }
 ];
 
 describe.each(hulls)('REVEAL_EDGE stern-locked reveal ($label)', ({ edge, left }) => {

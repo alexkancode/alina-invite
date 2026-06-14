@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, test } from 'vitest';
-import { REVEAL_EDGE, REVEAL_EDGE_MOBILE, SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
+import { SAIL_TRACK, SAIL_WEAVE } from '../../src/lib/yait/heroScene';
 
 const css = readFileSync(resolve(__dirname, '../../src/styles/yait.css'), 'utf8');
 
@@ -39,43 +39,28 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(block.match(/[\d.]+%|from|to/g) ?? []).toHaveLength(SAIL_WEAVE.length);
   });
 
-  const revealPairs = [
-    { mask: 'reveal-mask', text: 'reveal-text', edge: REVEAL_EDGE },
-    { mask: 'reveal-mask-mobile', text: 'reveal-text-mobile', edge: REVEAL_EDGE_MOBILE }
-  ];
-
-  test.each(revealPairs)('$mask sweeps with the hull-locked edge', ({ mask, edge }) => {
-    const block = keyframeBlock(mask);
-    expect(block.length).toBeGreaterThan(0);
-    for (const wp of edge) {
-      expectFrame(block, wp.offset, `translateX(${wp.percent}%)`);
-    }
-  });
-
-  test.each(revealPairs)('$text counter-translates by the same magnitudes', ({ text, edge }) => {
-    const block = keyframeBlock(text);
-    expect(block.length).toBeGreaterThan(0);
-    for (const wp of edge) {
-      expectFrame(block, wp.offset, `translateX(${-wp.percent}%)`);
-    }
+  test('the headline text carries zero animation (reveal is on the clip, not the text)', () => {
+    const headlineBlock = css.match(/\.headline \{([\s\S]*?)\n\}/)?.[1] ?? '';
+    expect(headlineBlock.length).toBeGreaterThan(0);
+    expect(headlineBlock).not.toMatch(/animation/);
+    const windowBlock = css.match(/\.reveal-window \{([\s\S]*?)\n\}/)?.[1] ?? '';
+    expect(windowBlock).toContain('clip-path: url(#yait-wave-clip)');
+    expect(windowBlock).not.toMatch(/animation/);
+    expect(css).not.toMatch(/@keyframes reveal-mask/);
+    expect(css).not.toMatch(/@keyframes reveal-text/);
   });
 
   test('layers flow linearly through the beats and ease out only into the dock', () => {
     expect(css).toMatch(/sail-x 4.444s linear both/);
     expect(css).toMatch(/sail-weave 4.444s linear both/);
-    expect(css).toMatch(/reveal-mask 5.333s linear both/);
-    expect(css).toMatch(/reveal-text 5.333s linear both/);
-    expect(css).toMatch(/animation-name: reveal-mask-mobile;/);
-    expect(css).toMatch(/animation-name: reveal-text-mobile;/);
     expect(css).not.toMatch(/reveal-mask-top|reveal-text-top/);
     expect(css).not.toMatch(/cubic-bezier\(0\.37, 0, 0\.63, 1\)/);
   });
 
   test('only the final dock segment eases out (no per-beat stops)', () => {
     const dockEase = /animation-timing-function: cubic-bezier\(0\.61, 1, 0\.88, 1\);/g;
-    expect((css.match(dockEase) ?? []).length).toBe(6);
+    expect((css.match(dockEase) ?? []).length).toBe(2);
     expect(keyframeBlock('sail-x')).toMatch(/68\.75% \{[\s\S]*?animation-timing-function: cubic-bezier\(0\.61, 1, 0\.88, 1\);/);
-    expect(keyframeBlock('reveal-mask')).toMatch(/83\.33% \{[\s\S]*?animation-timing-function: cubic-bezier\(0\.61, 1, 0\.88, 1\);/);
   });
 
   test('the envelope swivels toward the screen at both inner beats and returns flat', () => {
@@ -142,8 +127,8 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/\.fry \{\s*height: calc\(var\(--fry-h\) \* 0\.8\);\s*\}/);
   });
 
-  test('one reveal window clips and sweeps the whole headline as a unit', () => {
-    expect(css).toMatch(/\.reveal-window \{[\s\S]*?clip-path: url\(#yait-wave-clip\);[\s\S]*?animation: reveal-mask 5.333s/);
+  test('one reveal window clips the whole headline as a unit', () => {
+    expect(css).toMatch(/\.reveal-window \{[\s\S]*?clip-path: url\(#yait-wave-clip\);/);
     expect(css).not.toMatch(/\.line-mask/);
   });
 

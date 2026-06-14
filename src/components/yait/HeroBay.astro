@@ -1,8 +1,15 @@
 ---
-import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, SCENE_TIMELINE, WHIP, WHIP_EDGE_FRAMES } from '../../lib/yait/heroScene';
+import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, REVEAL_DURATION_MS, REVEAL_EDGE, SCENE_TIMELINE, WHIP, WHIP_EDGE_FRAMES } from '../../lib/yait/heroScene';
 import { CLOUD_ART } from '../../lib/yait/cloudArt';
 
 const fries = buildFryCrowd(FRY_COUNT, CROWD_SEED);
+
+const revealSweep = {
+  values: REVEAL_EDGE.map(wp => `${wp.percent / 100} 0`).join('; '),
+  keyTimes: REVEAL_EDGE.map(wp => wp.offset).join('; '),
+  keySplines: REVEAL_EDGE.slice(1).map((_, i) => (i === REVEAL_EDGE.length - 2 ? '0.61 1 0.88 1' : '0 0 1 1')).join('; '),
+  dur: `${REVEAL_DURATION_MS / 1000}s`
+};
 
 const fryStyle = (fry: (typeof fries)[number]) =>
   `--fry-h: ${fry.heightPx}px; --fry-hue: ${fry.hue}; --fry-amp: ${fry.bounceAmplitudePx}px; ` +
@@ -33,7 +40,18 @@ const fryStyle = (fry: (typeof fries)[number]) =>
             repeatCount="indefinite"></animate>
           <animateTransform
             attributeName="transform"
+            type="translate"
+            additive="sum"
+            values={revealSweep.values}
+            keyTimes={revealSweep.keyTimes}
+            dur={revealSweep.dur}
+            fill="freeze"
+            calcMode="spline"
+            keySplines={revealSweep.keySplines}></animateTransform>
+          <animateTransform
+            attributeName="transform"
             type="rotate"
+            additive="sum"
             values="0 0.5 0.5; -15 0.5 0.5; 0 0.5 0.5; -15 0.5 0.5; 0 0.5 0.5"
             keyTimes="0; 0.2083; 0.39; 0.5729; 1"
             dur="5.333s"

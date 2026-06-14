@@ -4,7 +4,6 @@ import sharp from 'sharp';
 const DOCKED_AFTER_MS = 6300;
 const MIN_ROLL_DELTA_PX = 800;
 const ROLL_BURST_FRAMES = 7;
-const ROLL_BURST_STEP_MS = 220;
 const MIN_BEAT_FLOW_PX = 5;
 
 async function changedPixels(a: Buffer, b: Buffer): Promise<number> {
@@ -193,27 +192,46 @@ test.describe('yait home hero', () => {
     expect(atBeat).not.toBe(between);
   });
 
-  test('the reveal edge sits at the stern, never ahead of it', async ({ page }) => {
+  test('the headline text element carries zero animation', async ({ page }) => {
     await page.goto('/home');
-    const probes = await page.evaluate(() => {
-      const mask = document.querySelector('.reveal-window');
-      const track = document.querySelector('[data-testid="envelope"]');
-      if (!mask || !track) return null;
-      const sample = (t: number) => {
-        for (const a of document.getAnimations({ subtree: true })) {
-          a.pause();
-          a.currentTime = t;
-        }
-        return {
-          edge: mask!.getBoundingClientRect().right,
-          stern: track.getBoundingClientRect().left
-        };
+    const anims = await page.evaluate(() => ({
+      headline: getComputedStyle(document.querySelector('.headline')!).animationName,
+      window: getComputedStyle(document.querySelector('.reveal-window')!).animationName
+    }));
+    expect(anims.headline === 'none' || anims.headline === '').toBe(true);
+    expect(anims.window === 'none' || anims.window === '').toBe(true);
+  });
+
+  test('the glyphs never move through the whole reveal (clip sweeps, text is static)', async ({ page }) => {
+    await page.goto('/home');
+    await page.evaluate(() => document.fonts.ready);
+    const glyph = { x: 55, y: 100, width: 95, height: 85 };
+    const pin = (t: number) => page.evaluate((time) => {
+      for (const a of document.getAnimations({ subtree: true })) { a.pause(); a.currentTime = time; }
+    }, t);
+    await pin(800);
+    const a = await page.screenshot({ clip: glyph });
+    await pin(4800);
+    const b = await page.screenshot({ clip: glyph });
+    expect(Buffer.compare(a, b)).toBe(0);
+  });
+
+  test('the reveal front is a stern-locked clip translate (advances, rests docked)', async ({ page }) => {
+    await page.goto('/home');
+    const sweep = await page.evaluate(() => {
+      const t = document.querySelector('#yait-wave-clip animateTransform[type="translate"]');
+      if (!t) return null;
+      return {
+        values: (t.getAttribute('values') ?? '').split(';').map(s => Number(s.trim().split(/\s+/)[0])),
+        keyTimes: (t.getAttribute('keyTimes') ?? '').split(';').map(s => Number(s.trim()))
       };
-      return [sample(1333), sample(2222), sample(4167)];
     });
-    expect(probes).not.toBeNull();
-    for (const { edge, stern } of probes!) {
-      expect(Math.abs(edge - stern)).toBeLessThan(40);
+    expect(sweep).not.toBeNull();
+    expect(sweep!.values[0]).toBeLessThanOrEqual(-1);            // starts fully hidden
+    expect(sweep!.values[sweep!.values.length - 1]).toBeCloseTo(-0.15, 2); // rests docked
+    for (let i = 1; i < sweep!.values.length; i++) {
+      expect(sweep!.values[i]).toBeGreaterThan(sweep!.values[i - 1]); // only advances
+      expect(sweep!.keyTimes[i]).toBeGreaterThan(sweep!.keyTimes[i - 1]);
     }
   });
 
@@ -321,20 +339,23 @@ test.describe('yait home hero', () => {
   test('the wave rolls perceptibly while revealed text stays byte-stable', async ({ page }) => {
     await page.goto('/home');
     await page.evaluate(() => document.fonts.ready);
-    await page.evaluate(() => {
-      for (const a of document.getAnimations({ subtree: true })) {
-        a.pause();
-        a.currentTime = 3889;
-      }
-    });
+    // Drive SMIL time directly: past the reveal the sweep/rotate are frozen (fill=freeze)
+    // and only the looping morph rolls the edge, over fully-revealed static text.
+    const seek = (t: number) => page.evaluate((time) => {
+      const svg = document.querySelector('.bay-scene') as SVGSVGElement;
+      svg.pauseAnimations();
+      svg.setCurrentTime(time);
+    }, t);
     const edgeRegion = { x: 150, y: 80, width: 480, height: 360 };
     const wordRegion = { x: 55, y: 100, width: 95, height: 85 };
+    await seek(6.0);
     const wordA = await page.screenshot({ clip: wordRegion });
     const edgeFrames = [];
     for (let i = 0; i < ROLL_BURST_FRAMES; i++) {
+      await seek(6.0 + i * 0.18);
       edgeFrames.push(await page.screenshot({ clip: edgeRegion }));
-      if (i < ROLL_BURST_FRAMES - 1) await page.waitForTimeout(ROLL_BURST_STEP_MS);
     }
+    await seek(6.0);
     const wordB = await page.screenshot({ clip: wordRegion });
     const deltas = await Promise.all(edgeFrames.slice(1).map(f => changedPixels(edgeFrames[0], f)));
     expect(Math.max(...deltas)).toBeGreaterThan(MIN_ROLL_DELTA_PX);

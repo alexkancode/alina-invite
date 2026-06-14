@@ -67,11 +67,6 @@ export const REVEAL_EDGE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
   lockVw: REVEAL_LOCK_VW
 }, REVEAL_REST_PERCENT);
 
-export const REVEAL_EDGE_MOBILE: RevealWaypoint[] = buildRevealEdge(SAIL_TRACK, {
-  leftPercent: ENVELOPE_LEFT_PERCENT_MOBILE,
-  lockVw: REVEAL_LOCK_VW
-}, REVEAL_REST_PERCENT);
-
 export const REVEAL_DURATION_MS = 5333;
 
 export interface WhipGeometry {
