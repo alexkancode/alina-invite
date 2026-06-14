@@ -20,8 +20,8 @@ const fryStyle = (fry: (typeof fries)[number]) =>
         <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="11" result="n">
           <animate attributeName="baseFrequency" dur="21s" values="0.008 0.012;0.013 0.009;0.007 0.014;0.008 0.012" repeatCount="indefinite"></animate>
         </feTurbulence>
-        <feDisplacementMap in="SourceGraphic" in2="n" xChannelSelector="R" yChannelSelector="G" scale="6">
-          <animate attributeName="scale" dur="13s" values="6;13;8;6" repeatCount="indefinite"></animate>
+        <feDisplacementMap in="SourceGraphic" in2="n" xChannelSelector="R" yChannelSelector="G" scale="4">
+          <animate attributeName="scale" dur="13s" values="4;9;6;4" repeatCount="indefinite"></animate>
         </feDisplacementMap>
       </filter>
       <clipPath id="yait-wave-clip" clipPathUnits="objectBoundingBox">

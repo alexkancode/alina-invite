@@ -43,14 +43,14 @@
 
 @keyframes swell-tall {
   0%, 100% { transform: scale(1, 1); }
-  45% { transform: scale(1.011, 1.03); }
-  75% { transform: scale(0.995, 0.987); }
+  45% { transform: scale(1.008, 1.021); }
+  75% { transform: scale(0.997, 0.991); }
 }
 
 @keyframes swell-flat {
   0%, 100% { transform: scale(1, 1); }
-  50% { transform: scale(1.022, 0.984); }
-  80% { transform: scale(0.992, 1.015); }
+  50% { transform: scale(1.015, 0.989); }
+  80% { transform: scale(0.994, 1.011); }
 }
 
 .grain {
