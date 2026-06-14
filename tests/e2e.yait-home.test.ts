@@ -152,6 +152,20 @@ test.describe('yait home hero', () => {
     expect(shadow).toBeGreaterThanOrEqual(150);
   });
 
+  test('the drift moves at constant velocity (linear, visible from load)', async ({ page }) => {
+    await page.goto('/home');
+    // at 25% of the 80s cycle, a linear drift sits at 25% of its 160px peak (~40px);
+    // ease-in-out would sit near ~23px, so this pins the linear timing deterministically.
+    const tx = await page.evaluate(() => {
+      const el = document.querySelector('.cloud-drift-shadow')!;
+      const anim = (el as Element & { getAnimations: () => Animation[] }).getAnimations()[0];
+      anim.currentTime = 20000;
+      return new DOMMatrixReadOnly(getComputedStyle(el).transform).m41;
+    });
+    expect(tx).toBeGreaterThan(32);
+    expect(tx).toBeLessThan(48);
+  });
+
   test('reduced motion rests the cloud layers static', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/home');

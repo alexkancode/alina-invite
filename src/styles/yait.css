@@ -41,9 +41,9 @@
   transform-origin: 50% 92%;
 }
 
-.cloud-drift-shadow { animation: drift-shadow 80s ease-in-out infinite alternate; }
-.cloud-drift-mid { animation: drift-mid 80s ease-in-out infinite alternate; }
-.cloud-drift-cream { animation: drift-cream 80s ease-in-out infinite alternate; }
+.cloud-drift-shadow { animation: drift-shadow 80s linear infinite alternate; }
+.cloud-drift-mid { animation: drift-mid 80s linear infinite alternate; }
+.cloud-drift-cream { animation: drift-cream 80s linear infinite alternate; }
 
 @keyframes drift-shadow {
   from { transform: translateX(0); }

@@ -119,6 +119,13 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(peak('drift-shadow')).toBeGreaterThanOrEqual(120);
   });
 
+  test('the drift runs at constant velocity (linear), so it moves from load', () => {
+    for (const tone of ['shadow', 'mid', 'cream']) {
+      expect(css).toMatch(new RegExp(`\\.cloud-drift-${tone} \\{[\\s\\S]*?animation: drift-${tone} 80s linear`));
+    }
+    expect(css).not.toMatch(/\.cloud-drift-\w+ \{[^}]*ease-in-out/);
+  });
+
   test('no keyframe is defined but left unattached (orphan guard)', () => {
     const defined = [...css.matchAll(/@keyframes ([\w-]+)/g)].map(m => m[1]);
     const referenced = new Set(
