@@ -116,6 +116,7 @@ describe('sail keyframes match the three-beat spec', () => {
     };
     expect(peak('drift-cream')).toBeGreaterThan(peak('drift-mid'));
     expect(peak('drift-mid')).toBeGreaterThan(peak('drift-shadow'));
+    expect(peak('drift-shadow')).toBeGreaterThanOrEqual(120);
   });
 
   test('no keyframe is defined but left unattached (orphan guard)', () => {

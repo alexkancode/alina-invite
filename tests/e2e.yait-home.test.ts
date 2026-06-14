@@ -134,19 +134,22 @@ test.describe('yait home hero', () => {
     expect(a).not.toBe(b);
   });
 
-  test('the whitest layer drifts farther than the rest (staggered parallax)', async ({ page }) => {
+  test('the whitest layer drifts farthest over a few-hundred-px range (parallax)', async ({ page }) => {
     await page.goto('/home');
-    const tx = (sel: string) => page.evaluate((s) => {
-      const m = new DOMMatrixReadOnly(getComputedStyle(document.querySelector(s)!).transform);
+    // seek each drift animation to its peak so offsets are deterministic, not timing-dependent
+    const txAtPeak = (sel: string) => page.evaluate((s) => {
+      const el = document.querySelector(s)!;
+      const anim = (el as Element & { getAnimations: () => Animation[] }).getAnimations()[0];
+      anim.currentTime = 80000;
+      const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
       return m.m41;
     }, sel);
-    // sample near a drift peak so the offsets are well separated
-    await page.waitForTimeout(4000);
-    const [cream, mid, shadow] = await Promise.all([
-      tx('.cloud-drift-cream'), tx('.cloud-drift-mid'), tx('.cloud-drift-shadow')
-    ]);
-    expect(Math.abs(cream)).toBeGreaterThan(Math.abs(mid));
-    expect(Math.abs(mid)).toBeGreaterThan(Math.abs(shadow));
+    const cream = await txAtPeak('.cloud-drift-cream');
+    const mid = await txAtPeak('.cloud-drift-mid');
+    const shadow = await txAtPeak('.cloud-drift-shadow');
+    expect(cream).toBeGreaterThan(mid);
+    expect(mid).toBeGreaterThan(shadow);
+    expect(shadow).toBeGreaterThanOrEqual(150);
   });
 
   test('reduced motion rests the cloud layers static', async ({ page }) => {
