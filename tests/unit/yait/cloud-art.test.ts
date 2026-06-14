@@ -19,6 +19,13 @@ describe('CLOUD_ART traced cloud data', () => {
     }
   });
 
+  test('the outlines are smooth bezier curves, not straight-segment polylines', () => {
+    for (const layer of CLOUD_ART.layers) {
+      expect((layer.d.match(/C /g) ?? []).length).toBeGreaterThanOrEqual(4);
+      expect(layer.d).not.toMatch(/ L /);
+    }
+  });
+
   test('is static constant data (deterministic)', () => {
     expect(CLOUD_ART).toEqual(CLOUD_ART);
     expect(CLOUD_ART.layers).toHaveLength(3);
