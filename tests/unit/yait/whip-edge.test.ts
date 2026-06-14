@@ -47,16 +47,16 @@ const project = (anchors: { x: number; y: number }[]) => {
 const outOffsets = (anchors: { x: number; y: number }[]) => project(anchors).map(c => c.out);
 
 describe('WHIP_GEOMETRY', () => {
-  test('is a 45-degree slant with the tuned bump shape', () => {
+  test('is a steep (more-upright) slant with the tuned bump shape', () => {
     expect(WHIP_GEOMETRY).toEqual({
       viewportW: 1280,
       maskH: 370,
-      slantPx: 370,
+      slantPx: 300,
       amplitudePx: 50,
       widthFrac: 0.16667,
       samples: 28
     });
-    expect(WHIP_GEOMETRY.slantPx).toBe(WHIP_GEOMETRY.maskH);
+    expect(WHIP_GEOMETRY.slantPx).toBeLessThan(WHIP_GEOMETRY.maskH);
   });
 });
 

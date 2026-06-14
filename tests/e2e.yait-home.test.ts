@@ -208,7 +208,7 @@ test.describe('yait home hero', () => {
     expect(lines[0].left).toBeLessThan(200);
   });
 
-  test('the reveal edge clips through a 45-degree slant, and a mid frame carries one whip bump', async ({ page }) => {
+  test('the reveal edge clips through a steep diagonal slant, and a mid frame carries one whip bump', async ({ page }) => {
     await page.goto('/home');
     const probe = await page.evaluate(() => {
       const mask = document.querySelector('.reveal-window');
