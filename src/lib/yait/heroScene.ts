@@ -209,8 +209,8 @@ export function buildFryCrowd(count: number, seed: number): FryConfig[] {
 }
 
 export interface CloudShape {
-  ellipses: { cx: number; cy: number; rx: number; ry: number }[];
-  base: { x: number; y: number; width: number; height: number };
+  d: string;
+  points: { x: number; y: number }[];
 }
 
 export interface CloudSpec {
@@ -227,26 +227,46 @@ export interface CloudLayout {
   glow: boolean;
 }
 
-const CLOUD_BLUEPRINT = [
-  { dx: 0, rx: 58, ry: 40 },
-  { dx: -54, rx: 40, ry: 30 },
-  { dx: 52, rx: 44, ry: 32 },
-  { dx: -16, rx: 34, ry: 27 }
-];
+const CLOUD_LOBES = 4;
+const CLOUD_HALF_WIDTH = 100;
+const CLOUD_PEAK = 56;
 
 export function buildCloud(spec: CloudSpec): CloudShape {
   const rand = createSeededRandom(spec.seed);
-  const jitter = (value: number, frac: number) => value * (1 + (rand() - 0.5) * 2 * frac);
-  const ellipses = CLOUD_BLUEPRINT.map(b => {
-    const rx = Math.round(jitter(b.rx, 0.18) * spec.scale);
-    const ry = Math.round(jitter(b.ry, 0.18) * spec.scale);
-    const cx = Math.round(spec.cx + jitter(b.dx, 0.12) * spec.scale);
-    return { cx, cy: spec.baseY - ry, rx, ry };
-  });
-  const left = Math.min(...ellipses.map(e => e.cx - e.rx));
-  const right = Math.max(...ellipses.map(e => e.cx + e.rx));
-  const height = Math.round(12 * spec.scale);
-  return { ellipses, base: { x: left, y: spec.baseY - height, width: right - left, height } };
+  const round = (n: number) => Math.round(n * 100) / 100;
+  const halfW = CLOUD_HALF_WIDTH * spec.scale;
+  const xL = spec.cx - halfW;
+  const xR = spec.cx + halfW;
+  const points: { x: number; y: number }[] = [{ x: round(xL), y: spec.baseY }];
+  for (let i = 0; i < CLOUD_LOBES; i++) {
+    const t = (i + 1) / (CLOUD_LOBES + 1);
+    if (i > 0) {
+      const vx = xL + 2 * halfW * (t - 0.5 / (CLOUD_LOBES + 1));
+      const envelope = Math.sin(Math.PI * (t - 0.5 / (CLOUD_LOBES + 1)));
+      const vy = spec.baseY - CLOUD_PEAK * spec.scale * envelope * (0.5 + rand() * 0.12);
+      points.push({ x: round(vx), y: round(vy) });
+    }
+    const envelope = Math.sin(Math.PI * t);
+    const peakX = xL + 2 * halfW * t + (rand() - 0.5) * 12 * spec.scale;
+    const peakY = spec.baseY - CLOUD_PEAK * spec.scale * envelope * (0.82 + rand() * 0.32);
+    points.push({ x: round(peakX), y: round(peakY) });
+  }
+  points.push({ x: round(xR), y: spec.baseY });
+
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] ?? points[i];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] ?? points[i + 1];
+    const c1x = round(p1.x + (p2.x - p0.x) / 6);
+    const c1y = round(p1.y + (p2.y - p0.y) / 6);
+    const c2x = round(p2.x - (p3.x - p1.x) / 6);
+    const c2y = round(p2.y - (p3.y - p1.y) / 6);
+    d += ` C ${c1x} ${c1y} ${c2x} ${c2y} ${p2.x} ${p2.y}`;
+  }
+  d += ` L ${points[0].x} ${points[0].y} Z`;
+  return { d, points };
 }
 
 export const CLOUDS: CloudLayout[] = [

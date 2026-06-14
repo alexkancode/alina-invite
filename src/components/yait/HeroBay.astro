@@ -50,10 +50,7 @@ const fryStyle = (fry: (typeof fries)[number]) =>
             {cloud.glow && (
               <ellipse class="cloud-glow" cx={cloud.spec.cx} cy={cloud.spec.baseY - 30 * cloud.spec.scale} rx={86 * cloud.spec.scale} ry={52 * cloud.spec.scale} fill="#F4A259" opacity="0.4"></ellipse>
             )}
-            <rect x={shape.base.x} y={shape.base.y} width={shape.base.width} height={shape.base.height} fill="url(#yait-cloud-grad)"></rect>
-            {shape.ellipses.map(e => (
-              <ellipse cx={e.cx} cy={e.cy} rx={e.rx} ry={e.ry} fill="url(#yait-cloud-grad)"></ellipse>
-            ))}
+            <path d={shape.d} fill="url(#yait-cloud-grad)"></path>
           </g>
         </g>
       );

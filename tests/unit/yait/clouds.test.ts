@@ -5,25 +5,28 @@ const spec = { cx: 760, baseY: 130, scale: 1, seed: 7 };
 
 describe('buildCloud', () => {
   const cloud = buildCloud(spec);
+  const rise = (c: typeof cloud) => Math.max(...c.points.map(p => spec.baseY - p.y));
 
-  test('is a puffy stack of at least four ellipses on a flat base', () => {
-    expect(cloud.ellipses.length).toBeGreaterThanOrEqual(4);
+  test('is one closed smooth bezier path (lumpy top over a flat base)', () => {
+    expect(cloud.d.startsWith('M ')).toBe(true);
+    expect(cloud.d.endsWith('Z')).toBe(true);
+    expect((cloud.d.match(/C /g) ?? []).length).toBeGreaterThanOrEqual(4);
   });
 
-  test('every ellipse is bottom-aligned so the cloud has a flat bottom', () => {
-    for (const e of cloud.ellipses) {
-      expect(Math.abs(e.cy + e.ry - spec.baseY)).toBeLessThan(1.5);
-    }
+  test('the bottom corners sit on the flat baseline', () => {
+    expect(cloud.points[0].y).toBe(spec.baseY);
+    expect(cloud.points[cloud.points.length - 1].y).toBe(spec.baseY);
   });
 
-  test('the base rect closes the flat bottom across the cloud width', () => {
-    expect(cloud.base.y + cloud.base.height).toBeCloseTo(spec.baseY, 0);
-    expect(cloud.base.width).toBeGreaterThan(0);
+  test('the top rises into several lumps above the baseline', () => {
+    const lumps = cloud.points.filter(p => spec.baseY - p.y > 5);
+    expect(lumps.length).toBeGreaterThanOrEqual(3);
+    expect(rise(cloud)).toBeGreaterThan(20);
   });
 
-  test('the bumps are jittered (not all the same radius)', () => {
-    const radii = new Set(cloud.ellipses.map(e => Math.round(e.rx)));
-    expect(radii.size).toBeGreaterThan(1);
+  test('the lumps are irregular (peak heights vary)', () => {
+    const peaks = new Set(cloud.points.map(p => Math.round(spec.baseY - p.y)).filter(h => h > 5));
+    expect(peaks.size).toBeGreaterThan(1);
   });
 
   test('is deterministic for a seed and varies across seeds', () => {
@@ -32,9 +35,7 @@ describe('buildCloud', () => {
   });
 
   test('scale grows the cloud', () => {
-    const big = buildCloud({ ...spec, scale: 1.6 });
-    const span = (c: typeof cloud) => Math.max(...c.ellipses.map(e => e.rx));
-    expect(span(big)).toBeGreaterThan(span(cloud));
+    expect(rise(buildCloud({ ...spec, scale: 1.6 }))).toBeGreaterThan(rise(cloud));
   });
 });
 

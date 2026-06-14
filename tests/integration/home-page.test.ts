@@ -50,7 +50,7 @@ describe('GET /home', () => {
   test('ships sunset clouds instead of the old flat pills', () => {
     expect(homeHtml).toContain('id="yait-cloud-grad"');
     expect(homeHtml).toContain('class="cloud cloud--1"');
-    expect(homeHtml).toContain('fill="url(#yait-cloud-grad)"');
+    expect(homeHtml).toMatch(/<path d="M [^"]*Z" fill="url\(#yait-cloud-grad\)"/);
     expect(homeHtml).not.toContain('rx="13" fill="#F4E8D1"');
     expect(homeHtml).not.toContain('rx="11" fill="#F4E8D1"');
   });
