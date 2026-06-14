@@ -46,10 +46,10 @@ describe('yait scene contract canary', () => {
 
   test('the timeline constants the stylesheet choreography depends on are stable', () => {
     expect(SCENE_TIMELINE).toEqual({
-      sailDurationMs: 5000,
-      dockSettleDurationMs: 1000,
-      bounceStartMs: 6000,
-      ctaRiseStartMs: 6000
+      sailDurationMs: 4444,
+      dockSettleDurationMs: 889,
+      bounceStartMs: 5333,
+      ctaRiseStartMs: 5333
     });
   });
 });
