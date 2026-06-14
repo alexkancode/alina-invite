@@ -206,6 +206,19 @@ test.describe('yait home hero', () => {
     expect(atBeat).not.toBe(between);
   });
 
+  test('the mirrored echo line is a translucent white stroke that reveals nothing', async ({ page }) => {
+    await page.goto('/home');
+    const echo = await page.evaluate(() => {
+      const el = document.querySelector('.reveal-echo-line')!;
+      const s = getComputedStyle(el);
+      return { stroke: s.stroke, opacity: s.strokeOpacity, fill: s.fill, clip: s.clipPath };
+    });
+    expect(echo.stroke).toBe('rgb(255, 255, 255)');
+    expect(Number(echo.opacity)).toBeCloseTo(0.45, 2);
+    expect(echo.fill).toBe('none');
+    expect(echo.clip === 'none' || echo.clip === '').toBe(true);
+  });
+
   test('the headline text element carries zero animation', async ({ page }) => {
     await page.goto('/home');
     const anims = await page.evaluate(() => ({

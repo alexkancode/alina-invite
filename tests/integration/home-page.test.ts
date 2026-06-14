@@ -100,6 +100,16 @@ describe('GET /home', () => {
     expect(sweep.endsWith('-0.15 0')).toBe(true);
   });
 
+  test('a mirrored echo wave line sits over the headline and reveals nothing', () => {
+    expect(homeHtml).toContain('class="reveal-echo"');
+    expect(homeHtml).toContain('class="reveal-echo-line"');
+    expect(homeHtml).toContain('transform="translate(0 1) scale(1 -1)"');
+    const echo = homeHtml.match(/class="reveal-echo"[\s\S]*?<\/svg>/)?.[0] ?? '';
+    expect(echo).toContain('attributeName="d"');
+    expect(echo).toContain('type="translate"');
+    expect(echo).not.toContain('clip-path');
+  });
+
   test('reduced-motion users get the morph removed by the inline script', () => {
     expect(homeHtml).toContain('prefers-reduced-motion');
     expect(homeHtml).toContain("querySelectorAll('animate, animateTransform')");

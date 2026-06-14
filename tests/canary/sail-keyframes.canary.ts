@@ -138,6 +138,16 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).not.toMatch(/\.line-mask/);
   });
 
+  test('the mirrored echo line is a semi-transparent white stroke that reveals nothing', () => {
+    const echo = css.match(/\.reveal-echo-line \{([\s\S]*?)\n\}/)?.[1] ?? '';
+    expect(echo.length).toBeGreaterThan(0);
+    expect(echo).toMatch(/fill: none;/);
+    expect(echo).toMatch(/stroke: #ffffff;/);
+    expect(echo).toMatch(/stroke-opacity: 0\.45;/);
+    expect(echo).toMatch(/stroke-width: 5px;/);
+    expect(echo).toMatch(/vector-effect: non-scaling-stroke;/);
+  });
+
   test('the second headline line is indented exactly 100px by rule', () => {
     expect(css).toMatch(/\.headline-line-indent \{\s*padding-left: 100px;/);
   });

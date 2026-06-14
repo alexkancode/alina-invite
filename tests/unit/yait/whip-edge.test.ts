@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
+  buildWhipEdgeLine,
   buildWhipEdgePath,
   whipCenters,
   WHIP,
@@ -7,8 +8,30 @@ import {
   WHIP_CENTER_MIN,
   WHIP_EDGE_FRAMES,
   WHIP_GEOMETRY,
-  WHIP_HALF_FRAMES
+  WHIP_HALF_FRAMES,
+  WHIP_LINE_FRAMES
 } from '../../../src/lib/yait/heroScene';
+
+describe('buildWhipEdgeLine (open echo line)', () => {
+  test('is an open wavy edge: starts with M, has cubics, no box edges or close', () => {
+    const line = buildWhipEdgeLine(WHIP_GEOMETRY, 0.5);
+    expect(line.startsWith('M ')).toBe(true);
+    expect((line.match(/C /g) ?? []).length).toBeGreaterThanOrEqual(4);
+    expect(line).not.toContain('-0.5 -0.5');
+    expect(line).not.toMatch(/ L /);
+    expect(line.trimEnd().endsWith('Z')).toBe(false);
+  });
+
+  test('shares the wave edge with the clip path (same head + cubics)', () => {
+    const line = buildWhipEdgeLine(WHIP_GEOMETRY, 0.5);
+    const clip = buildWhipEdgePath(WHIP_GEOMETRY, 0.5);
+    expect(clip).toContain(line.replace(/^M /, ''));
+  });
+
+  test('WHIP_LINE_FRAMES mirrors WHIP_EDGE_FRAMES frame count', () => {
+    expect(WHIP_LINE_FRAMES).toHaveLength(WHIP_EDGE_FRAMES.length);
+  });
+});
 
 interface Cubic {
   c1: { x: number; y: number };

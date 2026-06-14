@@ -94,7 +94,7 @@ export const WHIP_DURATION_MS = 3333;
 
 const frac = (n: number) => Math.round(n * 100000) / 100000;
 
-export function buildWhipEdgePath(g: WhipGeometry, center: number): string {
+function whipEdgeParts(g: WhipGeometry, center: number): { head: { x: number; y: number }; tail: { x: number; y: number }; cubics: string[] } {
   const edgeLen = Math.hypot(g.slantPx, g.maskH);
   const normal = { x: -g.maskH / edgeLen, y: g.slantPx / edgeLen };
   const x0Px = g.viewportW - g.slantPx;
@@ -123,9 +123,17 @@ export function buildWhipEdgePath(g: WhipGeometry, center: number): string {
     const c2 = { x: p1.x - (ds / 3) * d1.x, y: p1.y - (ds / 3) * d1.y };
     return `C ${frac(c1.x)} ${frac(c1.y)} ${frac(c2.x)} ${frac(c2.y)} ${frac(p1.x)} ${frac(p1.y)}`;
   });
-  const head = pointAt(0);
-  const tail = pointAt(1);
+  return { head: pointAt(0), tail: pointAt(1), cubics };
+}
+
+export function buildWhipEdgePath(g: WhipGeometry, center: number): string {
+  const { head, tail, cubics } = whipEdgeParts(g, center);
   return `M -0.5 -0.5 L ${frac(head.x)} -0.5 L ${frac(head.x)} ${frac(head.y)} ${cubics.join(' ')} L ${frac(tail.x)} 1.5 L -0.5 1.5 Z`;
+}
+
+export function buildWhipEdgeLine(g: WhipGeometry, center: number): string {
+  const { head, cubics } = whipEdgeParts(g, center);
+  return `M ${frac(head.x)} ${frac(head.y)} ${cubics.join(' ')}`;
 }
 
 export function whipCenters(min: number, max: number, half: number): number[] {
@@ -138,6 +146,9 @@ export function whipCenters(min: number, max: number, half: number): number[] {
 
 export const WHIP_EDGE_FRAMES: string[] = whipCenters(WHIP_CENTER_MIN, WHIP_CENTER_MAX, WHIP_HALF_FRAMES)
   .map(c => buildWhipEdgePath(WHIP_GEOMETRY, c));
+
+export const WHIP_LINE_FRAMES: string[] = whipCenters(WHIP_CENTER_MIN, WHIP_CENTER_MAX, WHIP_HALF_FRAMES)
+  .map(c => buildWhipEdgeLine(WHIP_GEOMETRY, c));
 
 export const WHIP = { durationMs: WHIP_DURATION_MS };
 
