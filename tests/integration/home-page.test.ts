@@ -68,6 +68,8 @@ describe('GET /home', () => {
     expect(homeHtml).toContain('dur="5.333s"');
     expect(homeHtml).toContain('keyTimes="0; 0.2083; 0.39; 0.5729; 1"');
     expect(homeHtml).toContain('fill="freeze"');
+    expect(homeHtml).toContain('-15 0.5 0.5');
+    expect(homeHtml).not.toContain('; 15 0.5 0.5;');
   });
 
   test('reduced-motion users get the morph removed by the inline script', () => {
