@@ -102,6 +102,22 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud-layer/);
   });
 
+  test('the clouds drift left-to-right with the whitest layer leading', () => {
+    expect(css).toMatch(/@keyframes drift-shadow/);
+    expect(css).toMatch(/@keyframes drift-mid/);
+    expect(css).toMatch(/@keyframes drift-cream/);
+    expect(css).toMatch(/\.cloud-drift-shadow \{[\s\S]*?animation: drift-shadow/);
+    expect(css).toMatch(/\.cloud-drift-mid \{[\s\S]*?animation: drift-mid/);
+    expect(css).toMatch(/\.cloud-drift-cream \{[\s\S]*?animation: drift-cream/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud-drift/);
+    const peak = (name: string) => {
+      const block = css.match(new RegExp(`@keyframes ${name} \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? '';
+      return Number(block.match(/translateX\((\d+(?:\.\d+)?)px\)/g)?.map(s => Number(s.match(/[\d.]+/)![0])).sort((a, b) => b - a)[0] ?? 0);
+    };
+    expect(peak('drift-cream')).toBeGreaterThan(peak('drift-mid'));
+    expect(peak('drift-mid')).toBeGreaterThan(peak('drift-shadow'));
+  });
+
   test('no keyframe is defined but left unattached (orphan guard)', () => {
     const defined = [...css.matchAll(/@keyframes ([\w-]+)/g)].map(m => m[1]);
     const referenced = new Set(

@@ -16,7 +16,7 @@ const fryStyle = (fry: (typeof fries)[number]) =>
         <stop offset="0%" stop-color="#34BBD0"></stop>
         <stop offset="100%" stop-color="#5BC9D6"></stop>
       </linearGradient>
-      <filter id="yait-cloud-warp" x="-6%" y="-6%" width="112%" height="112%">
+      <filter id="yait-cloud-warp" x="-10%" y="-6%" width="120%" height="112%">
         <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="11" result="n">
           <animate attributeName="baseFrequency" dur="21s" values="0.008 0.012;0.013 0.009;0.007 0.014;0.008 0.012" repeatCount="indefinite"></animate>
         </feTurbulence>
@@ -49,7 +49,9 @@ const fryStyle = (fry: (typeof fries)[number]) =>
     <g class="clouds" transform="translate(297 0) scale(1.25)">
       <g filter="url(#yait-cloud-warp)">
         {CLOUD_ART.layers.map(layer => (
-          <path class={`cloud-layer cloud-${layer.tone}`} d={layer.d}></path>
+          <g class={`cloud-drift cloud-drift-${layer.tone}`}>
+            <path class={`cloud-layer cloud-${layer.tone}`} d={layer.d}></path>
+          </g>
         ))}
       </g>
     </g>

@@ -134,12 +134,30 @@ test.describe('yait home hero', () => {
     expect(a).not.toBe(b);
   });
 
+  test('the whitest layer drifts farther than the rest (staggered parallax)', async ({ page }) => {
+    await page.goto('/home');
+    const tx = (sel: string) => page.evaluate((s) => {
+      const m = new DOMMatrixReadOnly(getComputedStyle(document.querySelector(s)!).transform);
+      return m.m41;
+    }, sel);
+    // sample near a drift peak so the offsets are well separated
+    await page.waitForTimeout(4000);
+    const [cream, mid, shadow] = await Promise.all([
+      tx('.cloud-drift-cream'), tx('.cloud-drift-mid'), tx('.cloud-drift-shadow')
+    ]);
+    expect(Math.abs(cream)).toBeGreaterThan(Math.abs(mid));
+    expect(Math.abs(mid)).toBeGreaterThan(Math.abs(shadow));
+  });
+
   test('reduced motion rests the cloud layers static', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/home');
-    const name = await page.evaluate(() =>
+    const creamAnim = await page.evaluate(() =>
       getComputedStyle(document.querySelector('.cloud-cream')!).animationName);
-    expect(name === 'none' || name === '').toBe(true);
+    const driftAnim = await page.evaluate(() =>
+      getComputedStyle(document.querySelector('.cloud-drift-cream')!).animationName);
+    expect(creamAnim === 'none' || creamAnim === '').toBe(true);
+    expect(driftAnim === 'none' || driftAnim === '').toBe(true);
   });
 
   test('the envelope swivels toward the screen at the inner beat and returns flat', async ({ page }) => {

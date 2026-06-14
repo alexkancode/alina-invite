@@ -54,6 +54,11 @@ describe('GET /home', () => {
     expect(homeHtml).toContain('cloud-layer cloud-cream');
   });
 
+  test('each cloud layer sits in its own drift group for parallax', () => {
+    expect((homeHtml.match(/class="cloud-drift cloud-drift-/g) ?? []).length).toBe(3);
+    expect(homeHtml).toContain('cloud-drift cloud-drift-cream');
+  });
+
   test('the clouds warp through an animated displacement filter', () => {
     expect(homeHtml).toContain('id="yait-cloud-warp"');
     expect(homeHtml.toLowerCase()).toContain('feturbulence');

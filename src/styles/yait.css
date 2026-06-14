@@ -41,6 +41,25 @@
   transform-origin: 50% 92%;
 }
 
+.cloud-drift-shadow { animation: drift-shadow 60s ease-in-out infinite alternate; }
+.cloud-drift-mid { animation: drift-mid 60s ease-in-out infinite alternate; }
+.cloud-drift-cream { animation: drift-cream 60s ease-in-out infinite alternate; }
+
+@keyframes drift-shadow {
+  from { transform: translateX(0); }
+  to { transform: translateX(8px); }
+}
+
+@keyframes drift-mid {
+  from { transform: translateX(0); }
+  to { transform: translateX(12px); }
+}
+
+@keyframes drift-cream {
+  from { transform: translateX(0); }
+  to { transform: translateX(16px); }
+}
+
 @keyframes swell-tall {
   0%, 100% { transform: scale(1, 1); }
   45% { transform: scale(1.008, 1.021); }
@@ -410,7 +429,8 @@
   .headline,
   .fry,
   .club,
-  .cloud-layer {
+  .cloud-layer,
+  .cloud-drift {
     animation: none;
   }
 }
