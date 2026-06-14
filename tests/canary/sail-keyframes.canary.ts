@@ -97,6 +97,12 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud,[\s\S]*?\.cloud-inner/);
   });
 
+  test('the hero cloud rim-glow pulses like golden-hour light and rests under reduced motion', () => {
+    expect(css).toMatch(/@keyframes glow-breathe \{[\s\S]*?transform: scale\(1\.04\);/);
+    expect(css).toMatch(/\.cloud-glow \{[\s\S]*?animation: glow-breathe 12s ease-in-out infinite;/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.cloud-glow/);
+  });
+
   test('mobile scales the tall fries back into proportion', () => {
     expect(css).toMatch(/\.fry \{\s*height: calc\(var\(--fry-h\) \* 0\.8\);\s*\}/);
   });

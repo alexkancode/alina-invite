@@ -60,4 +60,12 @@ describe('CLOUDS layout', () => {
       expect(c.opacity).toBeLessThanOrEqual(hero.opacity);
     }
   });
+
+  test('there is a receding parallax plane of small, faint clouds', () => {
+    const receding = CLOUDS.filter(c => c.opacity <= 0.4 && !c.glow);
+    expect(receding.length).toBeGreaterThanOrEqual(2);
+    for (const c of receding) {
+      expect(c.spec.scale).toBeLessThan(0.6);
+    }
+  });
 });

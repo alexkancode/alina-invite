@@ -55,6 +55,11 @@ describe('GET /home', () => {
     expect(homeHtml).not.toContain('rx="11" fill="#F4E8D1"');
   });
 
+  test('ships the pulsing rim-glow and a far parallax plane', () => {
+    expect(homeHtml).toContain('class="cloud-glow"');
+    expect((homeHtml.match(/class="cloud cloud--/g) ?? []).length).toBeGreaterThanOrEqual(6);
+  });
+
   test('the clip path morphs its d through the whip frames', () => {
     expect(homeHtml).toContain('<animate');
     expect(homeHtml).toContain('attributeName="d"');

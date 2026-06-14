@@ -123,7 +123,7 @@ test.describe('yait home hero', () => {
 
   test('the sunset clouds drift, and rest on-screen under reduced motion', async ({ page }) => {
     await page.goto('/home');
-    await expect(page.locator('.cloud')).toHaveCount(4);
+    await expect(page.locator('.cloud')).toHaveCount(6);
     const driftX = () => page.evaluate(() => {
       const m = getComputedStyle(document.querySelector('.cloud--1')!).transform;
       const parts = m.match(/matrix\(([^)]+)\)/);
@@ -133,6 +133,19 @@ test.describe('yait home hero', () => {
     await page.waitForTimeout(900);
     const b = await driftX();
     expect(Math.abs(b - a)).toBeGreaterThan(0.5);
+  });
+
+  test('the hero rim-glow pulses, and rests static under reduced motion', async ({ page }) => {
+    await page.goto('/home');
+    await expect(page.locator('.cloud-glow')).toHaveCount(1);
+    const glowState = () => page.evaluate(() => {
+      const s = getComputedStyle(document.querySelector('.cloud-glow')!);
+      return s.opacity + '|' + s.transform;
+    });
+    const a = await glowState();
+    await page.waitForTimeout(1500);
+    const b = await glowState();
+    expect(a).not.toBe(b);
   });
 
   test('reduced motion rests the clouds on-screen and still', async ({ page }) => {

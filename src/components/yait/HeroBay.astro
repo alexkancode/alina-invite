@@ -48,7 +48,7 @@ const fryStyle = (fry: (typeof fries)[number]) =>
         <g class={`cloud cloud--${cloud.id}`} opacity={cloud.opacity}>
           <g class={`cloud-inner cloud-inner--${cloud.id}`}>
             {cloud.glow && (
-              <ellipse cx={cloud.spec.cx} cy={cloud.spec.baseY - 30 * cloud.spec.scale} rx={86 * cloud.spec.scale} ry={52 * cloud.spec.scale} fill="#F4A259" opacity="0.4"></ellipse>
+              <ellipse class="cloud-glow" cx={cloud.spec.cx} cy={cloud.spec.baseY - 30 * cloud.spec.scale} rx={86 * cloud.spec.scale} ry={52 * cloud.spec.scale} fill="#F4A259" opacity="0.4"></ellipse>
             )}
             <rect x={shape.base.x} y={shape.base.y} width={shape.base.width} height={shape.base.height} fill="url(#yait-cloud-grad)"></rect>
             {shape.ellipses.map(e => (

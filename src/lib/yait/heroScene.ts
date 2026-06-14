@@ -253,5 +253,7 @@ export const CLOUDS: CloudLayout[] = [
   { id: 1, spec: { cx: 740, baseY: 150, scale: 1.05, seed: 41 }, opacity: 0.95, glow: true },
   { id: 2, spec: { cx: 250, baseY: 120, scale: 0.7, seed: 12 }, opacity: 0.6, glow: false },
   { id: 3, spec: { cx: 470, baseY: 96, scale: 0.55, seed: 88 }, opacity: 0.5, glow: false },
-  { id: 4, spec: { cx: 1040, baseY: 185, scale: 0.65, seed: 23 }, opacity: 0.55, glow: false }
+  { id: 4, spec: { cx: 1040, baseY: 185, scale: 0.65, seed: 23 }, opacity: 0.55, glow: false },
+  { id: 5, spec: { cx: 880, baseY: 78, scale: 0.42, seed: 57 }, opacity: 0.34, glow: false },
+  { id: 6, spec: { cx: 350, baseY: 84, scale: 0.46, seed: 9 }, opacity: 0.32, glow: false }
 ];
