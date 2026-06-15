@@ -138,21 +138,19 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).not.toMatch(/\.line-mask/);
   });
 
-  test('the mirrored echo line is a semi-transparent white stroke that reveals nothing', () => {
+  test('the mirrored wake is a semi-transparent white fill (tapered ribbon, no stroke)', () => {
     const echo = css.match(/\.reveal-echo-line \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(echo.length).toBeGreaterThan(0);
-    expect(echo).toMatch(/fill: none;/);
-    expect(echo).toMatch(/stroke: #ffffff;/);
-    expect(echo).toMatch(/stroke-opacity: 0\.45;/);
-    expect(echo).toMatch(/stroke-width: 5px;/);
-    expect(echo).toMatch(/vector-effect: non-scaling-stroke;/);
+    expect(echo).toMatch(/fill: #ffffff;/);
+    expect(echo).toMatch(/fill-opacity: 0\.45;/);
+    expect(echo).not.toMatch(/stroke-width/);
   });
 
-  test('the echo wave is anchored at the boat stern and trails 3x long', () => {
+  test('the wake is anchored at the boat stern at the waterline', () => {
     const echo = css.match(/\.reveal-echo \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(echo).toMatch(/position: absolute;/);
     expect(echo).not.toMatch(/translateY/);
-    expect(echo).toMatch(/width: 294%;/);
+    expect(echo).toMatch(/right: 100%;/);
   });
 
   test('the second headline line is indented exactly 100px by rule', () => {

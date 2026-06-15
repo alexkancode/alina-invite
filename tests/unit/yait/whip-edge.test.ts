@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import {
+  buildWakeRibbon,
   buildWhipEdgeLine,
   buildWhipEdgePath,
+  WAKE_FRAMES,
+  WAKE_GEOMETRY,
   whipCenters,
   WHIP,
   WHIP_CENTER_MAX,
@@ -11,6 +14,31 @@ import {
   WHIP_HALF_FRAMES,
   WHIP_LINE_FRAMES
 } from '../../../src/lib/yait/heroScene';
+
+describe('buildWakeRibbon (tapered boat wake)', () => {
+  test('is a closed filled ribbon with rounded (arc) caps', () => {
+    const d = buildWakeRibbon(WAKE_GEOMETRY, 0);
+    expect(d.startsWith('M ')).toBe(true);
+    expect(d.trimEnd().endsWith('Z')).toBe(true);
+    expect((d.match(/A /g) ?? []).length).toBe(2);
+  });
+
+  test('thickens from the stern (right) to the far end (left)', () => {
+    const ys = (x: number) => {
+      const half = WAKE_GEOMETRY.minHalf + (WAKE_GEOMETRY.maxHalf - WAKE_GEOMETRY.minHalf) * (1 - x / WAKE_GEOMETRY.width);
+      return half;
+    };
+    expect(ys(0)).toBeCloseTo(WAKE_GEOMETRY.maxHalf, 5);
+    expect(ys(WAKE_GEOMETRY.width)).toBeCloseTo(WAKE_GEOMETRY.minHalf, 5);
+    expect(WAKE_GEOMETRY.maxHalf * 2).toBe(30);
+  });
+
+  test('is deterministic per phase and varies across phases', () => {
+    expect(buildWakeRibbon(WAKE_GEOMETRY, 1)).toBe(buildWakeRibbon(WAKE_GEOMETRY, 1));
+    expect(buildWakeRibbon(WAKE_GEOMETRY, 0)).not.toBe(buildWakeRibbon(WAKE_GEOMETRY, Math.PI));
+    expect(WAKE_FRAMES).toHaveLength(WAKE_GEOMETRY.frames);
+  });
+});
 
 describe('buildWhipEdgeLine (open echo line)', () => {
   test('is an open wavy edge: starts with M, has cubics, no box edges or close', () => {

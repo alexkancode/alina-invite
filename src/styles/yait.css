@@ -128,19 +128,16 @@
 
 .reveal-echo {
   position: absolute;
-  left: -294%;
-  bottom: -13px;
-  width: 294%;
-  height: 48px;
+  right: 100%;
+  bottom: -8px;
+  width: 225px;
+  height: 40px;
   pointer-events: none;
 }
 
 .reveal-echo-line {
-  fill: none;
-  stroke: #ffffff;
-  stroke-opacity: 0.45;
-  stroke-width: 5px;
-  vector-effect: non-scaling-stroke;
+  fill: #ffffff;
+  fill-opacity: 0.45;
 }
 
 .headline-line {

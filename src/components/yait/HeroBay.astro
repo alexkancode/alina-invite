@@ -1,5 +1,7 @@
 ---
-import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, REVEAL_DURATION_MS, REVEAL_EDGE, SCENE_TIMELINE, WHIP, WHIP_EDGE_FRAMES, WHIP_LINE_FRAMES } from '../../lib/yait/heroScene';
+import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, REVEAL_DURATION_MS, REVEAL_EDGE, SCENE_TIMELINE, WAKE_FRAMES, WAKE_GEOMETRY, WHIP, WHIP_EDGE_FRAMES } from '../../lib/yait/heroScene';
+
+const wakeViewBox = `${-WAKE_GEOMETRY.maxHalf} 0 ${WAKE_GEOMETRY.width + WAKE_GEOMETRY.maxHalf} ${WAKE_GEOMETRY.height}`;
 import { CLOUD_ART } from '../../lib/yait/cloudArt';
 
 const fries = buildFryCrowd(FRY_COUNT, CROWD_SEED);
@@ -106,16 +108,14 @@ const fryStyle = (fry: (typeof fries)[number]) =>
   </div>
 
   <div class="envelope-track" data-testid="envelope">
-    <svg class="reveal-echo" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
-      <g transform="translate(0 1) scale(1 -1)">
-        <path class="reveal-echo-line" d={WHIP_LINE_FRAMES[0]}>
-          <animate
-            attributeName="d"
-            values={WHIP_LINE_FRAMES.join(';')}
-            dur={`${WHIP.durationMs / 1000}s`}
-            repeatCount="indefinite"></animate>
-        </path>
-      </g>
+    <svg class="reveal-echo" viewBox={wakeViewBox} preserveAspectRatio="none" aria-hidden="true">
+      <path class="reveal-echo-line" d={WAKE_FRAMES[0]}>
+        <animate
+          attributeName="d"
+          values={WAKE_FRAMES.join(';')}
+          dur={`${WHIP.durationMs / 1000}s`}
+          repeatCount="indefinite"></animate>
+      </path>
     </svg>
     <div class="envelope">
     <div class="envelope-pivot">

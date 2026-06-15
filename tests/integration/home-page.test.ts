@@ -100,14 +100,14 @@ describe('GET /home', () => {
     expect(sweep.endsWith('-0.15 0')).toBe(true);
   });
 
-  test('the mirrored echo wave is the boat wake: inside the envelope, wiggles, reveals nothing', () => {
+  test('the boat wake is a tapered ribbon inside the envelope that wiggles and reveals nothing', () => {
     expect(homeHtml).toContain('class="reveal-echo"');
     expect(homeHtml).toContain('class="reveal-echo-line"');
-    expect(homeHtml).toContain('transform="translate(0 1) scale(1 -1)"');
     const envelope = homeHtml.match(/data-testid="envelope"[\s\S]*?class="reveal-echo"/)?.[0] ?? '';
     expect(envelope.length).toBeGreaterThan(0);
     const echo = homeHtml.match(/class="reveal-echo"[\s\S]*?<\/svg>/)?.[0] ?? '';
     expect(echo).toContain('attributeName="d"');
+    expect(echo).toMatch(/d="M [^"]*A /);
     expect(echo).not.toContain('type="translate"');
     expect(echo).not.toContain('clip-path');
   });

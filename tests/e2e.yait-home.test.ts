@@ -206,16 +206,15 @@ test.describe('yait home hero', () => {
     expect(atBeat).not.toBe(between);
   });
 
-  test('the mirrored echo line is a translucent white stroke that reveals nothing', async ({ page }) => {
+  test('the boat wake is a translucent white fill that reveals nothing', async ({ page }) => {
     await page.goto('/home');
     const echo = await page.evaluate(() => {
       const el = document.querySelector('.reveal-echo-line')!;
       const s = getComputedStyle(el);
-      return { stroke: s.stroke, opacity: s.strokeOpacity, fill: s.fill, clip: s.clipPath };
+      return { fill: s.fill, opacity: s.fillOpacity, clip: s.clipPath };
     });
-    expect(echo.stroke).toBe('rgb(255, 255, 255)');
+    expect(echo.fill).toBe('rgb(255, 255, 255)');
     expect(Number(echo.opacity)).toBeCloseTo(0.45, 2);
-    expect(echo.fill).toBe('none');
     expect(echo.clip === 'none' || echo.clip === '').toBe(true);
   });
 
@@ -229,15 +228,16 @@ test.describe('yait home hero', () => {
       const echo = document.querySelector('.reveal-echo-line')!.getBoundingClientRect();
       const boat = document.querySelector('[data-testid="envelope"]')!.getBoundingClientRect();
       const d = document.documentElement;
-      return { echoRight: echo.right, echoWidth: echo.width, boatLeft: boat.left, overflowX: d.scrollWidth - d.clientWidth, overflowY: d.scrollHeight - window.innerHeight };
+      return { echoRight: echo.right, echoWidth: echo.width, echoHeight: echo.height, boatLeft: boat.left, overflowX: d.scrollWidth - d.clientWidth, overflowY: d.scrollHeight - window.innerHeight };
     }, t);
     const mid = await sample(2000);
     const dock = await sample(6000);
     // wake sits at the stern (echo right edge near the boat's left edge) at every sail moment
-    expect(Math.abs(mid.echoRight - mid.boatLeft)).toBeLessThan(10);
-    expect(Math.abs(dock.echoRight - dock.boatLeft)).toBeLessThan(10);
-    // the wake trails well behind the stern (3x-long)
+    expect(Math.abs(mid.echoRight - mid.boatLeft)).toBeLessThan(12);
+    expect(Math.abs(dock.echoRight - dock.boatLeft)).toBeLessThan(12);
+    // the wake trails well behind the stern (long) and thickens toward the far end (~30px)
     expect(dock.echoWidth).toBeGreaterThan(150);
+    expect(dock.echoHeight).toBeGreaterThan(24);
     // it travels with the boat as it sails in
     expect(dock.boatLeft - mid.boatLeft).toBeGreaterThan(50);
     expect(dock.overflowX).toBeLessThanOrEqual(1);

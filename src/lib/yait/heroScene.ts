@@ -152,6 +152,50 @@ export const WHIP_LINE_FRAMES: string[] = whipCenters(WHIP_CENTER_MIN, WHIP_CENT
 
 export const WHIP = { durationMs: WHIP_DURATION_MS };
 
+export interface WakeGeometry {
+  width: number;
+  height: number;
+  maxHalf: number;
+  minHalf: number;
+  amplitude: number;
+  samples: number;
+  frames: number;
+}
+
+export const WAKE_GEOMETRY: WakeGeometry = {
+  width: 210,
+  height: 40,
+  maxHalf: 15,
+  minHalf: 2,
+  amplitude: 4,
+  samples: 24,
+  frames: 16
+};
+
+export function buildWakeRibbon(g: WakeGeometry, phase: number): string {
+  const r = (n: number) => Math.round(n * 100) / 100;
+  const yc = (x: number) => g.height / 2 + g.amplitude * Math.sin((2 * Math.PI * x) / g.width + phase);
+  const half = (x: number) => g.minHalf + (g.maxHalf - g.minHalf) * (1 - x / g.width);
+  const top = Array.from({ length: g.samples + 1 }, (_, i) => {
+    const x = g.width * (1 - i / g.samples);
+    return [x, yc(x) - half(x)] as const;
+  });
+  const bottom = Array.from({ length: g.samples + 1 }, (_, i) => {
+    const x = g.width * (i / g.samples);
+    return [x, yc(x) + half(x)] as const;
+  });
+  let d = `M ${r(top[0][0])} ${r(top[0][1])}`;
+  for (let i = 1; i < top.length; i++) d += ` L ${r(top[i][0])} ${r(top[i][1])}`;
+  d += ` A ${g.maxHalf} ${g.maxHalf} 0 0 1 ${r(bottom[0][0])} ${r(bottom[0][1])}`;
+  for (let i = 1; i < bottom.length; i++) d += ` L ${r(bottom[i][0])} ${r(bottom[i][1])}`;
+  d += ` A ${g.minHalf} ${g.minHalf} 0 0 1 ${r(top[0][0])} ${r(top[0][1])}`;
+  return d + ' Z';
+}
+
+export const WAKE_FRAMES: string[] = Array.from({ length: WAKE_GEOMETRY.frames }, (_, i) =>
+  buildWakeRibbon(WAKE_GEOMETRY, (2 * Math.PI * i) / WAKE_GEOMETRY.frames)
+);
+
 export interface SceneTimeline {
   sailDurationMs: number;
   dockSettleDurationMs: number;
