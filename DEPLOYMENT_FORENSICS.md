@@ -1,103 +1,69 @@
-# Deployment Forensics - yait Perceptible Wave Roll
+# Deployment Forensics - yait Beach Clouds, Bigger Headline, Static-Text Reveal + Echo
 
 ## Deployment Details
 
-**Date:** 2026-06-12
-**Service:** party-app (Railway, environment: production)
+**Date:** 2026-06-14
+**Service:** party-app (Railway, project invites-photo-system, environment: production)
 **Live target:** https://yait.social/home
+**Method:** Direct Railway deploy (`npm run party:deploy` = astro build + `railway up --detach`)
+**Railway deployment id:** b1a21434-179a-4e94-9385-c61f02bede20
+**Commits deployed:** 69 commits ahead of the prior origin/main (the full session of
+cloud, headline, reveal, and drift work), pushed to origin/main at a17ec45.
 
-## Commits Being Deployed
+## Why a direct Railway deploy (not the CI gate)
 
-- perceptible-wave-roll plan
-- perceptible-wave-roll implementation
+The configured CI deploy (`.github/workflows/deploy.yml` and `deploy-updated.yml`,
+`on: push: branches: [main]`) cannot deploy: both `test-api` and `test-e2e` fail at the
+`npm run migrate` step with `password authentication failed for user "postgres"`, so the
+`deploy` job is skipped. Root cause (pre-existing, not from this work):
+`scripts/migrate.ts` uses `DATABASE_URL` only when it does NOT contain `localhost`; CI's
+`DATABASE_URL` is `postgresql://postgres:test@localhost:5432/party`, so migrate falls
+back to a hardcoded `password: 'dev'` while the CI Postgres service password is `test`.
+The 2026-06-12 run failed identically - the CI gate has never passed. Additional
+pre-existing, unrelated failures exist (migration-validation tests, the
+database-config-consistency rule, eslint autofix tests, and the Postgres-dependent
+suites). Repairing CI is tracked as a separate effort; prod was shipped directly via
+Railway, which is how prior deploys actually happened.
 
-## Changes Deployed
+## Changes Deployed (high level)
 
-1. The SMIL roll on the shared `#yait-wave-clip` clipPath was sped up from one
-   wavelength per 4s to one per 1s (`WAVE_ROLL_PERIOD_MS = 1000`), raising crest
-   travel from ~13 px/s to ~52 px/s so the wave is perceptibly rolling down the
-   45-degree reveal slants instead of reading as a static curve. The roll vector
-   (0.02891 0.2 box units, one wavelength) is unchanged; only the period changed.
-2. The roll now stops at rest once the reveal completes. `repeatCount` is derived
-   from the reveal span (`ceil((REVEAL_DURATION_MS + REVEAL_TOP_DELAY_MS) / period)
-   = 7`) and the animation carries `fill="freeze"`. Because one wavelength of
-   translation is visually identical to the rest shape (the path keeps one-
-   wavelength zero-phase margins on each end), freezing after a whole number of
-   wavelengths lands exactly on rest. This also ends the prior perpetual repaint of
-   the two clipped line layers, which the indefinite loop incurred off-text forever.
-3. CSS untouched. No new mechanism: same SMIL-on-clipPath, same jitter-free
-   guarantee (text elements are never transformed). Amplitude stays at 12.5px. The
-   reduced-motion inline script still removes the animation node entirely.
+1. Removed the old procedural sunset clouds; rebuilt the hero sky from a pixel trace of
+   a beach reference into three tone layers (shadow/mid/cream), smoothed to beziers.
+2. Split the biggest cloud into its own group drifting 10% faster (72s vs 80s); the
+   whole cloud field drifts left-to-right ~200px at constant (linear) velocity with a
+   staggered per-tone parallax, plus a displacement-warp and gentle layered breathing.
+3. Sky recoloured to the cyan beach palette.
+4. Headline enlarged on desktop: `--headline-fs: clamp(2.8rem, 12vw, 10.5rem)`.
+5. Reveal re-architected so the headline text element carries ZERO animation: the wave
+   sweep moved onto the clip aperture (SMIL translate from REVEAL_EDGE) over static text.
+6. Added a mirrored decorative echo of the reveal wave (vertically flipped, semi-
+   transparent white ~5px ~45% stroke) that reveals nothing and animates in sync.
 
-## Cutover Sentinel
+## Pre-flight validation (local)
 
-GET https://yait.social/home contains `fill="freeze"`.
+- All yait tests green: unit + canary 101, integration 21, e2e 26.
+- Fixed one in-domain regression the pre-flight caught: `yait-scene.canary.ts` still
+  asserted the old SCENE_TIMELINE (5000/1000/6000); updated to the current
+  4444/889/5333 (a17ec45).
+- Full `test:api` locally shows 116 failures, all non-yait and environment-dependent
+  (no local Postgres) - zero yait files among them.
 
-Verified ABSENT in the BEFORE check: prod currently serves `dur="4s"` and
-`repeatCount="indefinite"` with no `fill="freeze"`. A secondary marker, `dur="1s"`,
-must also appear and `repeatCount="indefinite"` must disappear.
+## Post-deploy verification (live, https://yait.social)
 
-## Pre-Deploy Validation
+- `/home` 200; rendered HTML carries `reveal-echo`, `reveal-echo-line`, 6 `cloud-drift`
+  groups including `cloud-drift-hero-{shadow,mid,cream}`, 6 `cloud-layer` paths, cyan
+  `#34BBD0` present and old amber `#F9C784` gone, two `type="translate"` sweeps (clip +
+  echo).
+- Bundled CSS (`/_astro/home.*.css`) carries `clamp(2.8rem, 12vw, 10.5rem)`,
+  `reveal-echo-line` `stroke-opacity:.45` `stroke-width:5px`, and the hero `72s` drift.
+- Regression intact: `/` (birthday) 200 with `name="favoriteSong"`; `/api/health`
+  `{"status":"ok"}`; `/homex` 404.
+- Live screenshot at SMIL t=6.5s shows the enlarged "You Are / Invited To" headline
+  fully revealed over the cyan beach sky with clouds and sun.
 
-- 82 in-scope yait unit/canary/integration tests green (WAVE_ROLL period and the
-  whole-wavelength freeze-seam invariant; HTML contract for `dur="1s"`,
-  `repeatCount="7"`, `fill="freeze"`, and the derived vector).
-- 15 e2e green, including the strengthened live-pixel roll test: CSS animations
-  pinned at 3.0s with SMIL running free, the edge region must change by more than
-  800 px across 500ms (measured 987-1176 px at the new speed versus ~596 px for the
-  old 4s roll, so the floor genuinely separates fast from slow) while a fully-
-  revealed word region stays byte-identical (no jitter); a new test asserts the edge
-  is byte-identical 1s apart after the reveal completes (the freeze reaches rest);
-  reduced-motion run asserts the animation node is removed.
-- Local rebuild + redeploy on a fresh server: CURL confirmed the served HTML carries
-  `dur="1s"`, `repeatCount="7"`, `fill="freeze"`, the derived vector, the reduced-
-  motion guard, and that `dur="4s"`/`repeatCount="indefinite"` are absent; bogus
-  route 404; `/api/health` 200.
-- Magnified cut-edge frames at 250ms steps reviewed: crest contours on the glyph
-  edges visibly reshape across one wavelength.
+## Follow-ups
 
-## Earlier deployments today
-
-- yait SMIL Rolling Waves: cutover 41s on the /home `animateTransform` sentinel,
-  fully validated; introduced the roll this deploy retunes. Superseded here.
-- yait Home Landing: cutover 42s on the /home 404-to-200 sentinel; includes
-  db-pool-resilience.
-- yait S-Curve Sail-In: cutover 43s; fixed an inert entrance. Superseded by
-  three-beat-sail.
-- yait Three-Beat Sail: cutover 42s; split travel from weave for three felt beats.
-- yait Wake Reveal: cutover 32s; boat-synced wipe replaced word timers.
-- yait Hull-Locked Reveal (2026-06-11): cutover 53s; bow-locked edge.
-- yait Stern-Locked Reveal: cutover 42s; reveal edge moved to the stern.
-- yait Staggered Headline: cutover 53s; left-aligned lockup, prod indent 100px.
-- yait Slanted Reveal Edge: cutover 42s; prod measured 45 degrees exactly.
-- yait Wave Reveal Edge (+ 2/4/8-period and 12.5px amplitude retunes): all prod-
-  verified; established the wavy edge geometry this roll runs along.
-- yait Bezier Wave Edge: cutover 41s; 64 cubics, zero kinks prod-verified.
-- yait Symmetric Wave Crests: cutover 71s; worst apex offset 0.0px prod-verified.
-- yait Independent Line Reveals: cutover 32s; prod gaps 202/271/0, no convergence.
-- yait Open Envelope / Open Front V / Taller Tucked Fries: envelope staging, all
-  prod-verified.
-- yait Rolling Waves (carrier approach): REGRESSED prod (straight edge, text jitter)
-  and was ROLLED BACK in 42s; root causes recorded; replaced by the SMIL approach.
-
-## Production Validation
-
-- Cutover in 42 seconds (sentinel: `fill="freeze"` in prod /home HTML, poll #9).
-  Prod now serves `dur="1s"`, `repeatCount="7"`, `fill="freeze"`, and the derived
-  vector `to="0.02891 0.2"`; `dur="4s"` and `repeatCount="indefinite"` are gone
-  (both confirmed 0 occurrences post-cutover).
-- LIVE-PIXEL prod probe on https://yait.social/home (CSS animations pinned at 3.0s,
-  SMIL running free):
-  - edge region changed 1131 px across 500ms mid-reveal (floor 800; the wave rolls
-    perceptibly at the new speed on production)
-  - fully-revealed word region byte-identical across the same 500ms (no jitter)
-  - after letting the page run past 8s, the edge region is byte-identical across 1s
-    (the roll froze at rest on production)
-- Magnified prod mid-reveal capture reviewed: the wavy cut edge crosses the glyphs
-  as intended.
-- Live invite page /home 200 and /api/health 200 throughout.
-
-## Final Status Assessment
-
-**Deployment Status:** SUCCESSFUL
-**Service Availability:** STABLE (live invite page and health 200 throughout)
+- Repair the CI deploy gate (migrate `DATABASE_URL` handling + the other pre-existing
+  test failures) so pushes can test and deploy automatically again.
+- Mobile reveal tracking is approximate (the SMIL clip sweep uses desktop REVEAL_EDGE
+  values; SMIL cannot be media-queried).
