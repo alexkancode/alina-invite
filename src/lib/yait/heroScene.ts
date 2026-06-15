@@ -158,23 +158,26 @@ export interface WakeGeometry {
   maxHalf: number;
   minHalf: number;
   amplitude: number;
+  splay: number;
   samples: number;
   frames: number;
 }
 
 export const WAKE_GEOMETRY: WakeGeometry = {
   width: 210,
-  height: 40,
+  height: 80,
   maxHalf: 15,
   minHalf: 2,
-  amplitude: 4,
-  samples: 24,
+  amplitude: 3,
+  splay: 22,
+  samples: 20,
   frames: 16
 };
 
-export function buildWakeRibbon(g: WakeGeometry, phase: number): string {
+function wakeTail(g: WakeGeometry, phase: number, dir: number): string {
   const r = (n: number) => Math.round(n * 100) / 100;
-  const yc = (x: number) => g.height / 2 + g.amplitude * Math.sin((2 * Math.PI * x) / g.width + phase);
+  const yc = (x: number) =>
+    g.height / 2 + dir * g.splay * (1 - x / g.width) + g.amplitude * Math.sin((2 * Math.PI * x) / g.width + phase);
   const half = (x: number) => g.minHalf + (g.maxHalf - g.minHalf) * (1 - x / g.width);
   const top = Array.from({ length: g.samples + 1 }, (_, i) => {
     const x = g.width * (1 - i / g.samples);
@@ -192,8 +195,12 @@ export function buildWakeRibbon(g: WakeGeometry, phase: number): string {
   return d + ' Z';
 }
 
+export function buildWakeTails(g: WakeGeometry, phase: number): string {
+  return `${wakeTail(g, phase, -1)} ${wakeTail(g, phase, 1)}`;
+}
+
 export const WAKE_FRAMES: string[] = Array.from({ length: WAKE_GEOMETRY.frames }, (_, i) =>
-  buildWakeRibbon(WAKE_GEOMETRY, (2 * Math.PI * i) / WAKE_GEOMETRY.frames)
+  buildWakeTails(WAKE_GEOMETRY, (2 * Math.PI * i) / WAKE_GEOMETRY.frames)
 );
 
 export interface SceneTimeline {

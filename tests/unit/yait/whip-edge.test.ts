@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
-  buildWakeRibbon,
+  buildWakeTails,
   buildWhipEdgeLine,
   buildWhipEdgePath,
   WAKE_FRAMES,
@@ -15,27 +15,27 @@ import {
   WHIP_LINE_FRAMES
 } from '../../../src/lib/yait/heroScene';
 
-describe('buildWakeRibbon (tapered boat wake)', () => {
-  test('is a closed filled ribbon with rounded (arc) caps', () => {
-    const d = buildWakeRibbon(WAKE_GEOMETRY, 0);
+describe('buildWakeTails (two trapezoidal V tails)', () => {
+  test('is two closed subpaths, each with two rounded (arc) caps', () => {
+    const d = buildWakeTails(WAKE_GEOMETRY, 0);
     expect(d.startsWith('M ')).toBe(true);
     expect(d.trimEnd().endsWith('Z')).toBe(true);
-    expect((d.match(/A /g) ?? []).length).toBe(2);
+    expect((d.match(/M /g) ?? []).length).toBe(2);
+    expect((d.match(/Z/g) ?? []).length).toBe(2);
+    expect((d.match(/A /g) ?? []).length).toBe(4);
   });
 
-  test('thickens from the stern (right) to the far end (left)', () => {
-    const ys = (x: number) => {
-      const half = WAKE_GEOMETRY.minHalf + (WAKE_GEOMETRY.maxHalf - WAKE_GEOMETRY.minHalf) * (1 - x / WAKE_GEOMETRY.width);
-      return half;
-    };
-    expect(ys(0)).toBeCloseTo(WAKE_GEOMETRY.maxHalf, 5);
-    expect(ys(WAKE_GEOMETRY.width)).toBeCloseTo(WAKE_GEOMETRY.minHalf, 5);
+  test('thickens from the stern to the far end (~30px) and splays into a V', () => {
+    const half = (x: number) => WAKE_GEOMETRY.minHalf + (WAKE_GEOMETRY.maxHalf - WAKE_GEOMETRY.minHalf) * (1 - x / WAKE_GEOMETRY.width);
+    expect(half(0)).toBeCloseTo(WAKE_GEOMETRY.maxHalf, 5);
+    expect(half(WAKE_GEOMETRY.width)).toBeCloseTo(WAKE_GEOMETRY.minHalf, 5);
     expect(WAKE_GEOMETRY.maxHalf * 2).toBe(30);
+    expect(WAKE_GEOMETRY.splay).toBeGreaterThan(WAKE_GEOMETRY.maxHalf);
   });
 
   test('is deterministic per phase and varies across phases', () => {
-    expect(buildWakeRibbon(WAKE_GEOMETRY, 1)).toBe(buildWakeRibbon(WAKE_GEOMETRY, 1));
-    expect(buildWakeRibbon(WAKE_GEOMETRY, 0)).not.toBe(buildWakeRibbon(WAKE_GEOMETRY, Math.PI));
+    expect(buildWakeTails(WAKE_GEOMETRY, 1)).toBe(buildWakeTails(WAKE_GEOMETRY, 1));
+    expect(buildWakeTails(WAKE_GEOMETRY, 0)).not.toBe(buildWakeTails(WAKE_GEOMETRY, Math.PI));
     expect(WAKE_FRAMES).toHaveLength(WAKE_GEOMETRY.frames);
   });
 });

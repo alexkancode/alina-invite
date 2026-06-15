@@ -107,7 +107,9 @@ describe('GET /home', () => {
     expect(envelope.length).toBeGreaterThan(0);
     const echo = homeHtml.match(/class="reveal-echo"[\s\S]*?<\/svg>/)?.[0] ?? '';
     expect(echo).toContain('attributeName="d"');
-    expect(echo).toMatch(/d="M [^"]*A /);
+    const d = echo.match(/class="reveal-echo-line" d="([^"]+)"/)?.[1] ?? '';
+    expect((d.match(/M /g) ?? []).length).toBe(2);
+    expect((d.match(/A /g) ?? []).length).toBe(4);
     expect(echo).not.toContain('type="translate"');
     expect(echo).not.toContain('clip-path');
   });

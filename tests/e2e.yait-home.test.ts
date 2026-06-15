@@ -235,9 +235,9 @@ test.describe('yait home hero', () => {
     // wake sits at the stern (echo right edge near the boat's left edge) at every sail moment
     expect(Math.abs(mid.echoRight - mid.boatLeft)).toBeLessThan(12);
     expect(Math.abs(dock.echoRight - dock.boatLeft)).toBeLessThan(12);
-    // the wake trails well behind the stern (long) and thickens toward the far end (~30px)
+    // the wake trails behind the stern (long) and fans into a V (tall spread)
     expect(dock.echoWidth).toBeGreaterThan(150);
-    expect(dock.echoHeight).toBeGreaterThan(24);
+    expect(dock.echoHeight).toBeGreaterThan(45);
     // it travels with the boat as it sails in
     expect(dock.boatLeft - mid.boatLeft).toBeGreaterThan(50);
     expect(dock.overflowX).toBeLessThanOrEqual(1);
