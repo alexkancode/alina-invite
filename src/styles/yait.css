@@ -130,10 +130,11 @@
   position: absolute;
   right: 100%;
   bottom: -40px;
-  width: 225px;
+  width: 245px;
   height: 80px;
   pointer-events: none;
-  animation: wake-fade 1.2s 5.333s linear forwards;
+  transform-origin: 100% 50%;
+  animation: wake-fade 1.2s 5.333s linear forwards, pivot 4.444s ease-in-out both;
 }
 
 @keyframes wake-fade {

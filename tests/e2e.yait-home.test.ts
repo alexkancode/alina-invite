@@ -223,6 +223,9 @@ test.describe('yait home hero', () => {
     const isDescendant = await page.evaluate(() =>
       document.querySelector('[data-testid="envelope"]')!.contains(document.querySelector('.reveal-echo')));
     expect(isDescendant).toBe(true);
+    const swivelsWithBoat = await page.evaluate(() =>
+      document.querySelector('.reveal-echo')!.getAnimations().some(a => (a as CSSAnimation).animationName === 'pivot'));
+    expect(swivelsWithBoat).toBe(true);
     const sample = (t: number) => page.evaluate((ms) => {
       document.getAnimations({ subtree: true }).forEach(a => { a.pause(); a.currentTime = ms; });
       const echo = document.querySelector('.reveal-echo-line')!.getBoundingClientRect();

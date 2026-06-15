@@ -26,6 +26,12 @@ describe('buildWakeTails (two trapezoidal V tails)', () => {
     expect((d.match(new RegExp(`A ${WAKE_GEOMETRY.maxHalf} ${WAKE_GEOMETRY.maxHalf} 0 0 0 `, 'g')) ?? []).length).toBe(2);
   });
 
+  test('the lower tail is longer than the upper (extends past the far origin)', () => {
+    const d = buildWakeTails(WAKE_GEOMETRY, 0);
+    expect(WAKE_GEOMETRY.bottomExtra).toBe(20);
+    expect(d).toMatch(/ -\d/);
+  });
+
   test('thickens from the stern to the far end (~30px) and splays into a V', () => {
     const half = (x: number) => WAKE_GEOMETRY.minHalf + (WAKE_GEOMETRY.maxHalf - WAKE_GEOMETRY.minHalf) * (1 - x / WAKE_GEOMETRY.width);
     expect(half(0)).toBeCloseTo(WAKE_GEOMETRY.maxHalf, 5);

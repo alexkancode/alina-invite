@@ -151,7 +151,8 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(echo).toMatch(/position: absolute;/);
     expect(echo).not.toMatch(/translateY/);
     expect(echo).toMatch(/right: 100%;/);
-    expect(echo).toMatch(/animation: wake-fade 1\.2s 5\.333s linear forwards;/);
+    expect(echo).toMatch(/animation: wake-fade 1\.2s 5\.333s linear forwards, pivot 4\.444s ease-in-out both;/);
+    expect(echo).toMatch(/transform-origin: 100% 50%;/);
     expect(css).toMatch(/@keyframes wake-fade \{[\s\S]*?opacity: 0;/);
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reveal-echo \{\s*opacity: 0;/);
   });

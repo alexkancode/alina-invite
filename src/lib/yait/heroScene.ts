@@ -159,6 +159,7 @@ export interface WakeGeometry {
   minHalf: number;
   amplitude: number;
   splay: number;
+  bottomExtra: number;
   samples: number;
   frames: number;
 }
@@ -170,21 +171,22 @@ export const WAKE_GEOMETRY: WakeGeometry = {
   minHalf: 2,
   amplitude: 3,
   splay: 22,
+  bottomExtra: 20,
   samples: 20,
   frames: 16
 };
 
-function wakeTail(g: WakeGeometry, phase: number, dir: number): string {
+function wakeTail(g: WakeGeometry, phase: number, dir: number, length: number): string {
   const r = (n: number) => Math.round(n * 100) / 100;
-  const yc = (x: number) =>
-    g.height / 2 + dir * g.splay * (1 - x / g.width) + g.amplitude * Math.sin((2 * Math.PI * x) / g.width + phase);
-  const half = (x: number) => g.minHalf + (g.maxHalf - g.minHalf) * (1 - x / g.width);
+  const t = (x: number) => (g.width - x) / length;
+  const yc = (x: number) => g.height / 2 + dir * g.splay * t(x) + g.amplitude * Math.sin(2 * Math.PI * t(x) + phase);
+  const half = (x: number) => g.minHalf + (g.maxHalf - g.minHalf) * t(x);
   const top = Array.from({ length: g.samples + 1 }, (_, i) => {
-    const x = g.width * (1 - i / g.samples);
+    const x = g.width - (i / g.samples) * length;
     return [x, yc(x) - half(x)] as const;
   });
   const bottom = Array.from({ length: g.samples + 1 }, (_, i) => {
-    const x = g.width * (i / g.samples);
+    const x = g.width - length + (i / g.samples) * length;
     return [x, yc(x) + half(x)] as const;
   });
   let d = `M ${r(top[0][0])} ${r(top[0][1])}`;
@@ -196,7 +198,7 @@ function wakeTail(g: WakeGeometry, phase: number, dir: number): string {
 }
 
 export function buildWakeTails(g: WakeGeometry, phase: number): string {
-  return `${wakeTail(g, phase, -1)} ${wakeTail(g, phase, 1)}`;
+  return `${wakeTail(g, phase, -1, g.width)} ${wakeTail(g, phase, 1, g.width + g.bottomExtra)}`;
 }
 
 export const WAKE_FRAMES: string[] = Array.from({ length: WAKE_GEOMETRY.frames }, (_, i) =>

@@ -1,7 +1,7 @@
 ---
 import { buildFryCrowd, CROWD_SEED, FRY_COUNT, HEADLINE_LINES, REVEAL_DURATION_MS, REVEAL_EDGE, SCENE_TIMELINE, WAKE_FRAMES, WAKE_GEOMETRY, WHIP, WHIP_EDGE_FRAMES } from '../../lib/yait/heroScene';
 
-const wakeViewBox = `${-WAKE_GEOMETRY.maxHalf} 0 ${WAKE_GEOMETRY.width + WAKE_GEOMETRY.maxHalf} ${WAKE_GEOMETRY.height}`;
+const wakeViewBox = `${-(WAKE_GEOMETRY.maxHalf + WAKE_GEOMETRY.bottomExtra)} 0 ${WAKE_GEOMETRY.width + WAKE_GEOMETRY.maxHalf + WAKE_GEOMETRY.bottomExtra} ${WAKE_GEOMETRY.height}`;
 import { CLOUD_ART } from '../../lib/yait/cloudArt';
 
 const fries = buildFryCrowd(FRY_COUNT, CROWD_SEED);
