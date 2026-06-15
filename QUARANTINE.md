@@ -43,15 +43,25 @@ tracked here for separate triage, not deleted.
 
 ## e2e (excluded via `playwright.config.ts` `testMatch`)
 
-- `tests/e2e.test.ts` - Google Maps embed assertions and RSVP-modal happy/unhappy paths
-  that depend on external services not configured in CI.
-- `tests/e2e.game.test.ts` - game board rendering/difficulty assertions (subsystem drift).
+Only `tests/e2e.yait-home.test.ts` is in the gate - it is self-contained (no DB, no
+external services). Every other e2e file opens the RSVP flow / song search, which needs
+Spotify credentials not present in CI (they pass locally only because local has creds),
+or asserts headless-sensitive layout:
+
+- `tests/e2e.test.ts` - Google Maps embed + RSVP modal (external services).
+- `tests/e2e.game.test.ts` - game board rendering/difficulty (subsystem drift).
+- `tests/e2e.combobox-selected-state.test.ts`, `tests/e2e.song-preview.test.ts` - open
+  the RSVP modal with Spotify song search (`Missing Spotify credentials` in CI).
+- `tests/e2e.guest-list-preview.test.ts` - RSVP modal setup + headless-sensitive scroll
+  visibility assertions.
+- `tests/e2e.attending-pill.test.ts`, `tests/e2e.calendar-buttons.test.ts` - share the
+  RSVP-modal / credential-dependent setup.
 
 ## Still in the gate (meaningful coverage)
 
 - All yait suites: `tests/unit/yait/**`, `tests/canary/{sail-keyframes,yait-scene}.canary.ts`,
   `tests/integration/home-page.test.ts` (includes the birthday `/` + `/api/health`
-  regression guard), and `tests/e2e.yait-home.test.ts`.
-- Birthday e2e that pass: combobox, song-preview, guest-list-preview, attending-pill,
-  calendar-buttons.
-- The core API, calendar, rate-limiter, overlay, and other currently-green suites.
+  regression guard), and `tests/e2e.yait-home.test.ts` (the only credential-free e2e).
+- The core API, calendar, rate-limiter, overlay, and other currently-green vitest suites
+  (the birthday site is covered at the integration/vitest level even though its browser
+  e2e are quarantined).
