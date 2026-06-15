@@ -257,14 +257,16 @@ test.describe('yait home hero', () => {
     expect(dock.overflowY).toBeLessThanOrEqual(1);
   });
 
-  test('the headline text element carries zero animation', async ({ page }) => {
+  test('the headline text element carries zero animation and is coral', async ({ page }) => {
     await page.goto('/home');
-    const anims = await page.evaluate(() => ({
+    const s = await page.evaluate(() => ({
       headline: getComputedStyle(document.querySelector('.headline')!).animationName,
-      window: getComputedStyle(document.querySelector('.reveal-window')!).animationName
+      window: getComputedStyle(document.querySelector('.reveal-window')!).animationName,
+      color: getComputedStyle(document.querySelector('.headline')!).color
     }));
-    expect(anims.headline === 'none' || anims.headline === '').toBe(true);
-    expect(anims.window === 'none' || anims.window === '').toBe(true);
+    expect(s.headline === 'none' || s.headline === '').toBe(true);
+    expect(s.window === 'none' || s.window === '').toBe(true);
+    expect(s.color).toBe('rgb(231, 111, 81)');
   });
 
   test('the glyphs never move through the whole reveal (clip sweeps, text is static)', async ({ page }) => {

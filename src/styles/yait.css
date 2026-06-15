@@ -116,7 +116,7 @@
   font-weight: 400;
   font-size: var(--headline-fs);
   line-height: 1.1;
-  color: var(--yait-ink);
+  color: var(--yait-coral);
   text-shadow: 4px 4px 0 var(--yait-sand);
 }
 
@@ -226,6 +226,7 @@
   z-index: 2;
   display: block;
   width: 100%;
+  overflow: visible;
 }
 
 .envelope-flap {

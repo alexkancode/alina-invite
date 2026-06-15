@@ -100,9 +100,10 @@ describe('GET /home', () => {
     expect(sweep.endsWith('-0.15 0')).toBe(true);
   });
 
-  test('the red flag points left (backward) and the back flap is flush with the envelope', () => {
-    expect(homeHtml).toContain('d="M32 10 L2 18 L32 26 Z"');
-    expect(homeHtml).not.toContain('d="M14 10 L44 18 L14 26 Z"');
+  test('the red flag points left on a tall mast and the back flap is flush with the envelope', () => {
+    expect(homeHtml).toContain('d="M32 -55 L2 -47 L32 -39 Z"');
+    expect(homeHtml).toContain('y2="-55"');
+    expect(homeHtml).not.toContain('d="M32 10 L2 18 L32 26 Z"');
     expect(homeHtml).toContain('d="M 4 90 L 100 8 L 196 90 Z"');
     expect(homeHtml).not.toContain('d="M 12 90 L 100 8 L 188 90 Z"');
   });

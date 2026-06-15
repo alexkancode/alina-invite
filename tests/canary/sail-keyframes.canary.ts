@@ -39,10 +39,12 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(block.match(/[\d.]+%|from|to/g) ?? []).toHaveLength(SAIL_WEAVE.length);
   });
 
-  test('the headline text carries zero animation (reveal is on the clip, not the text)', () => {
+  test('the headline text carries zero animation and is coral like the CTA', () => {
     const headlineBlock = css.match(/\.headline \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(headlineBlock.length).toBeGreaterThan(0);
     expect(headlineBlock).not.toMatch(/animation/);
+    expect(headlineBlock).toMatch(/color: var\(--yait-coral\);/);
+    expect(css).toMatch(/\.envelope-art \{[\s\S]*?overflow: visible;/);
     const windowBlock = css.match(/\.reveal-window \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(windowBlock).toContain('clip-path: url(#yait-wave-clip)');
     expect(windowBlock).not.toMatch(/animation/);
