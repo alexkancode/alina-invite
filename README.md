@@ -14,6 +14,48 @@ A comprehensive photo upload and game integration system built with Astro, featu
 ```
 **→ See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide**
 
+## Outstanding TODO (as of 2026-06-15)
+
+Known open items after the CI-pipeline cleanup. The CI test gate (`test-api` +
+`test-e2e`) is green and consolidated into one workflow
+(`.github/workflows/deploy.yml`); the only thing blocking automated production deploys
+is item 1.
+
+1. **Add the `RAILWAY_TOKEN` secret to finish CI auto-deploy (primary).**
+   - Why: the `deploy-production` job runs
+     `railway up --service ... --environment production --detach` but fails with
+     `Invalid RAILWAY_TOKEN` because the GitHub Actions secret is empty. The
+     `RAILWAY_SERVICE_ID` repo variable is already set. `RAILWAY_TOKEN` is NOT stored as
+     an env var anywhere today - the local `~/.railway/config.json` is a rotating CLI
+     login session (account OAuth), not a CI-suitable project token.
+   - What: create a Railway **Project Token** (dashboard -> project
+     `invites-photo-system` -> Settings -> Tokens, scoped to the `production`
+     environment), then `gh secret set RAILWAY_TOKEN --body "<token>"`. Re-run the latest
+     workflow (or push to `main`) to validate `deploy-production` goes green.
+   - Meanwhile: `npm run party:deploy` is the working manual deploy path.
+
+2. **Triage the quarantined test backlog (see [QUARANTINE.md](./QUARANTINE.md)).**
+   - Why: ~33 test files / ~115 tests fail for pre-existing reasons (deleted source,
+     missing Spotify/storage credentials, malformed test harnesses, stale assertions),
+     unrelated to the deployable app. They are excluded from the gate so it can be green
+     and meaningful, and tracked there rather than deleted.
+   - What: work through QUARANTINE.md suite by suite, fix the root cause, and remove the
+     entry from the `QUARANTINED` array in `vitest.config.ts` or the `testMatch` in
+     `playwright.config.ts`.
+
+3. **Add an "un-quarantine" guard.**
+   - Why: a quarantined suite can silently start passing again and stay excluded, so the
+     backlog never shrinks on its own.
+   - What: a CI step that runs the quarantined suites and fails if any now pass,
+     prompting removal from quarantine.
+
+4. **Mobile headline reveal-edge tracking is approximate.**
+   - Why: the reveal sweep is a SMIL clip translate using the desktop `REVEAL_EDGE`
+     values; SMIL cannot be media-queried, so on mobile the wave edge tracks the boat
+     ~15% less precisely. It still fully reveals; this is cosmetic only.
+   - What (optional): drive the sweep responsively (JS-set values per viewport) for
+     pixel-accurate mobile tracking.
+
 ## 📁 **Project Structure**
 
 ```text
