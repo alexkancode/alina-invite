@@ -148,6 +148,11 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(echo).toMatch(/vector-effect: non-scaling-stroke;/);
   });
 
+  test('the echo wave is dropped down by its own height', () => {
+    const echo = css.match(/\.reveal-echo \{([\s\S]*?)\n\}/)?.[1] ?? '';
+    expect(echo).toMatch(/transform: translateY\(100%\);/);
+  });
+
   test('the second headline line is indented exactly 100px by rule', () => {
     expect(css).toMatch(/\.headline-line-indent \{\s*padding-left: 100px;/);
   });

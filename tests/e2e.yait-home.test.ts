@@ -219,6 +219,23 @@ test.describe('yait home hero', () => {
     expect(echo.clip === 'none' || echo.clip === '').toBe(true);
   });
 
+  test('the echo wave is dropped below the headline and adds no page scroll', async ({ page }) => {
+    await page.goto('/home');
+    const m = await page.evaluate(() => {
+      const echo = document.querySelector('.reveal-echo-line')!.getBoundingClientRect();
+      const headline = document.querySelector('.headline')!.getBoundingClientRect();
+      const d = document.documentElement;
+      return {
+        echoTop: echo.top, headlineBottom: headline.bottom,
+        overflowX: d.scrollWidth - d.clientWidth,
+        overflowY: d.scrollHeight - window.innerHeight
+      };
+    });
+    expect(m.echoTop).toBeGreaterThanOrEqual(m.headlineBottom - 1);
+    expect(m.overflowX).toBeLessThanOrEqual(1);
+    expect(m.overflowY).toBeLessThanOrEqual(1);
+  });
+
   test('the headline text element carries zero animation', async ({ page }) => {
     await page.goto('/home');
     const anims = await page.evaluate(() => ({
