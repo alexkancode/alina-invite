@@ -366,8 +366,7 @@ test.describe('yait home hero', () => {
   test('the wave rolls perceptibly while revealed text stays byte-stable', async ({ page }) => {
     await page.goto('/home');
     await page.evaluate(() => document.fonts.ready);
-    // Drive SMIL time directly: past the reveal the sweep/rotate are frozen (fill=freeze)
-    // and only the looping morph rolls the edge, over fully-revealed static text.
+    await page.evaluate(() => document.getAnimations({ subtree: true }).forEach(a => a.pause()));
     const seek = (t: number) => page.evaluate((time) => {
       const svg = document.querySelector('.bay-scene') as SVGSVGElement;
       svg.pauseAnimations();
