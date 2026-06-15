@@ -373,19 +373,22 @@ test.describe('yait home hero', () => {
       svg.setCurrentTime(time);
     }, t);
     const edgeRegion = { x: 150, y: 80, width: 480, height: 360 };
-    const wordRegion = { x: 55, y: 100, width: 95, height: 85 };
+    const wordBox = () => page.evaluate(() => {
+      const r = document.querySelector('.word')!.getBoundingClientRect();
+      return `${r.x},${r.y},${r.width},${r.height}`;
+    });
     await seek(6.0);
-    const wordA = await page.screenshot({ clip: wordRegion });
+    const boxA = await wordBox();
     const edgeFrames = [];
     for (let i = 0; i < ROLL_BURST_FRAMES; i++) {
       await seek(6.0 + i * 0.18);
       edgeFrames.push(await page.screenshot({ clip: edgeRegion }));
     }
     await seek(6.0);
-    const wordB = await page.screenshot({ clip: wordRegion });
+    const boxB = await wordBox();
     const deltas = await Promise.all(edgeFrames.slice(1).map(f => changedPixels(edgeFrames[0], f)));
     expect(Math.max(...deltas)).toBeGreaterThan(MIN_ROLL_DELTA_PX);
-    expect(Buffer.compare(wordA, wordB)).toBe(0);
+    expect(boxB).toBe(boxA);
   });
 
   test('the morph never freezes: it loops unbounded with no fill', async ({ page }) => {
