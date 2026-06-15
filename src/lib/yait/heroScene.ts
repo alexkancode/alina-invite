@@ -189,7 +189,7 @@ function wakeTail(g: WakeGeometry, phase: number, dir: number): string {
   });
   let d = `M ${r(top[0][0])} ${r(top[0][1])}`;
   for (let i = 1; i < top.length; i++) d += ` L ${r(top[i][0])} ${r(top[i][1])}`;
-  d += ` A ${g.maxHalf} ${g.maxHalf} 0 0 1 ${r(bottom[0][0])} ${r(bottom[0][1])}`;
+  d += ` A ${g.maxHalf} ${g.maxHalf} 0 0 0 ${r(bottom[0][0])} ${r(bottom[0][1])}`;
   for (let i = 1; i < bottom.length; i++) d += ` L ${r(bottom[i][0])} ${r(bottom[i][1])}`;
   d += ` A ${g.minHalf} ${g.minHalf} 0 0 1 ${r(top[0][0])} ${r(top[0][1])}`;
   return d + ' Z';

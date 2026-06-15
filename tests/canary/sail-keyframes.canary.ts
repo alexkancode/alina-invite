@@ -146,11 +146,14 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(echo).not.toMatch(/stroke-width/);
   });
 
-  test('the wake is anchored at the boat stern at the waterline', () => {
+  test('the wake is anchored at the boat stern and fades out after the boat docks', () => {
     const echo = css.match(/\.reveal-echo \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(echo).toMatch(/position: absolute;/);
     expect(echo).not.toMatch(/translateY/);
     expect(echo).toMatch(/right: 100%;/);
+    expect(echo).toMatch(/animation: wake-fade 1\.2s 5\.333s linear forwards;/);
+    expect(css).toMatch(/@keyframes wake-fade \{[\s\S]*?opacity: 0;/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reveal-echo \{\s*opacity: 0;/);
   });
 
   test('the second headline line is indented exactly 100px by rule', () => {

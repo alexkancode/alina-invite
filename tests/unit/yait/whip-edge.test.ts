@@ -23,6 +23,7 @@ describe('buildWakeTails (two trapezoidal V tails)', () => {
     expect((d.match(/M /g) ?? []).length).toBe(2);
     expect((d.match(/Z/g) ?? []).length).toBe(2);
     expect((d.match(/A /g) ?? []).length).toBe(4);
+    expect((d.match(new RegExp(`A ${WAKE_GEOMETRY.maxHalf} ${WAKE_GEOMETRY.maxHalf} 0 0 0 `, 'g')) ?? []).length).toBe(2);
   });
 
   test('thickens from the stern to the far end (~30px) and splays into a V', () => {

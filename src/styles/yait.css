@@ -133,6 +133,12 @@
   width: 225px;
   height: 80px;
   pointer-events: none;
+  animation: wake-fade 1.2s 5.333s linear forwards;
+}
+
+@keyframes wake-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .reveal-echo-line {
@@ -406,7 +412,12 @@
   .fry,
   .club,
   .cloud-layer,
-  .cloud-drift {
+  .cloud-drift,
+  .reveal-echo {
     animation: none;
+  }
+
+  .reveal-echo {
+    opacity: 0;
   }
 }
