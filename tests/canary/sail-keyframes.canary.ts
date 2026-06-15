@@ -148,10 +148,11 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(echo).toMatch(/vector-effect: non-scaling-stroke;/);
   });
 
-  test('the echo wave is anchored at the boat stern (absolute, no headline drop)', () => {
+  test('the echo wave is anchored at the boat stern and trails 3x long', () => {
     const echo = css.match(/\.reveal-echo \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(echo).toMatch(/position: absolute;/);
     expect(echo).not.toMatch(/translateY/);
+    expect(echo).toMatch(/width: 294%;/);
   });
 
   test('the second headline line is indented exactly 100px by rule', () => {

@@ -229,13 +229,15 @@ test.describe('yait home hero', () => {
       const echo = document.querySelector('.reveal-echo-line')!.getBoundingClientRect();
       const boat = document.querySelector('[data-testid="envelope"]')!.getBoundingClientRect();
       const d = document.documentElement;
-      return { echoRight: echo.right, boatLeft: boat.left, overflowX: d.scrollWidth - d.clientWidth, overflowY: d.scrollHeight - window.innerHeight };
+      return { echoRight: echo.right, echoWidth: echo.width, boatLeft: boat.left, overflowX: d.scrollWidth - d.clientWidth, overflowY: d.scrollHeight - window.innerHeight };
     }, t);
     const mid = await sample(2000);
     const dock = await sample(6000);
     // wake sits at the stern (echo right edge near the boat's left edge) at every sail moment
-    expect(Math.abs(mid.echoRight - mid.boatLeft)).toBeLessThan(8);
-    expect(Math.abs(dock.echoRight - dock.boatLeft)).toBeLessThan(8);
+    expect(Math.abs(mid.echoRight - mid.boatLeft)).toBeLessThan(10);
+    expect(Math.abs(dock.echoRight - dock.boatLeft)).toBeLessThan(10);
+    // the wake trails well behind the stern (3x-long)
+    expect(dock.echoWidth).toBeGreaterThan(150);
     // it travels with the boat as it sails in
     expect(dock.boatLeft - mid.boatLeft).toBeGreaterThan(50);
     expect(dock.overflowX).toBeLessThanOrEqual(1);

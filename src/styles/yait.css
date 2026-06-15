@@ -128,9 +128,9 @@
 
 .reveal-echo {
   position: absolute;
-  left: -98%;
+  left: -294%;
   bottom: -13px;
-  width: 98%;
+  width: 294%;
   height: 48px;
   pointer-events: none;
 }
