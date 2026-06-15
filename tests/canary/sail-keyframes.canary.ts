@@ -138,11 +138,11 @@ describe('sail keyframes match the three-beat spec', () => {
     expect(css).not.toMatch(/\.line-mask/);
   });
 
-  test('the mirrored wake is a semi-transparent white fill (tapered ribbon, no stroke)', () => {
+  test('the wake is filled by the transparent-to-0.45 gradient (no stroke, no flat opacity)', () => {
     const echo = css.match(/\.reveal-echo-line \{([\s\S]*?)\n\}/)?.[1] ?? '';
     expect(echo.length).toBeGreaterThan(0);
-    expect(echo).toMatch(/fill: #ffffff;/);
-    expect(echo).toMatch(/fill-opacity: 0\.45;/);
+    expect(echo).toMatch(/fill: url\(#yait-wake-grad\);/);
+    expect(echo).not.toMatch(/fill-opacity/);
     expect(echo).not.toMatch(/stroke-width/);
   });
 

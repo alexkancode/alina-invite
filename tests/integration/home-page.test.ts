@@ -117,6 +117,9 @@ describe('GET /home', () => {
     const d = echo.match(/class="reveal-echo-line" d="([^"]+)"/)?.[1] ?? '';
     expect((d.match(/M /g) ?? []).length).toBe(2);
     expect((d.match(/A /g) ?? []).length).toBe(4);
+    expect(echo).toContain('id="yait-wake-grad"');
+    expect(echo).toContain('stop-opacity="0"');
+    expect(echo).toContain('stop-opacity="0.45"');
     expect(echo).not.toContain('type="translate"');
     expect(echo).not.toContain('clip-path');
   });

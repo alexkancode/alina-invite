@@ -151,8 +151,7 @@
 }
 
 .reveal-echo-line {
-  fill: #ffffff;
-  fill-opacity: 0.45;
+  fill: url(#yait-wake-grad);
 }
 
 .headline-line {

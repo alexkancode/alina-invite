@@ -206,15 +206,14 @@ test.describe('yait home hero', () => {
     expect(atBeat).not.toBe(between);
   });
 
-  test('the boat wake is a translucent white fill that reveals nothing', async ({ page }) => {
+  test('the boat wake is filled by the fade-in gradient and reveals nothing', async ({ page }) => {
     await page.goto('/home');
     const echo = await page.evaluate(() => {
       const el = document.querySelector('.reveal-echo-line')!;
       const s = getComputedStyle(el);
-      return { fill: s.fill, opacity: s.fillOpacity, clip: s.clipPath };
+      return { fill: s.fill, clip: s.clipPath };
     });
-    expect(echo.fill).toBe('rgb(255, 255, 255)');
-    expect(Number(echo.opacity)).toBeCloseTo(0.45, 2);
+    expect(echo.fill).toContain('yait-wake-grad');
     expect(echo.clip === 'none' || echo.clip === '').toBe(true);
   });
 

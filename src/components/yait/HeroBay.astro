@@ -109,6 +109,12 @@ const fryStyle = (fry: (typeof fries)[number]) =>
 
   <div class="envelope-track" data-testid="envelope">
     <svg class="reveal-echo" viewBox={wakeViewBox} preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="yait-wake-grad" gradientUnits="userSpaceOnUse" x1={WAKE_GEOMETRY.width} y1="40" x2="0" y2="40">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0"></stop>
+          <stop offset="1" stop-color="#ffffff" stop-opacity="0.45"></stop>
+        </linearGradient>
+      </defs>
       <path class="reveal-echo-line" d={WAKE_FRAMES[0]}>
         <animate
           attributeName="d"
