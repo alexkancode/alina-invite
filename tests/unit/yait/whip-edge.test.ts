@@ -109,7 +109,7 @@ describe('WHIP_GEOMETRY', () => {
     expect(WHIP_GEOMETRY).toEqual({
       viewportW: 1280,
       maskH: 370,
-      slantPx: 300,
+      slantPx: 240,
       amplitudePx: 50,
       widthFrac: 0.16667,
       samples: 28

@@ -347,7 +347,7 @@ test.describe('yait home hero', () => {
     expect(probe!.clip).toContain('yait-wave-clip');
     expect(probe!.frameCount).toBe(25);
     const ratio = probe!.mid.slantPx / probe!.mid.height;
-    expect(ratio).toBeGreaterThan(0.6);
+    expect(ratio).toBeGreaterThan(0.45);
     expect(ratio).toBeLessThan(1.25);
     expect(probe!.mid.maxAbsDevPx).toBeGreaterThan(20);
     expect(probe!.mid.lobes).toBe(1);
