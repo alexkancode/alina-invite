@@ -219,21 +219,27 @@ test.describe('yait home hero', () => {
     expect(echo.clip === 'none' || echo.clip === '').toBe(true);
   });
 
-  test('the echo wave is dropped below the headline and adds no page scroll', async ({ page }) => {
+  test('the echo wave is the boat wake: pinned to the stern, rides the sail, no scroll', async ({ page }) => {
     await page.goto('/home');
-    const m = await page.evaluate(() => {
+    const isDescendant = await page.evaluate(() =>
+      document.querySelector('[data-testid="envelope"]')!.contains(document.querySelector('.reveal-echo')));
+    expect(isDescendant).toBe(true);
+    const sample = (t: number) => page.evaluate((ms) => {
+      document.getAnimations({ subtree: true }).forEach(a => { a.pause(); a.currentTime = ms; });
       const echo = document.querySelector('.reveal-echo-line')!.getBoundingClientRect();
-      const headline = document.querySelector('.headline')!.getBoundingClientRect();
+      const boat = document.querySelector('[data-testid="envelope"]')!.getBoundingClientRect();
       const d = document.documentElement;
-      return {
-        echoTop: echo.top, headlineBottom: headline.bottom,
-        overflowX: d.scrollWidth - d.clientWidth,
-        overflowY: d.scrollHeight - window.innerHeight
-      };
-    });
-    expect(m.echoTop).toBeGreaterThanOrEqual(m.headlineBottom - 1);
-    expect(m.overflowX).toBeLessThanOrEqual(1);
-    expect(m.overflowY).toBeLessThanOrEqual(1);
+      return { echoRight: echo.right, boatLeft: boat.left, overflowX: d.scrollWidth - d.clientWidth, overflowY: d.scrollHeight - window.innerHeight };
+    }, t);
+    const mid = await sample(2000);
+    const dock = await sample(6000);
+    // wake sits at the stern (echo right edge near the boat's left edge) at every sail moment
+    expect(Math.abs(mid.echoRight - mid.boatLeft)).toBeLessThan(8);
+    expect(Math.abs(dock.echoRight - dock.boatLeft)).toBeLessThan(8);
+    // it travels with the boat as it sails in
+    expect(dock.boatLeft - mid.boatLeft).toBeGreaterThan(50);
+    expect(dock.overflowX).toBeLessThanOrEqual(1);
+    expect(dock.overflowY).toBeLessThanOrEqual(1);
   });
 
   test('the headline text element carries zero animation', async ({ page }) => {

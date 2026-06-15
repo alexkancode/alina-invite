@@ -103,6 +103,9 @@ const fryStyle = (fry: (typeof fries)[number]) =>
         ))}
       </h1>
     </div>
+  </div>
+
+  <div class="envelope-track" data-testid="envelope">
     <svg class="reveal-echo" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
       <g transform="translate(0 1) scale(1 -1)">
         <path class="reveal-echo-line" d={WHIP_LINE_FRAMES[0]}>
@@ -111,21 +114,9 @@ const fryStyle = (fry: (typeof fries)[number]) =>
             values={WHIP_LINE_FRAMES.join(';')}
             dur={`${WHIP.durationMs / 1000}s`}
             repeatCount="indefinite"></animate>
-          <animateTransform
-            attributeName="transform"
-            type="translate"
-            values={revealSweep.values}
-            keyTimes={revealSweep.keyTimes}
-            dur={revealSweep.dur}
-            fill="freeze"
-            calcMode="spline"
-            keySplines={revealSweep.keySplines}></animateTransform>
         </path>
       </g>
     </svg>
-  </div>
-
-  <div class="envelope-track" data-testid="envelope">
     <div class="envelope">
     <div class="envelope-pivot">
     <svg class="envelope-flap" viewBox="0 0 200 140">
