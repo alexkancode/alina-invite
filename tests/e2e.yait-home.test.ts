@@ -223,9 +223,16 @@ test.describe('yait home hero', () => {
     const isDescendant = await page.evaluate(() =>
       document.querySelector('[data-testid="envelope"]')!.contains(document.querySelector('.reveal-echo')));
     expect(isDescendant).toBe(true);
-    const swivelsWithBoat = await page.evaluate(() =>
-      document.querySelector('.reveal-echo')!.getAnimations().some(a => (a as CSSAnimation).animationName === 'pivot'));
-    expect(swivelsWithBoat).toBe(true);
+    const swivels = await page.evaluate(() =>
+      document.querySelector('.reveal-echo')!.getAnimations().some(a => (a as CSSAnimation).animationName === 'wake-pivot'));
+    expect(swivels).toBe(true);
+    const m13 = await page.evaluate(() => {
+      document.getAnimations({ subtree: true }).forEach(a => { a.pause(); a.currentTime = 1111; });
+      const parse = (sel: string) => new DOMMatrixReadOnly(getComputedStyle(document.querySelector(sel)!).transform).m13;
+      return { wake: parse('.reveal-echo'), boat: parse('.envelope-pivot') };
+    });
+    // the wake swivels opposite to the boat at the beat
+    expect(m13.wake * m13.boat).toBeLessThan(0);
     const sample = (t: number) => page.evaluate((ms) => {
       document.getAnimations({ subtree: true }).forEach(a => { a.pause(); a.currentTime = ms; });
       const echo = document.querySelector('.reveal-echo-line')!.getBoundingClientRect();

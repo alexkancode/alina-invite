@@ -100,6 +100,13 @@ describe('GET /home', () => {
     expect(sweep.endsWith('-0.15 0')).toBe(true);
   });
 
+  test('the red flag points left (backward) and the back flap is flush with the envelope', () => {
+    expect(homeHtml).toContain('d="M32 10 L2 18 L32 26 Z"');
+    expect(homeHtml).not.toContain('d="M14 10 L44 18 L14 26 Z"');
+    expect(homeHtml).toContain('d="M 4 90 L 100 8 L 196 90 Z"');
+    expect(homeHtml).not.toContain('d="M 12 90 L 100 8 L 188 90 Z"');
+  });
+
   test('the boat wake is a tapered ribbon inside the envelope that wiggles and reveals nothing', () => {
     expect(homeHtml).toContain('class="reveal-echo"');
     expect(homeHtml).toContain('class="reveal-echo-line"');

@@ -134,12 +134,20 @@
   height: 80px;
   pointer-events: none;
   transform-origin: 100% 50%;
-  animation: wake-fade 1.2s 5.333s linear forwards, pivot 4.444s ease-in-out both;
+  animation: wake-fade 1.2s 5.333s linear forwards, wake-pivot 4.444s ease-in-out both;
 }
 
 @keyframes wake-fade {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+
+@keyframes wake-pivot {
+  0% { transform: perspective(600px) rotateY(0deg); }
+  25% { transform: perspective(600px) rotateY(-20deg); }
+  47% { transform: perspective(600px) rotateY(0deg); }
+  68.75% { transform: perspective(600px) rotateY(-20deg); }
+  to { transform: perspective(600px) rotateY(0deg); }
 }
 
 .reveal-echo-line {
